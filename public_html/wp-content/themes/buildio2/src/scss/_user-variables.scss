@@ -1,0 +1,55 @@
+// user-variables.scss
+// Use this to overwrite Bootstrap and Front variables
+//
+
+
+// Example of a variable override to change Front's primary color and font size
+// Remove the "//" to comment it in and see it in action!
+// $primary: $red;
+// $font-size-base: .875rem;
+
+// The color of the SVG loader should be modified manually.
+// See assets/svg/components/circle-preloader.svg
+
+
+@font-face {
+	font-family: 'Inter var';
+	src: url('../fonts/Inter-Regular.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Inter var';
+	src: url('../fonts/Inter-SemiBold.woff2') format('woff2');
+	font-weight: 600;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Inter var';
+	src: url('../fonts/Inter-Bold.woff2') format('woff2');
+	font-weight: 700;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'Inter var';
+	src: url('../fonts/Inter-ExtraBold.woff2') format('woff2');
+	font-weight: 800;
+	font-style: normal;
+}
+  
+  
+  $font-family-base: "Inter var", sans-serif;
+  $font-family-sans-serif: "Inter var", sans-serif;
+  body,h1,h2,h3,h4,h5,p,div,a,td,th,button,ul,li,ol{
+	  font-feature-settings:"cv02","cv03","cv04","cv11";
+  }
+
+/*$primary: #1B7DC5; */
+$primary: #711FE6;
+$dark: #4A0C8F;
+$gray-700: #474747;
+$navbar-brand-default-width:10.5rem;
+

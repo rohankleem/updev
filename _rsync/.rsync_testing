@@ -1,0 +1,16 @@
+- rktest/rktest3.txt
+- rktest/rktest5.txt
+
+#+ secret
+#+ storage
+#+ vendor
+
+#+ rktest/
+- rktest/three/cumquat/carrot/cat/holden/
++ rktest/***
+
+
+- *
+
+#aim
+## uploads - only adds, doesn't replace or delete

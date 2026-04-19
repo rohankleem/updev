@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "WebFetch(domain:unipixelhq.com)",
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost/uphq/)",
+      "Bash(curl -s http://localhost/)",
+      "Bash(curl -s http://uphq.local.site/)",
+      "WebFetch(domain:uphq.local.site)",
+      "Bash(find /c/xampp/htdocs/uphq/public_html/wp-content/themes/buildio2/page-templates -type f -name *.php)",
+      "Bash(grep -v \"^$\")",
+      "Bash(find C:xampphtdocsuphqpublic_htmlwp-contentthemesbuildio2 -type f \\\\\\(-name *index* -o -name *blog* \\\\\\))",
+      "Bash(grep -E \"\\\\.php$\")",
+      "Bash(find /c/xampp/htdocs/uphq/public_html/wp-content/plugins -name *.php -type f)",
+      "Bash(npx webpack:*)",
+      "Bash(robocopy \"C:\\\\xampp\\\\htdocs\\\\uphq\" \"C:\\\\xampp\\\\htdocs\\\\updev\" /E /XD \".git\" \"node_modules\" \"_ignore*\" \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\vendor\" \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\public_html\\\\wp-content\\\\uploads\" \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\public_html\\\\wp-content\\\\plugins\\\\unipixel\" /XF \"*.log\" /R:1 /W:1 /NFL /NDL /NP)",
+      "Bash(echo \"---EXIT: $?---\")",
+      "Bash(MSYS_NO_PATHCONV=1 robocopy \"C:\\\\xampp\\\\htdocs\\\\uphq\" \"C:\\\\xampp\\\\htdocs\\\\updev\" /E /XD \".git\" \"node_modules\" \"_ignore*\" \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\vendor\" \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\public_html\\\\wp-content\\\\uploads\" \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\public_html\\\\wp-content\\\\plugins\\\\unipixel\" /XF \"*.log\" /R:1 /W:1 /NFL /NDL /NP)"
+    ]
+  }
+}

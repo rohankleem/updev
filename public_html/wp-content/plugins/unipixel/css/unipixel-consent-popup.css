@@ -1,0 +1,204 @@
+/* === General container styling === */
+.unipixel-card {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 1.5rem;
+  max-width: 700px;
+  background: var(--upx-bg, #fff);
+  color: var(--upx-text, #222);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 1rem 1.25rem;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  z-index: 9999;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.unipixel-card h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.unipixel-text {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.unipixel-text-small {
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+/* === Buttons === */
+.unipixel-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.upx-btn {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.upx-btn-dark {
+  background: #333;
+  color: #fff;
+}
+
+.upx-btn-dark-main {
+  background: #333;
+  color: #fff;
+  padding: 14px 38px;
+  font-weight: bold;
+}
+
+.upx-btn-dark:hover {
+  background: #000;
+}
+
+.upx-btn-outline {
+  background: transparent;
+  border: 1px solid #888;
+  color: #333;
+}
+
+.upx-btn-outline:hover {
+  background: #f0f0f0;
+}
+
+/* === Toggle Switches === */
+.upx-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0;
+}
+
+.upx-switch input[type="checkbox"] {
+  appearance: none;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: #ccc;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.upx-switch input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+}
+
+.upx-switch input[type="checkbox"]:checked {
+  background: #333;
+}
+
+.upx-switch input[type="checkbox"]:checked::before {
+  transform: translateX(16px);
+}
+
+.upx-switch label {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* === Dark mode === */
+@media (prefers-color-scheme: dark) {
+  .unipixel-card {
+    --upx-bg: #1f1f1f;
+    --upx-text: #f1f1f1;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+  }
+
+  .upx-btn-dark {
+    background: #eee;
+    color: #111;
+  }
+
+  .upx-btn-outline {
+    border-color: #aaa;
+    color: #eee;
+  }
+
+  .upx-switch input[type="checkbox"] {
+    background: #555;
+  }
+
+  .upx-switch input[type="checkbox"]:checked {
+    background: #ddd;
+  }
+
+  .upx-switch label {
+    color: #f1f1f1;
+  }
+}
+
+/* === Animation === */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+
+
+
+/* === Overlay === */
+#unipixel-consent-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 9998;
+  animation: fadeInOverlay 0.3s ease-out;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* === Card styling === */
+.unipixel-card {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 2rem;
+  max-width: 600px;
+  background: var(--upx-bg, #fff);
+  color: var(--upx-text, #222);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  padding: 1rem 1.25rem;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  z-index: 9999;
+  animation: fadeInUp 0.3s ease-out;
+}
+

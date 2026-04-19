@@ -1,0 +1,300 @@
+:root {
+    --bs-primary: #4A54F5;
+    /* Force the Bootstrap purple color as the primary color */
+
+    --bs-blue: #0d6efd;
+    --bs-indigo: #6610f2;
+    --bs-purple: #6f42c1;
+    --bs-pink: #d63384;
+    --bs-secondary: #6c757d;
+    --bs-success: #198754;
+    --bs-info: #0dcaf0;
+    --bs-warning: #ffc107;
+    --bs-danger: #dc3545;
+    --bs-light: #f8f9fa;
+    --bs-dark: #212529;
+}
+
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #3e47d4;
+    /* Adjust this as needed */
+    --bs-btn-hover-border-color: #3e47d4;
+    /* Adjust this as needed */
+    --bs-btn-focus-shadow-rgb: 74, 84, 245;
+    /* Update this to match the RGB value */
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #3e47d4;
+    /* Adjust this as needed */
+    --bs-btn-active-border-color: #3e47d4;
+    /* Adjust this as needed */
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: var(--bs-primary);
+    --bs-btn-disabled-border-color: var(--bs-primary);
+}
+
+
+
+.UniPixelShell div,
+.UniPixelShell p,
+.UniPixelShell span,
+.UniPixelShell input,
+.UniPixelShell label {
+    font-size: .92rem;
+}
+
+.UniPixelShell {
+    padding: 20px;
+}
+
+.UniPixelShell h1 {
+    font-size: 1.6rem;
+    margin-bottom: .9em;
+}
+
+.UniPixelShell h2 {
+    font-size: 1.3rem;
+    margin-bottom: .8em;
+}
+
+.UniPixelShell h3 {
+    font-size: 1.2rem;
+    margin-bottom: .8em;
+}
+
+.UniPixelShell h4 {
+    font-size: 1.15rem;
+    margin-bottom: .8em;
+}
+
+
+.notice {
+    display: none
+}
+
+
+
+/* Loader and mask styles */
+.loading-mask {
+    position: relative;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.loading-mask::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 1040;
+    /* Lower z-index for the mask */
+}
+
+.UniPixelSpinner {
+    position: absolute;
+    inset: 0;
+    display: none;
+    /* shown/hidden by JS */
+    z-index: 1050;
+    /* above the mask (::after at 1040) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.UniPixelListeningTxt{
+    animation: fadePulse 1.5s ease-in-out infinite;
+}
+@keyframes fadePulse {
+    0%   { opacity: 1; }
+    50%  { opacity: 0.2; }
+    100% { opacity: 1; }
+}
+
+
+
+/* Style the form labels */
+.UniPixelShell .form-group .col-form-label {
+    font-weight: bold;
+}
+
+/* Style the form controls */
+.UniPixelShell .form-control {
+    width: 100%;
+    max-width: 500px;
+}
+
+/* Style the submit button */
+.UniPixelShell .btn.btn-primary {
+    font-size: 1rem;
+    /* Adjust to your preferred size */
+}
+
+.UniPixelShell .card {
+    /*override wp card max width*/
+    max-width: 100%;
+}
+
+
+.UniPixelShell .bg-light-green {
+    background-color: #D6F3DF;
+}
+
+.UniPixelShell .bg-light-light-green {
+    background-color: #e2f7e9;
+}
+
+.UniPixelShell .bg-light-purple {
+    background-color: #D1D4FC;
+}
+
+.UniPixelShell .bg-light-blue {
+    background-color: #DEEAFD;
+}
+
+.UniPixelShell .bg-light-red {
+    background-color: #FCDDD6;
+}
+
+.UniPixelShell .bg-light-green,
+.UniPixelShell .bg-light-purple,
+.UniPixelShell .bg-light-blue,
+.UniPixelShell .bg-light-red {
+    border-radius: .25rem;
+    /* Optional: to match Bootstrap card border radius */
+    padding: 1rem;
+    /* Optional: to add some padding */
+    margin-bottom: 1rem;
+    /* Optional: to add some space between cards */
+}
+
+
+.UniPixelShell .borderless {
+    border: none;
+}
+
+
+.UniPixelShell .form-check.form-switch input[type=checkbox]:checked {}
+
+.UniPixelShell .form-check.form-switch .form-check-input {
+    margin-top: 3px;
+    background-repeat: no-repeat !important;
+}
+
+
+.UniPixelShell .form-check.form-switch input[type=checkbox] {
+
+    /*width: 3rem !important;*/
+    width: 38px !important;
+    height: 22px !important;
+}
+
+.UniPixelShell .form-check.form-switch input[type=checkbox]::before {}
+
+
+.UniPixelShell .form-check.form-switch input[type=checkbox]:checked::before {
+    content: "";
+}
+
+
+.UniPixelShell .form-check input[type=radio] {
+    margin-top: 6px !important;
+}
+
+
+.UniPixelShell .nav-tabs dd,
+.UniPixelShell .nav-tabs li {
+    margin-bottom: 0;
+}
+
+
+.UniPixelShell .underline-tabs .nav-tabs {
+    border-bottom: 2px solid #e9ecef;
+}
+
+.UniPixelShell .underline-tabs .nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 1rem 1.5rem;
+    margin-bottom: -2px;
+    font-weight: 500;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.UniPixelShell .underline-tabs .nav-link:hover {
+    border-bottom-color: #0d6efd50;
+    color: #0d6efd;
+}
+
+.UniPixelShell .underline-tabs .nav-link.active {
+    border-bottom-color: #0d6efd;
+    color: #0d6efd;
+}
+
+/* Content Animation */
+.UniPixelShell .tab-pane.fade {
+    transition: all 0.2s ease-out;
+}
+
+.UniPixelShell .tab-pane.fade.show {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+
+.UniPixelShell .msoft-disabled th,
+.UniPixelShell .msoft-disabled td {
+    opacity: 0.5;
+    background-color: #f9f9f9 !important;
+    pointer-events: none;
+}
+
+
+
+/* ==============================================
+   UniPixel Admin — Events Table Layout
+   ============================================== */
+
+
+
+
+.UniPixelShell .colSendClientSide,
+.UniPixelShell .colSendServerSide,
+.UniPixelShell .colLogResponse{
+    width: 140px;
+}
+
+.UniPixelShell .colDelete{
+    width: 80px;
+}
+
+
+.UniPixelPopover{
+    --bs-popover-max-width: 400px;
+}
+
+.UniPixelShell ul{
+        font-size: .92rem;
+}
+
+

@@ -1,0 +1,358 @@
+/*------------------------------------
+  File for your custom SCSS style
+------------------------------------*/
+
+h1,h2,h3,h4,h5,h6{
+  font-family: "Comfortaa", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+.display-1, .display-2, .display-3, .display-4,.display-5{
+  font-weight: 700;
+}
+
+p,td,div,body, ul, li {
+  font-family: "Poppins", sans-serif;
+}
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.poppins-regular-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.poppins-semibold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+
+
+#header {
+	padding-top: 0.85rem;
+	padding-bottom: 0.85rem;
+}
+
+
+.header-soft {
+	background-color: transparent !important;
+	border-bottom: 1px solid #ddd;
+}
+
+
+.icon-container svg {
+  width: 24px;  /* or whatever size you desire */
+  height: 24px;
+  display: block; /* this helps remove any potential unwanted whitespace around the SVG */
+}
+
+
+.swiper-wrapper {
+  transition-timing-function: linear !important
+}
+
+.swiper-slide{
+  height: auto;
+}
+
+#wpdcom{
+  max-width: 100% !important;
+}
+
+
+.swiperBlogSnippets{
+
+
+  
+}
+
+.swiper-button-disabled{
+  display:none;   
+}
+
+
+.tempHide{
+  display:none
+}
+
+
+
+.bg-light-green {
+  background-color: #D6F3DF;
+}
+
+.bg-light-purple {
+  background-color: #D1D4FC;
+}
+
+.bg-light-blue {
+  background-color: #DEEAFD;
+}
+
+.bg-light-green, .bg-light-purple, .bg-light-blue {
+  border-radius: .25rem; /* Optional: to match Bootstrap card border radius */
+  padding: 1rem; /* Optional: to add some padding */
+  margin-bottom: 1rem; /* Optional: to add some space between cards */
+}
+
+
+.borderless {
+  border: none;
+}
+
+
+.largeSvgIcon svg{
+width:14rem;
+height:14rem;
+
+}
+
+.backGradient1 {
+  --c0: #1f237a;  /* deep left shadow */
+  --c1: #4a54f5;  /* primary */
+  --c2: #7a82ff;  /* highlight */
+  background: linear-gradient(100deg, var(--c0) 0%, var(--c1) 45%, var(--c2) 100%);
+}
+
+.backGradient2 {
+  --c0: #17194f;
+  --c1: #3d45d8;
+  --c2: #9ea4ff;
+  background: linear-gradient(110deg, var(--c0) 0%, var(--c1) 55%, var(--c2) 100%);
+}
+
+.backGradient3 {
+  --c0: #161c66;
+  --c1: #4a54f5;
+  --c2: #b1b4ff;
+  background: linear-gradient(115deg, var(--c0) 0%, var(--c1) 60%, var(--c2) 100%);
+}
+
+.backGradient4 {
+  --c0: #121530;
+  --c1: #2f3aa9;
+  --c2: #c5c7ff;
+  background: linear-gradient(120deg, var(--c0) 0%, var(--c1) 50%, var(--c2) 100%);
+}
+
+
+
+.hero-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;          /* BACKGROUND */
+  pointer-events: none;
+}
+
+.hero-bg .container,
+.hero-bg .row,
+.hero-bg [class*="col-"] {
+  position: relative;
+  z-index: 1;          /* FOREGROUND */
+}
+
+
+
+.xImgHero1{max-width:125% !important}
+
+
+
+.stats-marquee{
+  width: 100%;
+  overflow: hidden;
+}
+
+/* This becomes the “carousel surface” */
+.stats-marquee__scroller{
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  cursor: grab;
+  user-select: none;
+
+  /* Hide scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.stats-marquee__scroller::-webkit-scrollbar{
+  display: none;
+}
+.stats-marquee__scroller:active{
+  cursor: grabbing;
+}
+
+.stats-marquee__inner{
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  width: max-content !important;
+}
+
+.stats-marquee__track{
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 1rem;
+  padding-right: 1rem; /* space between Track A and B */
+}
+
+.stats-marquee__item{
+  flex: 0 0 auto !important;
+  width: 51vw; /* your 60% sizing */
+}
+
+@media (min-width: 576px){ .stats-marquee__item{ width: 28.8vw; } }
+@media (min-width: 992px){ .stats-marquee__item{ width: 19.2vw; } }
+@media (min-width: 1200px){ .stats-marquee__item{ width: 14.4vw; } }
+
+.stats-marquee__item{ min-width: 220px; }
+
+/* Stop icons stealing pointer events while dragging */
+.stats-marquee .svg-icon{ pointer-events: none; }
+
+
+
+@keyframes statsMarqueeMove {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+
+/*------------------------------------
+  Offcanvas mobile menu
+------------------------------------*/
+
+#navbarOffcanvas {
+  --bs-offcanvas-width: 95%;
+  --bs-offcanvas-padding-x: 0.75rem;
+  --bs-offcanvas-padding-y: 0.75rem;
+  --bs-offcanvas-transition: transform 0.35s ease-in-out;
+  transition: transform 0.35s ease-in-out !important;
+
+  .offcanvas-body {
+    overflow-x: hidden;
+  }
+
+  // On desktop (lg+), prevent offcanvas overflow from clipping dropdown menus
+  @media (min-width: 992px) {
+    overflow: visible !important;
+
+    .offcanvas-body {
+      overflow: visible !important;
+    }
+
+    .hs-sub-menu.dropdown-menu {
+      width: max-content;
+    }
+
+    .dropdown-item {
+      white-space: nowrap;
+    }
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+  }
+
+  .dropdown-item .text-truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .dropdown-item .badge {
+    flex-shrink: 0;
+  }
+
+}
+
+
+/*------------------------------------
+  Mega menu animation speed
+------------------------------------*/
+
+.hs-sub-menu.animated,
+.hs-mega-menu.animated {
+  animation-duration: 300ms;
+}
+
+
+/*------------------------------------
+  Blog single post
+------------------------------------*/
+
+.blog-single {
+  max-width: 60rem; /* ~960px — readable content width */
+  padding-left: 2.5rem;
+  padding-right: 2.4rem;
+}
+
+.blog-single p {
+  margin-bottom: 1.4rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.blog-single h1,
+.blog-single h2,
+.blog-single h3,
+.blog-single h4,
+.blog-single h5,
+.blog-single h6 {
+  color: $primary;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.blog-single h1 {
+  margin-top: 0;
+}
+
+.blog-single .entry-meta {
+  font-size: 0.875rem;
+}
+
+.blog-single .entry-content img {
+  border-radius: 0.5rem;
+}
+
+.blog-single .wp-block-code code {
+  display: block;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  background-color: #f9f9f9;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.625rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}

@@ -1,0 +1,137 @@
+/*------------------------------------
+  Documentation Layout
+------------------------------------*/
+
+.docs-layout {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ---- Left Sidebar Nav ---- */
+
+.docs-sidebar {
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+
+.docs-sidebar .nav-subtitle {
+  padding-left: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.docs-sidebar .nav-link {
+  color: #677788;
+  font-size: 0.875rem;
+  padding: 0.45rem 1rem;
+  border-radius: 0;
+  border-left: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: #1e2022;
+    background-color: rgba(0, 0, 0, 0.025);
+  }
+
+  &.active {
+    color: #1e2022;
+    font-weight: 600;
+    background-color: rgba(111, 66, 193, 0.05);
+    border-left-color: #6f42c1;
+  }
+
+  .docs-chevron {
+    font-size: 0.55rem;
+    opacity: 0.5;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+  }
+
+  &:hover .docs-chevron,
+  &.active .docs-chevron {
+    opacity: 1;
+  }
+}
+
+// Nested children
+.docs-sidebar .nav-collapse {
+  .nav-link {
+    padding-left: 2rem;
+    font-size: 0.8125rem;
+  }
+}
+
+
+/* ---- Right TOC ---- */
+
+.docs-toc {
+  position: sticky;
+  top: 5rem;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+  padding-left: 1rem;
+  border-left: 1px solid #e7eaf3;
+}
+
+.docs-toc .nav-subtitle {
+  padding-left: 0;
+  margin-bottom: 0.5rem;
+}
+
+.docs-toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  a {
+    display: block;
+    padding: 0.2rem 0;
+    color: #677788;
+    text-decoration: none;
+    font-size: 0.8125rem;
+    transition: color 0.15s;
+
+    &:hover,
+    &.active {
+      color: #6f42c1;
+    }
+  }
+
+  .docs-toc-h3 {
+    padding-left: 0.75rem;
+  }
+}
+
+
+/* ---- Main Content ---- */
+
+.docs-content {
+  min-height: 50vh;
+
+  h2, h3, h4 {
+    scroll-margin-top: 5rem;
+  }
+}
+
+
+/* ---- Responsive ---- */
+
+@media (max-width: 991.98px) {
+  .docs-sidebar,
+  .docs-toc {
+    position: static;
+    max-height: none;
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .docs-toc {
+    border-top: 1px solid #e7eaf3;
+    padding-top: 1rem;
+    margin-top: 2rem;
+  }
+}

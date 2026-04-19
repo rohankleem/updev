@@ -1,0 +1,7 @@
+# PHP files to exclude
+unipixel.php
+# Exclude the entire 'assets' folder
+assets
+# Exclude Claude Code files
+.claude
+CLAUDE.md

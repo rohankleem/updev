@@ -1,0 +1,21 @@
+- wp-content/uploads/
+- wp-content/cache/
+- wp-content/mcloud-reports/
+- wp-content/mcloud-view-cache/
+- wp-content/languages/
+- wp-content/languages/
+- wp-content/autoptimize*
+- wp-content/uploads/
+- .well-known/
+- .htaccess
+- php.ini
+- wp-content/plugins/formidable/css/formidableforms.css
++ *
+
+
+#+ wp-admin/***
+#+ wp-content/***
+#+ wp-plugins/***
+
+#aim
+## uploads - only adds, doesn't replace or delete

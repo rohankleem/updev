@@ -1,0 +1,9 @@
+_ignore*
+.env
+composer.lock
+vendor/*
+.vscode
+public_html/wp-content/uploads
+*.log
+public_html/wp-content/themes/buildio2/node_modules
+public_html/wp-content/themes/buildio2/dist/*.bundle.*

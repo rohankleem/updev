@@ -1,0 +1,32 @@
+{
+  "scripts": {
+    "dev": "npx webpack build --mode development",
+    "prod": "npx webpack build --mode production",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "npx webpack watch --mode development"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.1",
+    "swiper": "^11.0.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
+    "autoprefixer": "^10.4.14",
+    "babel-loader": "^9.1.2",
+    "css-loader": "^6.8.1",
+    "css-minimizer-webpack-plugin": "^4.2.2",
+    "html-webpack-plugin": "^5.5.3",
+    "mini-css-extract-plugin": "^2.7.6",
+    "postcss-loader": "^7.3.3",
+    "raw-loader": "^4.0.2",
+    "sass": "^1.64.2",
+    "sass-loader": "^13.3.2",
+    "style-loader": "^3.3.3",
+    "svg-inline-loader": "^0.8.2",
+    "svg-sprite-loader": "^6.0.11",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}
