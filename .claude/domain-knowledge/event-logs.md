@@ -1,6 +1,8 @@
-# How to Use UniPixel's Stored Event Logs
+# Stored Event Logs — User Guide
 
-> **Purpose:** Help/docs page for unipixelhq.com. Written for store owners, not developers. References screenshots that need to be created from annotated captures.
+> **Dual purpose:** this is both the published help article for unipixelhq.com and the source of truth for how the Stored Event Logs admin UX should read to non-technical store owners. When the admin UI changes, this doc updates; when this doc's framing changes, the admin UI copy should follow.
+>
+> Referenced screenshots live alongside the published article — annotated captures ready to publish, personal data cleaned.
 
 ---
 
@@ -153,4 +155,10 @@ For each purchase on your store, you'll typically see **two rows per platform** 
 3. **Server-side popover** — Meta server Purchase event (Send Method: server, Party: first) with Sent Data popover open, key fields highlighted (user_data, fbp, fbc, em, custom_data)
 4. **Client-side popover** — Meta client Purchase event (Send Method: client, Party: third) with Sent Data popover open, simpler payload visible
 
-> **Note:** The screenshots you already made (annotated with red arrows and callout boxes) cover images 1, 2, 3, and 4 almost exactly. Just need to clean up the personal data (blur IP, truncate hashes) and they're ready to publish.
+> **Note:** Existing annotated screenshots (red arrows + callout boxes) cover images 1, 2, 3, and 4 almost exactly. Just need personal data cleanup (blur IP, truncate hashes) before publishing.
+
+---
+
+## Also informs
+
+- Stored Event Logs UX backlog (release-log.md #27) — filter by event type, platform, date; intro text explaining what logs are for; surface that "Log Server-side Response" must be ON per event.

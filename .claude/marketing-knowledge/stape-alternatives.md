@@ -1,5 +1,7 @@
 # Stape Alternatives: Why WordPress Users Don't Need Server Containers
 
+> **Content asset.** Published article targeting WordPress users researching Stape. Keep evergreen — update competitor sections if comparisons shift.
+
 **Target keyword:** Stape alternatives
 **Secondary keywords:** Stape alternative for WordPress, server-side tracking without containers, Stape vs UniPixel, WordPress server-side tracking
 **Intent:** Capture WordPress users researching Stape and redirect them to a simpler, native solution

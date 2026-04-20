@@ -1,6 +1,6 @@
-# Discoveries — Event Quality Investigation
+# Platform Discoveries — Event Quality Investigation
 
-Built up across sessions as platform reports are assessed and code is audited.
+Cross-session audit findings as platform reports are assessed and code is audited. When a platform diagnostic is investigated, the outcome lands here (fixed, dismissed as platform overreach, noted for later, etc.).
 
 ---
 
@@ -201,16 +201,7 @@ Must produce no FAIL output. Also lint via stdin to match the SVN hook behaviour
 cat "$EXPORT/functions/unipixel-functions.php" | php -l 2>&1
 ```
 
----
-
-### Pre-Export Checklist (run every time before `obf.sh export`)
-
-1. **Smart quotes scan** — `grep -rl` for Unicode curly quotes in all `.php` files. Fix any found.
-2. **`php -l` on source** — lint all PHP files in the plugin folder.
-3. **Run `obf.sh export`**
-4. **`php -l` on export** — lint all PHP files in the export folder (both filename and stdin modes).
-5. **Version check** — `UNIPIXEL_VERSION` in `unipixel.php` matches `Stable tag` in `readme.txt`.
-6. **Exclusion check** — `.claude/` and `CLAUDE.md` not present in export.
+> The pre-export checklist itself lives in `app-knowledge/deploy-and-release.md` — this section captures *why* each check is in the list.
 
 ---
 

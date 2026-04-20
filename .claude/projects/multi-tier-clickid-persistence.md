@@ -1,8 +1,8 @@
 # Feature: Multi-Tier Click ID Persistence
 
+**Status:** Not started
 **Bucket:** Event Quality
 **Effort:** Days
-**Status:** Not started
 **Priority:** High — general improvement with real-world impact across all platforms
 
 ---
@@ -190,7 +190,7 @@ This feature directly aligns with UniPixel's Sales Pillar 1: "Your ads are wasti
 
 It also enables a genuine, demonstrable visible-in-admin feature: **"See exactly which ad click led to each order, directly in WooCommerce."** That's a marketing-friendly, customer-facing benefit that competitors don't necessarily expose cleanly.
 
-Changelog phrasing (customer-facing, outcome-focused, per the tone rules):
+Changelog phrasing (customer-facing, outcome-focused, per the tone rules in `marketing-knowledge/positioning.md`):
 
 > Improvement: More of your ad-driven conversions now reach your ad platforms with proper attribution — even when browser cookies are disturbed during checkout or between apps. Each WooCommerce order now also records which ad click (if any) led to the purchase, directly in the order admin.
 

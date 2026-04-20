@@ -1,4 +1,6 @@
-# Licensing, Gating & Obfuscation — Notes
+# Licensing, Gating & Obfuscation
+
+Protection strategy for UniPixel — what we do today, what we've considered, what we plan to build when download traction justifies it.
 
 ## Current Obfuscation (`_obf/`)
 
