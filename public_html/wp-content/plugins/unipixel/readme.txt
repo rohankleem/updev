@@ -4,7 +4,7 @@ Tags: meta conversion api, pinterest conversions api, server-side tracking, tikt
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.0
-Stable tag: 2.6.3
+Stable tag: 2.6.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,7 +26,7 @@ UniPixel fixes this by sending conversion events directly from your WordPress se
 - **WooCommerce events** — ViewContent, AddToCart, InitiateCheckout and Purchase tracked automatically with full product data (names, categories, variants, values).
 - **Custom events** — create your own click, view and interaction events for any WordPress page. Not limited to WooCommerce.
 - **Automatic deduplication** — each event gets a unique ID shared between client and server, so platforms count it once.
-- **Built-in consent management** — includes its own consent banner or reads from OneTrust, Cookiebot, Osano, Silktide, Orest Bida, Complianz, CookieYes and Moove GDPR.
+- **Built-in consent management** — fully featured popup with built-in translations for 18 languages, editable wording per language, 5 layout styles (centred card / top or bottom bar / corner card), optional non-blocking mode, and a Reject all button toggle. Or skip the popup entirely and let UniPixel read consent from your existing CMP — supports OneTrust, Cookiebot, Osano, Silktide, Orest Bida, Complianz, CookieYes, Moove GDPR, and CookieAdmin (Softaculous).
 - **Live event testing** — real-time console shows events as they fire, with full payload data.
 - **Event logging** — optional database storage of every event sent, for debugging and audit.
 
@@ -46,7 +46,7 @@ UniPixel sends API calls directly from your own WordPress server. No GTM server 
 - **Works on any WordPress site** — WooCommerce stores get automatic ecommerce event tracking. Non-WooCommerce sites use custom events for lead gen, SaaS, content or anything else.
 - **Five-minute setup** — install, enter your Pixel ID and access token, enable the platform. Done.
 
-Optional [Advanced Matching](https://buildio.dev/unipixel-docs/advanced-matching-setting-with-unipixel/) sends hashed user data (email, phone, address) alongside events to help platforms improve Event Match Quality.
+Optional [Advanced Matching](https://unipixelhq.com/unipixel-docs/advanced-matching-setting-with-unipixel/) sends hashed user data (email, phone, address) alongside events to help platforms improve Event Match Quality.
 
 == Installation ==
 
@@ -151,10 +151,32 @@ For more details on privacy policies and terms of use, please visit the followin
 - [TikTok Terms of Service](https://www.tiktok.com/legal/terms-of-service)
 - [Microsoft Privacy Statement](https://privacy.microsoft.com/privacystatement)
 - [Microsoft Advertising Agreement](https://about.ads.microsoft.com/en-us/resources/policies/microsoft-advertising-agreement)
-- [Buildio Privacy Policy](https://buildio.dev/privacy)
+- [UniPixel Privacy Policy](https://unipixelhq.com/privacy)
 
 
 == Changelog ==
+
+= 2.6.6 =
+* New: Centralised Event Manager. New admin page where you can set up a custom event across every platform in one go. Pick a conversion type (Lead, Newsletter Signup, Contact, Registration, Search or your own) and UniPixel fills in each platform's standard event name automatically.
+* New: URL-based trigger for custom events. Fire when a visitor lands on a specific page (great for thank-you pages, lead pages, post-checkout pages). Pick a page from your site, match a wildcard pattern like /thank-you*, or fire on every page.
+* New: Standard event name picker. When adding custom events you now choose from each platform's standard event list (Lead, Contact, Subscribe and the rest) instead of typing them by hand. Custom names are still supported.
+* Improvement: Fire-once-per-session guard on URL events stops conversion events double-counting if the visitor reloads the page.
+* Improvement: Google client/server mutual exclusion rule enforced inline in the Event Manager (Google permits one or the other for non-Purchase events).
+* Improvement: Disabled-platform hint with quick links so you can enable a platform straight from the Event Manager.
+* Improvement: Home dashboard reorganised. New full-width Event Manager card. Pinterest moved to the right with its brand pink.
+
+= 2.6.5 =
+* New: Optional "Reject all" button — give visitors a one-click way to decline tracking.
+* New: Popup layout options — choose centred card, full-width top or bottom bar, or a small corner card to fit your site.
+* New: Optional non-blocking mode — let visitors keep browsing while the popup stays visible (tracking still pauses until they choose).
+* New: Now compatible with CookieAdmin (Softaculous) consent banner — UniPixel reads its choices automatically.
+* Improvement: Popup is mobile-friendly — buttons stack cleanly on phones and corner layouts.
+* Fix: Popup animation no longer drifts horizontally when it appears.
+
+= 2.6.4 =
+* New: Multi-language consent popup — built-in translations for 18 languages (Spanish, French, German, Italian, Portuguese, Dutch, Polish, Japanese, Chinese, Korean, Turkish, Arabic, Russian, Swedish, Czech and more), matched to each visitor's language automatically.
+* New: Editable popup text — change any wording in any language from the admin to match your brand or jurisdiction.
+* New: Popup language control — auto-detect the visitor's language or force a specific one.
 
 = 2.6.3 =
 * Fix: Improved compatibility with WordPress themes and configurations. Event tracking now works reliably across all WordPress sites.

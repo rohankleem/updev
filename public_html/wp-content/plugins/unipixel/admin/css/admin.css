@@ -142,6 +142,26 @@
     max-width: 100%;
 }
 
+.bg-pinterest-pink {
+    background-color: #FFCCDE;
+}
+
+/* Phase 3 conversions builder: override the WP-admin default .card max-width
+   so the form uses the full content area instead of being capped at 520px. */
+.unipixel-conversion-builder,
+.unipixel-conversions-list {
+    max-width: 1200px;
+}
+.unipixel-conversion-builder .card,
+.unipixel-conversions-list .card {
+    max-width: 100%;
+    width: 100%;
+}
+.unipixel-conversion-builder .form-control,
+.unipixel-conversions-list .form-control {
+    max-width: 100%;
+}
+
 
 .UniPixelShell .bg-light-green {
     background-color: #D6F3DF;

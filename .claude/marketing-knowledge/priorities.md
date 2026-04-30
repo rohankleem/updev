@@ -12,10 +12,17 @@ Medium-cadence file. What's done, what's blocking adoption, what that means for 
 - WooCommerce events fire automatically (Purchase, AddToCart, InitiateCheckout, ViewContent)
 - Custom click/interaction event tracking from the WordPress admin
 - Advanced Matching (hashed PII) across Meta, TikTok, Pinterest
-- Consent management reading 9 CMPs + own popup
+- Microsoft CAPI full implementation (live on wp.org as of v2.6.0)
+- AddToCart via WooCommerce AJAX fragment mechanism (live on wp.org as of v2.6.0)
 - Optional server-side (users can start with just a Pixel ID, add server-side later)
-- AddToCart via WooCommerce AJAX fragment mechanism (shipped 2026-03-14)
-- Microsoft CAPI full implementation (staged in v2.6.x, not yet live on wp.org)
+- **Consent layer fully matured (v2.6.4 + v2.6.5):**
+  - Built-in popup ships with translations for 18 languages, auto-matched to visitor locale
+  - Every string editable from admin per language (brand voice / jurisdictional wording)
+  - 5 popup layout styles (centred card, top bar, bottom bar, bottom-left corner, bottom-right corner)
+  - Optional non-blocking mode (popup visible without dimmed backdrop, tracking still gated by consent)
+  - Optional Reject all button (force-choice friendly, GDPR-clean)
+  - Mobile-responsive — buttons stack on phones and corner layouts
+  - Reads 9 third-party CMPs (OneTrust, Cookiebot, Osano, Silktide, Orest Bida, Complianz, CookieYes, Moove GDPR, CookieAdmin / Softaculous)
 
 ---
 

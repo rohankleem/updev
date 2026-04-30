@@ -127,6 +127,15 @@ document.addEventListener('DOMContentLoaded', function () {
     eventsToTrack.forEach(function (event) {
         log_Initiate('UniPixel | Microsoft | Setting up tracking for:', event);
 
+        if (event.trigger === "url") {
+            if (typeof window.unipixelMatchUrlPattern === 'function' &&
+                window.unipixelMatchUrlPattern(event.elementRef, window.location.href) &&
+                window.unipixelShouldFireUrlEvent('microsoft', event.name, event.elementRef)) {
+                clientFirstEventTriggered_Microsoft(event, null);
+            }
+            return;
+        }
+
         document.querySelectorAll(event.elementRef).forEach(element => {
 
             if (event.trigger === "click") {

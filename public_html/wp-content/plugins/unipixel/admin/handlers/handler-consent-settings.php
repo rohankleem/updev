@@ -11,16 +11,40 @@ function unipixel_handle_consent_update() {
 	$consent_ui       = isset($_POST['consent_ui'])        ? sanitize_text_field($_POST['consent_ui']) : 'unipixel';
 	$consent_ui_style = isset($_POST['consent_ui_style'])  ? intval($_POST['consent_ui_style'])  : 1;
 
+	$consent_locale_override = isset($_POST['consent_locale_override'])
+		? sanitize_text_field(wp_unslash($_POST['consent_locale_override']))
+		: 'auto';
+	if ($consent_locale_override !== 'auto' && !unipixel_consent_is_valid_locale($consent_locale_override)) {
+		$consent_locale_override = 'auto';
+	}
+
+	$consent_show_reject = isset($_POST['consent_show_reject']) ? intval($_POST['consent_show_reject']) : 0;
+
+	$consent_popup_style = isset($_POST['consent_popup_style'])
+		? unipixel_consent_normalise_popup_style(sanitize_text_field(wp_unslash($_POST['consent_popup_style'])))
+		: 'centred';
+
+	// Force choice (dimmed overlay). Defaults to 1 (blocking) — strongest GDPR posture.
+	$consent_force_choice = isset($_POST['consent_force_choice']) ? intval($_POST['consent_force_choice']) : 0;
+
 	$newOptions = array(
-		'consent_honour'    => $consent_honour,
-		'consent_ui'        => $consent_ui,
-		'consent_ui_style'  => $consent_ui_style,
+		'consent_honour'           => $consent_honour,
+		'consent_ui'               => $consent_ui,
+		'consent_ui_style'         => $consent_ui_style,
+		'consent_locale_override'  => $consent_locale_override,
+		'consent_show_reject'      => $consent_show_reject,
+		'consent_popup_style'      => $consent_popup_style,
+		'consent_force_choice'     => $consent_force_choice,
 	);
 
 	$defaults = array(
-		'consent_honour'    => 0,
-		'consent_ui'        => 'unipixel',
-		'consent_ui_style'  => 1,
+		'consent_honour'           => 0,
+		'consent_ui'               => 'unipixel',
+		'consent_ui_style'         => 1,
+		'consent_locale_override'  => 'auto',
+		'consent_show_reject'      => 0,
+		'consent_popup_style'      => 'centred',
+		'consent_force_choice'     => 1,
 	);
 
 	$current_options = get_option('unipixel_consent_settings', $defaults);

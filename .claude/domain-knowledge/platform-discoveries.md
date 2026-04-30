@@ -207,7 +207,23 @@ cat "$EXPORT/functions/unipixel-functions.php" | php -l 2>&1
 
 ## Google
 
-_(No reports processed yet)_
+### G-001: Mutual-exclusion rule for client-side vs server-side per event
+
+**Rule:** For most event types, Google permits **either** client-side (gtag) **or** server-side (Measurement Protocol) — **not both at the same time**. The exception is **Purchase**, where both client-side and server-side are allowed (and recommended for dedup via `transaction_id`).
+
+**Why:** Google's GA4 attribution does not deduplicate non-purchase events the way Meta CAPI does — sending the same event from both sides counts it twice. Purchase is special-cased because GA4 uses `transaction_id` as a natural dedup key.
+
+**How the plugin implements it:** The admin UI for Google events enforces this — picking client-side disables the server-side toggle for that event type, and vice versa, except on the Purchase event row.
+
+**Other platforms:** Meta, TikTok, Pinterest, Microsoft do **not** have this restriction. They support browser + CAPI on every event, with `event_id` (Meta/TikTok/Pinterest) as the dedup key.
+
+**Implications for testing:**
+- Variants of Google-related flows can only test legal admin states. Trying to enable both for a non-purchase event should be blocked by the UI itself (worth its own scenario in `admin-pixel-config`).
+- Purchase variants are the only Google flow where "both on" is a valid state.
+
+---
+
+_(No platform reports processed yet)_
 
 ## Microsoft
 

@@ -122,6 +122,15 @@
         UniPixelEventDataTikTok.eventsToTrack.forEach(function (event) {
             log_Initiate('UniPixel | TikTok | Setting up tracking for event:', event);
 
+            if (event.trigger === "url") {
+                if (typeof window.unipixelMatchUrlPattern === 'function' &&
+                    window.unipixelMatchUrlPattern(event.elementRef, window.location.href) &&
+                    window.unipixelShouldFireUrlEvent('tiktok', event.name, event.elementRef)) {
+                    clientFirstEventTriggered_TikTok(event, null);
+                }
+                return;
+            }
+
             document.querySelectorAll(event.elementRef).forEach(element => {
                 if (event.trigger === "click") {
                     element.addEventListener('click', function () {

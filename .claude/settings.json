@@ -1,12 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Edit(**/CLAUDE.md)",
-      "Edit(**/.claude/**/*.md)",
-      "Write(**/CLAUDE.md)",
-      "Write(**/.claude/**/*.md)",
-      "MultiEdit(**/CLAUDE.md)",
-      "MultiEdit(**/.claude/**/*.md)"
+      "Edit(file_path://**/*.md)",
+      "Write(file_path://**/*.md)",
+      "MultiEdit(file_path://**/*.md)",
+
+      "Edit(file_path://CLAUDE.md)",
+      "Write(file_path://CLAUDE.md)",
+      "MultiEdit(file_path://CLAUDE.md)"
     ]
   }
 }

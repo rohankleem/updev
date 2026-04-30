@@ -1,0 +1,56 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: UniPixel\n"
+"Report-Msgid-Bugs-To: https://unipixelhq.com\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"MIME-Version: 1.0\n"
+"X-Domain: unipixel\n"
+
+msgid "Your Privacy Choices"
+msgstr ""
+
+msgid "This site uses cookies or similar technologies for technical purposes and, with your consent, for functionality, experience, measurement and marketing (personalized ads). You can choose which categories you are happy for us to use before continuing, or by clicking Accept."
+msgstr ""
+
+msgid "Accept all"
+msgstr ""
+
+msgid "Adjust preferences"
+msgstr ""
+
+msgid "Reject all"
+msgstr ""
+
+msgid "Manage Your Preferences"
+msgstr ""
+
+msgid "You can control which types of events are allowed to be sent from this site."
+msgstr ""
+
+msgid "Functional cookies"
+msgstr ""
+
+msgid "used to keep your preferences saved (like this consent choice) and enable essential plugin functionality."
+msgstr ""
+
+msgid "Performance cookies"
+msgstr ""
+
+msgid "allow anonymous analytics data for improving how conversion events (like <em>page_view</em> or <em>add_to_cart</em>) are tracked and measured."
+msgstr ""
+
+msgid "Marketing cookies"
+msgstr ""
+
+msgid "enable tracking for advertising platforms like Meta, Google Ads, and TikTok, so that conversions can be reported back to those platforms."
+msgstr ""
+
+msgid "<strong>Necessary cookies</strong> are always on and required for the site to function correctly. They do not include any marketing or analytics data."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Save preferences"
+msgstr ""

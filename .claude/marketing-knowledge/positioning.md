@@ -8,7 +8,7 @@ Foundational — what UniPixel is, how we talk about it, how we differentiate. S
 
 UniPixel is a WordPress plugin that sends conversion and event tracking data directly from the WordPress server to ad platforms — Meta, Pinterest, TikTok, Google, and Microsoft. It does server-side tracking without requiring GTM server containers, third-party cloud services, or paid subscriptions.
 
-The plugin handles WooCommerce ecommerce events automatically, provides an interface for custom event tracking (buttons, forms, interactions), includes built-in consent management reading from nine major CMPs or its own popup, and handles event deduplication automatically across all platforms.
+The plugin handles WooCommerce ecommerce events automatically, provides an interface for custom event tracking (buttons, forms, interactions), includes a fully-featured built-in consent layer (multi-language popup with editable wording, multiple layout styles, optional non-blocking mode, plus passthrough integration with nine major third-party CMPs), and handles event deduplication automatically across all platforms.
 
 UniPixel is designed to be sold. The model is full-feature access with a lock-in gate — every user gets everything, then a paywall activates once they're embedded. Target price: $89/yr. The current free phase is validation — establishing UniPixel as the preferred plugin before pricing activates.
 
@@ -50,9 +50,9 @@ Not just page views and purchases — track the button clicks, form submissions,
 
 ### Pillar 4: Privacy and consent without the headache
 
-GDPR, cookie laws, consent management — UniPixel handles it. Works with 9 major consent platforms or its own built-in popup. Data only sends when visitors consent. No legal grey areas, no compliance anxiety.
+GDPR, cookie laws, consent management — UniPixel handles it. Use the built-in consent popup (multi-language out of the box, editable wording, multiple layout styles, optional non-blocking mode) or pair UniPixel with one of the nine third-party CMPs it reads from. Either way, data only sends when visitors consent. No legal grey areas, no compliance anxiety.
 
-**The outcome:** You stay compliant without becoming a privacy lawyer. Consent is checked before any data fires. You track responsibly and your visitors' choices are respected automatically.
+**The outcome:** You stay compliant without becoming a privacy lawyer. Consent is checked before any data fires. The popup looks right on every device and speaks the right language for your visitors. Your visitors' choices are respected automatically.
 
 ### Pillar 5: Five ad platforms. One plugin. Minutes to set up.
 
@@ -110,7 +110,7 @@ But WordPress? Plugins run PHP on the server. UniPixel just uses that. It fires 
 1. **Server-side delivery.** Sends data through the protocols platforms have built — directly from the WordPress server.
 2. **Event-driven tracking.** Handles WooCommerce events automatically and doesn't require GTM.
 3. **Custom events.** Interface inside WordPress to set up and manage custom event triggers — buttons, forms, interactions. No GTM, no code.
-4. **Consent.** Checks consent before any event fires. Reads from 9 CMPs or its own built-in popup. Doesn't send data without permission.
+4. **Consent.** Checks consent before any event fires. Provides its own built-in consent popup (18 languages out of the box, editable text per language, choice of layouts, optional non-blocking mode, mobile-responsive), or reads choices from any of 9 third-party CMPs if the visitor already uses one. Doesn't send data without permission.
 
 ### The solution
 
@@ -228,7 +228,7 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 | WooCommerce events | Yes | Yes | Yes | Yes | Partial |
 | Custom click events | Yes | Pro | Pro | Pro | No |
 | Non-WooCommerce sites | Yes | Yes | No | No | No |
-| Consent management | Built-in + 9 CMPs | Separate plugin ($) | Built-in | Built-in | No |
+| Consent management | Built-in popup (18 languages, editable, multi-layout) + reads 9 third-party CMPs | Separate plugin ($) | Built-in | Built-in | No |
 | Event deduplication | All platforms | Yes | Yes | Yes | Meta only |
 | Multi-pixel support | No | Pro | Pro | ? | No |
 | GTM required | No | No | No | Yes (for SST) | No |
@@ -320,7 +320,7 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 1. **Self-hosted server-side tracking — zero external dependencies.** Every competitor that does server-side either requires GTM server containers, routes through their cloud, or needs separate hosting. UniPixel fires directly from WP server to platform APIs.
 2. **All 5 platforms at one price, no add-on upsells.** Meta + Pinterest + TikTok + Google + Microsoft in the base product.
 3. **Works on non-WooCommerce sites.** Lead gen, SaaS, content sites — not just WooCommerce.
-4. **Built-in consent management reading 9 CMPs.** OneTrust, Cookiebot, Osano, Silktide, Orest Bida, Complianz, CookieYes, Moove GDPR, or own popup.
+4. **Consent layer is a real feature, not a checkbox.** Own popup ships with translations for 18 languages out of the box, every string is editable from the admin per language, choose from 5 layout styles (centred card, top/bottom bar, corner cards), optional non-blocking mode, mobile-responsive. Reads from 9 third-party CMPs (OneTrust, Cookiebot, Osano, Silktide, Orest Bida, Complianz, CookieYes, Moove GDPR, CookieAdmin/Softaculous) if visitors prefer to use one of those instead.
 5. **Lightweight — no build step, no external JS bundles.** Pure PHP + vanilla JS.
 
 ---

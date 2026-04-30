@@ -62,7 +62,7 @@ function unipixel_page_general_settings()
             <hr />
             <h2><i class="fa-solid fa-shield-halved"></i> Advanced Matching</h2>
             <p><small>Sends hashed user data (email, phone, name, address) alongside events to Meta, TikTok and Pinterest to improve Event Match Quality. Data comes from order billing details or logged-in user profiles where available.
-                <a href="https://buildio.dev/unipixel-docs/advanced-matching-setting-with-unipixel/" target="_blank">Learn more</a></small></p>
+                <a href="https://unipixelhq.com/unipixel-docs/advanced-matching-setting-with-unipixel/" target="_blank">Learn more</a></small></p>
 
             <div class="mb-3 row">
                 <div class="col-3 col-sm-3">

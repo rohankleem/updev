@@ -70,6 +70,12 @@ function unipixel_get_consent_summary()
 		$summary = array_merge($summary, $parsed);
 	}
 
+	// CookieAdmin (Softaculous)
+	if (isset($_COOKIE['cookieadmin_consent'])) {
+		$parsed = unipixel_parse_cookieadmin_cookie();
+		$summary = array_merge($summary, $parsed);
+	}
+
 
 	return $summary;
 }
@@ -250,6 +256,59 @@ function unipixel_parse_cookieyes_cookie()
 			|| (isset($parsed['performance']) && $parsed['performance'] === 'yes'),
 		'marketing'   => isset($parsed['advertisement']) && $parsed['advertisement'] === 'yes',
 	);
+}
+
+
+function unipixel_parse_cookieadmin_cookie()
+{
+	if (empty($_COOKIE['cookieadmin_consent'])) {
+		return array();
+	}
+
+	$raw = sanitize_text_field(wp_unslash($_COOKIE['cookieadmin_consent']));
+	$decoded = json_decode($raw, true);
+	if (!is_array($decoded)) {
+		return array();
+	}
+
+	$result = array(
+		'necessary'  => true, // Always-on for CookieAdmin
+	);
+
+	// Shortcut shapes: {"accept":"true"} or {"reject":"true"}
+	if (!empty($decoded['accept']) && $decoded['accept'] === 'true') {
+		return array(
+			'necessary'   => true,
+			'functional'  => true,
+			'performance' => true,
+			'marketing'   => true,
+		);
+	}
+	if (!empty($decoded['reject']) && $decoded['reject'] === 'true') {
+		return array(
+			'necessary'   => true,
+			'functional'  => false,
+			'performance' => false,
+			'marketing'   => false,
+		);
+	}
+
+	// Category-by-category shape — keys vary slightly between CookieAdmin versions.
+	// We accept common synonyms from CookieAdmin's category vocabulary.
+	$is_granted = function ($val) {
+		// CookieAdmin stores 'true' (string) for granted categories.
+		return $val === 'true' || $val === true || $val === 1 || $val === '1';
+	};
+
+	$result['functional']  = isset($decoded['functional'])  ? $is_granted($decoded['functional'])  : (isset($decoded['preferences']) ? $is_granted($decoded['preferences']) : null);
+	$result['performance'] = (isset($decoded['analytics']) && $is_granted($decoded['analytics']))
+		|| (isset($decoded['performance']) && $is_granted($decoded['performance']))
+		|| (isset($decoded['statistics']) && $is_granted($decoded['statistics']));
+	$result['marketing']   = (isset($decoded['marketing']) && $is_granted($decoded['marketing']))
+		|| (isset($decoded['advertising']) && $is_granted($decoded['advertising']))
+		|| (isset($decoded['ads']) && $is_granted($decoded['ads']));
+
+	return $result;
 }
 
 

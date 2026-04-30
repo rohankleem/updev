@@ -7,8 +7,10 @@ require_once 'handlers/handler-general-settings.php';
 require_once 'handlers/handler-platform-settings.php';
 require_once 'handlers/handler-event-settings.php'; 
 require_once 'handlers/handler-event-woocomm-settings.php'; 
-require_once 'handlers/handler-consent-settings.php'; 
+require_once 'handlers/handler-consent-settings.php';
+require_once 'handlers/handler-consent-i18n.php';
 require_once 'handlers/handler-feedback.php';
+require_once 'handlers/handler-conversion-groups.php';
 require_once 'inc/feedback.php';
 require_once 'admin-wpmenu.php';
 require_once 'page-home.php';
@@ -26,6 +28,7 @@ require_once 'page-google-events.php';
 require_once 'page-microsoft-setup.php';
 require_once 'page-microsoft-events.php';
 require_once 'page-event-logs.php';
+require_once 'page-conversions.php';
 
 
 function unipixel_suppress_admin_notices() {
@@ -67,8 +70,10 @@ function unipixel_admin_enqueue($hook) {
 
         // Additional script for AJAX operations
         wp_enqueue_script('unipixel-ajax-consent-settings', plugins_url('admin/js/ajax-consent-settings.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-ajax-consent-i18n', plugins_url('admin/js/ajax-consent-i18n.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
         wp_enqueue_script('unipixel-ajax-platform-settings', plugins_url('admin/js/ajax-platform-settings.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
         wp_enqueue_script('unipixel-ajax-event-settings', plugins_url('admin/js/ajax-event-settings.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-ajax-conversion-groups', plugins_url('admin/js/ajax-conversion-groups.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
 
         wp_enqueue_script('unipixel-console-logger', plugins_url('/js/unipixel-console-logger.js', __DIR__), array('jquery'),UNIPIXEL_VERSION, true);
         wp_enqueue_script('unipixel-console-log-admin', plugins_url('admin/js/unipixel-console-logger-admin.js', __DIR__), array('jquery'),  UNIPIXEL_VERSION, true);

@@ -39,7 +39,9 @@ function unipixel_update_schema()
             event_description TEXT,
             send_client TINYINT(1) NOT NULL DEFAULT 1,
             send_server TINYINT(1) NOT NULL DEFAULT 0,
-            PRIMARY KEY (id)
+            conversion_group_id INT NULL DEFAULT NULL,
+            PRIMARY KEY (id),
+            KEY idx_conversion_group (conversion_group_id)
         );",
 
         // Generic event log
@@ -75,8 +77,22 @@ function unipixel_update_schema()
             event_description TEXT DEFAULT NULL,
             event_enabled TINYINT(1) NOT NULL DEFAULT 0,
             send_server_log_response TINYINT(1) NOT NULL DEFAULT 0,
-            send_client TINYINT(1) NOT NULL DEFAULT 1, 
-            send_server TINYINT(1) NOT NULL DEFAULT 0, 
+            send_client TINYINT(1) NOT NULL DEFAULT 1,
+            send_server TINYINT(1) NOT NULL DEFAULT 0,
+            PRIMARY KEY (id)
+        );",
+
+        // Conversion groups (Phase 3) — one row per cross-platform conversion configured
+        // in the Centralised Event Manager. unipixel_events_settings.conversion_group_id
+        // links the per-platform rows back to a group.
+        "CREATE TABLE {$wpdb->prefix}unipixel_conversion_groups (
+            id INT NOT NULL AUTO_INCREMENT,
+            conceptual_event VARCHAR(255) NOT NULL,
+            description TEXT,
+            event_trigger VARCHAR(255) NOT NULL,
+            trigger_target VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id)
         );"
     ];
@@ -108,8 +124,56 @@ function unipixel_update_schema()
         unipixel_setup_serverside_global_enabled();
     }
 
+    // (8) Phase 3 — conversion groups: link column on events_settings + new groups table
+    if (function_exists('unipixel_setup_conversion_groups')) {
+        unipixel_setup_conversion_groups();
+    }
+
     if ($wpdb->last_error) {
         error_log('WordPress Database Error: ' . $wpdb->last_error);
+    }
+}
+
+/**
+ * Phase 3 migration: add conversion_group_id link column to unipixel_events_settings
+ * and create the unipixel_conversion_groups table. Idempotent — safe to run repeatedly.
+ */
+function unipixel_setup_conversion_groups()
+{
+    global $wpdb;
+    $events_table = $wpdb->prefix . 'unipixel_events_settings';
+    $groups_table = $wpdb->prefix . 'unipixel_conversion_groups';
+
+    $col = $wpdb->get_var($wpdb->prepare("SHOW COLUMNS FROM %i LIKE %s", $events_table, 'conversion_group_id'));
+    if (!$col) {
+        $wpdb->query($wpdb->prepare(
+            "ALTER TABLE %i ADD COLUMN conversion_group_id INT NULL DEFAULT NULL",
+            $events_table
+        ));
+        $wpdb->query($wpdb->prepare(
+            "ALTER TABLE %i ADD INDEX idx_conversion_group (conversion_group_id)",
+            $events_table
+        ));
+    }
+
+    $exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $groups_table));
+    if (!$exists) {
+        $charset = $wpdb->get_charset_collate();
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta("CREATE TABLE {$groups_table} (
+            id INT NOT NULL AUTO_INCREMENT,
+            conceptual_event VARCHAR(255) NOT NULL,
+            description TEXT,
+            event_trigger VARCHAR(255) NOT NULL,
+            trigger_target VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id)
+        ) {$charset};");
+    }
+
+    if ($wpdb->last_error) {
+        error_log('UniPixel conversion_groups migration DB error: ' . $wpdb->last_error);
     }
 }
 

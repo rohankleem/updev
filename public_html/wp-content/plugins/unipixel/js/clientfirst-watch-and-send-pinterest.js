@@ -138,6 +138,15 @@ document.addEventListener('DOMContentLoaded', function () {
     eventsToTrack.forEach(function (event) {
         log_Initiate('UniPixel | Pinterest | Setting up tracking for event:', event);
 
+        if (event.trigger === "url") {
+            if (typeof window.unipixelMatchUrlPattern === 'function' &&
+                window.unipixelMatchUrlPattern(event.elementRef, window.location.href) &&
+                window.unipixelShouldFireUrlEvent('pinterest', event.name, event.elementRef)) {
+                clientFirstEventTriggered_Pinterest(event, null);
+            }
+            return;
+        }
+
         document.querySelectorAll(event.elementRef).forEach(element => {
             if (event.trigger === "click") {
                 element.addEventListener('click', function () {

@@ -1,0 +1,21 @@
+{
+  "platform_id": 4,
+  "platform_name": "Google",
+  "options": [
+    "",
+    "generate_lead",
+    "sign_up",
+    "login",
+    "search",
+    "select_content",
+    "share",
+    "begin_checkout",
+    "add_to_cart",
+    "view_item",
+    "purchase",
+    "view_promotion",
+    "select_promotion",
+    "__CUSTOM__"
+  ],
+  "_baseline_notes": "GA4 recommended events. Source: ajax-event-settings.js STANDARD_EVENTS_BY_PLATFORM[4]."
+}

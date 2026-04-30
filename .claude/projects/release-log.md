@@ -6,47 +6,19 @@ Single source of truth for release history, what's staged for the next release, 
 
 ## Current State
 
-- **Live on wordpress.org:** `v2.5.4`
-- **Source / pending version (`unipixel.php`):** `v2.6.3`
-- **Pending action:** deploy the staged version (v2.6.x) to wordpress.org — obf export ready, smart-quote check passed last session. See `session-state-rohan.md` for current blockers.
+- **Live on wordpress.org:** `v2.6.5`
+- **Source version (`unipixel.php`):** `v2.6.6`
+- **Pending action:** deploy v2.6.6 to wordpress.org. Centralised Event Manager release (Phase 1 URL trigger, Phase 2 standard event name dropdowns, Phase 3 cross-platform conversion builder with grouping). Obf export + SVN commit pending.
 
 > When a release ships, update this block, move the "Staged for next release" items into a stamped entry in "Released History", and bump the version in the four release-gate files (see `/CLAUDE.md` § Release Gate).
 
 ---
 
-## Staged for next release (Done since v2.5.4)
+## Staged for next release (Done since v2.6.6)
 
 > This is the staging area for unreleased work. When it's time to release, review this list, decide on a version number (patch/minor/major), then update readme, marketing, backlog accordingly. Rohan chooses the version number based on the weight of changes.
 
-### Microsoft Conversions API (CAPI) — full implementation
-- Server-first WooCommerce pipeline for all 4 events (Purchase, AddToCart, Checkout, ViewContent)
-- Client-first AJAX callback for PageView and custom events
-- `msclkid` cookie capture (90-day retention) from URL params
-- CAPI endpoint: `capi.uet.microsoft.com/v1/{tagID}/events` with Bearer auth
-- Deduplication via shared `eventId` between UET push and CAPI call
-- Consent mode integration — `adStorageConsent` (granted/denied) sent server-side, UET consent API set client-side
-- Admin UI: events page rewritten (WooCommerce event table, server-side columns, recommended settings)
-- Admin UI: help icon popovers on setup and events pages
-- "Apply Recommended Settings" one-click preset for Microsoft (both client+server on, log response for Purchase)
-- Removed legacy JS blocks that force-disabled server-side toggles for Microsoft
-- **⚠️ CAPI prototype:** Token access not yet self-service in Microsoft Advertising. Server-side untested against live endpoint. Client-side UET confirmed working. Do not advertise CAPI until verified.
-
-### AddToCart event quality improvement
-- Event quality improvements for AddToCart event — better handling of different add-to-cart methods across WooCommerce themes.
-- AJAX add-to-cart (shop/archive pages) now correctly fires client-side pixels for all 5 platforms via WooCommerce fragments (see `domain-knowledge/platform-discoveries.md` § ATC-001).
-- Consolidated internal user identifier logic for transient-based event relay.
-
-### Checkout (InitiateCheckout) event firing accuracy
-- Replaced commented-out transient dedup (1-min TTL, md5 IP+UA identifier) with WooCommerce session-based dedup tied to cart hash.
-- Event now fires once per genuine checkout intent — page refreshes, payment failure redirects, and back-button navigation no longer re-fire.
-- Cart changes between checkout visits correctly trigger a re-fire (new intent).
-- All 5 platforms (Meta, Google, TikTok, Pinterest, Microsoft) benefit.
-
-### Files changed (summary)
-- **New/rewritten:** `trackers/microsoft-handler.php`, `js/clientfirst-watch-and-send-microsoft.js`, `admin/page-microsoft-events.php`
-- **Major changes:** `functions/send-server-event.php`, `functions/hooks.php`, `functions/unipixel-functions.php`, `trackers/microsoft-enqueue.php`, `js/pixel-microsoft.js`, `js/unipixel-consent.js`, `config/schema.php`, `admin/page-microsoft-setup.php`, `admin/js/ajax-event-settings.js`, `admin/js/unipixel-apply-recommended.js`
-- **WooCommerce pipeline:** 16 files in `woocomm-hook-handling/` updated with Microsoft blocks
-- **Meta:** `unipixel.php` (version/description), `readme.txt` (Microsoft throughout)
+_(empty — v2.6.6 ships now)_
 
 ---
 
@@ -91,12 +63,15 @@ Single source of truth for release history, what's staged for the next release, 
 | 21 | Community seeding | Growth | Ongoing | **Active** | Facebook groups, Reddit, WP.org forums, WooCommerce Slack. 3–5 helpful replies/week. |
 | 22 | Deploy 2.5.1 to WordPress.org | Housekeeping | Hours | **Done** | Deployed. |
 | 23 | Commit local git changes | Housekeeping | Minutes | Pending | Multiple sessions of plugin work need committing. Waiting on instruction. |
-| 24 | Deploy v2.6.x to WordPress.org | Housekeeping | Hours | **IMMEDIATE** | Microsoft CAPI + AddToCart fragments release. Source at v2.6.3, obf export ready. See session-state. |
+| 24 | Deploy v2.6.x to WordPress.org | Housekeeping | Hours | **Done** | Shipped as v2.6.3. |
 | 25 | AddToBasket quality improvement | Event Quality | Days | **Done (staged)** | AJAX add-to-cart client pixel via fragment collector. Full detail in `domain-knowledge/platform-discoveries.md` § ATC-001, ATC-002. |
 | 26 | Remove jQuery dependency from frontend JS | Housekeeping | Days | Not started | Frontend scripts use jQuery for `$(document).ready()` and `$.post()` only. Replace with vanilla `DOMContentLoaded` and `fetch()`. Removes 30KB dependency. Low priority — WooCommerce sites always have jQuery. Immediate fix applied: `jquery` added as dependency of `unipixel-common`. |
 | 27 | Stored Event Logs UX improvements | UX | Hours–Days | Not started | (a) No explanation of what logs are, what they're for — needs intro text. (b) Hard to find events — no filtering by event type / platform / date. (c) Logging requires "Log Server-side Response" ON per event — easy to miss, logs empty by default. See `domain-knowledge/event-logs.md` for the guide's framing. |
 | 28 | Multi-tier click ID persistence | Event Quality | Days | Not started | Click IDs currently in single cookie = single point of failure. Full design: `projects/multi-tier-clickid-persistence.md`. Triggered by support case (Agence Amar). |
 | 29 | TikTok expanded event coverage (vertical/funnel events) | Platform Coverage, Event Quality | Hours–Days | Not started | Priority: AddPaymentInfo first (universal e-commerce signal, completes the TikTok funnel), then CompleteRegistration + SubmitForm for lead-gen verticals. Triggered by jerseysystem.com feedback. |
+| 30 | Meta test event code field | Event Quality, UX | Hours | Not started | No field to paste the Events Manager "Test Events" code — users can't verify server-side events land in Meta's Test Events tab, only in the plugin's local log. Add input on Meta setup page, pass as `test_event_code` in CAPI payload (opt-in, per session). Source: user feedback review. |
+| 31 | Consent popup localization (multi-language + editable) | UX, Platform Coverage | Days | Not started | Built-in consent popup is single-language only AND strings are hardcoded, so even single-language stores can't change wording. Dealbreaker for multi-region stores. Full spec: `projects/consent-popup-i18n.md` — covers admin UI, `.po/.mo` + override hybrid, security (kses + escaping), phased delivery (Phase 1 = editable English, Phase 2 = multi-language, Phase 3 = polish). Source: user feedback review. |
+| 32 | Refresh "Cookie Consent & Tracking" docs article | Growth | Hours | Not started | Article at `unipixelhq.com/unipixel-docs/` was written before v2.6.4 + v2.6.5 work. Now significantly understates capabilities — needs to cover the 18-language popup, per-language editable wording, 5 layout styles, optional non-blocking mode, and Reject all toggle. Apply voice rules from `marketing-knowledge/writing-style.md`. Help-icon popovers in the plugin admin point at this URL, so it's high-traffic. |
 
 ---
 
@@ -110,6 +85,7 @@ Single source of truth for release history, what's staged for the next release, 
 | 10 | Email/phone on client-first events | Hours | Not started |
 | 28 | Multi-tier click ID persistence | Days | Not started |
 | 29 | TikTok expanded event coverage | Hours–Days | Not started |
+| 30 | Meta test event code field | Hours | Not started |
 | 4 | Microsoft WooCommerce pipeline | Days | Done (staged) |
 | 25 | AddToBasket quality improvement | Days | Done (staged) |
 
@@ -131,6 +107,8 @@ Single source of truth for release history, what's staged for the next release, 
 | 8 | PHP validation — empty access token | Hours | Not started |
 | 11 | CMP auto-detection | Hours | Not started |
 | 27 | Stored Event Logs UX improvements | Hours–Days | Not started |
+| 30 | Meta test event code field | Hours | Not started |
+| 31 | Consent popup localization | Days | Not started |
 
 ### Platform Coverage
 | # | Feature | Effort | Status |
@@ -138,6 +116,7 @@ Single source of truth for release history, what's staged for the next release, 
 | 4 | Microsoft WooCommerce pipeline | Days | Done (staged) |
 | 7 | Additional platforms (Snapchat, LinkedIn) | Weeks | Not started |
 | 29 | TikTok expanded event coverage | Hours–Days | Not started |
+| 31 | Consent popup localization | Days | Not started |
 
 ### Commercial
 | # | Feature | Effort | Status |
@@ -163,7 +142,7 @@ Single source of truth for release history, what's staged for the next release, 
 | 9 | `send_server_log_response` in CREATE TABLE | Minutes | Not started |
 | 22 | Deploy 2.5.1 | Hours | Done |
 | 23 | Commit local git changes | Minutes | Pending |
-| 24 | Deploy v2.6.x to WordPress.org | Hours | **IMMEDIATE** |
+| 24 | Deploy v2.6.x to WordPress.org | Hours | Done |
 | 26 | Remove jQuery dependency from frontend JS | Days | Not started |
 
 ---
@@ -172,4 +151,8 @@ Single source of truth for release history, what's staged for the next release, 
 
 > Populated when a release ships. Each block should capture: version number, ship date, headline changes, files touched (summary), notable post-release observations.
 
-- **v2.5.4** — (last wp.org release) — fixed 15 PHP files with U+2018/U+2019 smart quotes from v2.5.3 that had caused fatal errors on all WooCommerce events. See `domain-knowledge/platform-discoveries.md` § RQ-001.
+- **v2.6.6** (2026-04-30) — Centralised Event Manager release. New top-level admin page for cross-platform conversion creation: pick a conceptual event (Lead, Newsletter Signup, etc.) and UniPixel fills in each platform's standard event name automatically. New URL-based trigger for custom events (fire on thank-you pages, lead pages, post-checkout pages with wildcard URL patterns). Standard event name dropdowns when defining custom events per platform. Page/URL picker reusable component. Fire-once-per-session guard for URL events. G-001 mutex enforced inline (Google client OR server, not both, except Purchase). Schema: new `unipixel_conversion_groups` table + `conversion_group_id` link column on `unipixel_events_settings`. Per-version detail: `public_html/wp-content/plugins/unipixel/readme.txt` changelog.
+- **v2.6.5** — popup style options (5 layouts: centred / top bar / bottom bar / bottom-left / bottom-right corner card), optional Reject all button (off by default, translated into all 18 locales), CookieAdmin (Softaculous) third-party CMP support, mobile-responsive popup (buttons stack on phones), popup animation centering fix, auto cache-bust for popup assets via filemtime suffix, plus admin polish (Test the popup section, Languages save-mode hint, dropdown label rename, plugin homepage URL update). Per-version detail: `public_html/wp-content/plugins/unipixel/readme.txt` changelog.
+- **v2.6.4** — multi-language consent popup (18 bundled locales + admin Languages & Content override accordion + popup language control). Per-version detail: `public_html/wp-content/plugins/unipixel/readme.txt` changelog.
+- **v2.6.0–2.6.3** — Microsoft CAPI full implementation, AddToCart fragment pixel for AJAX add-to-cart, InitiateCheckout session-based dedup, plus 2.6.1 / 2.6.3 compatibility fixes. Per-version detail: `public_html/wp-content/plugins/unipixel/readme.txt` changelog.
+- **v2.5.4** — fixed 15 PHP files with U+2018/U+2019 smart quotes from v2.5.3 that had caused fatal errors on all WooCommerce events. See `domain-knowledge/platform-discoveries.md` § RQ-001.

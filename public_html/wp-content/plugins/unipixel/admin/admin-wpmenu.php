@@ -23,6 +23,8 @@ function unipixel_add_admin_menus()
     add_submenu_page('unipixel', 'UniPixel | Microsoft Tracking Setup', 'Microsoft Setup', 'manage_options', 'unipixel_microsoft', 'unipixel_microsoft_router');
 
 
+    add_submenu_page('unipixel', 'UniPixel | Event Manager', 'Event Manager', 'manage_options', 'unipixel_conversions', 'unipixel_conversions_router');
+
     add_submenu_page('unipixel', 'UniPixel | Event Test Console', 'Event Test Console', 'manage_options', 'unipixel_console_logger', 'unipixel_page_console_logger');
     add_submenu_page('unipixel', 'UniPixel | Stored Event Logs', 'Stored Event Logs', 'manage_options', 'unipixel_event_logs', 'unipixel_page_event_logs');
     add_submenu_page('unipixel', 'UniPixel | General Settings', 'General Settings', 'manage_options', 'unipixel_general_settings', 'unipixel_page_general_settings');

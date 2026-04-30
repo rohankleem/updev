@@ -216,7 +216,7 @@ function unipixel_page_google_events()
                 <p class="mb-3">
                     <strong><?php echo esc_html__('Custom Events', 'unipixel'); ?></strong>
                     <?php echo esc_html__('track user interactions (clicks, visible elements, form submissions).', 'unipixel'); ?>
-                    <br><small><?php echo esc_html__('Need help?', 'unipixel'); ?> <a href="https://buildio.dev/unipixel-docs/custom-event-tracking/" target="_blank" rel="noopener"><?php echo esc_html__('Learn how to set up custom events', 'unipixel'); ?></a></small>
+                    <br><small><?php echo esc_html__('Need help?', 'unipixel'); ?> <a href="https://unipixelhq.com/unipixel-docs/custom-event-tracking/" target="_blank" rel="noopener"><?php echo esc_html__('Learn how to set up custom events', 'unipixel'); ?></a></small>
                 </p>
 
                 <table id="event-settings-table" class="table">

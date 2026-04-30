@@ -132,10 +132,17 @@ CLAUDE.md                                    ← You are here. Operating manual.
 │   ├── positioning.md                       ← What UniPixel is, 5 pillars, industry problem + solution, language rules.
 │   ├── priorities.md                        ← Where the product is now, what's blocking adoption.
 │   ├── campaigns.md                         ← Active ad campaigns (Google, Meta, forums), channels, how they reinforce each other.
+│   ├── unipixelhq-content.md                ← Inventory + structure of unipixelhq.com (home, docs, blog), what each surface is for.
+│   ├── writing-style.md                     ← Voice rules for blog + docs articles. Apply to every published piece.
 │   └── stape-alternatives.md                ← Content asset (published article).
-└── projects/                                ← Per-initiative working docs.
-    ├── release-log.md                       ← Version history, backlog with buckets, unreleased work staging.
-    └── multi-tier-clickid-persistence.md    ← Feature spec (not started).
+├── projects/                                ← Per-initiative working docs.
+│   ├── release-log.md                       ← Version history, backlog with buckets, unreleased work staging.
+│   ├── multi-tier-clickid-persistence.md    ← Feature spec (not started).
+│   ├── consent-popup-i18n.md                ← Feature spec (not started) — multi-language + editable consent popup.
+│   └── centralised-event-builder.md         ← 3-phase feature: URL trigger → event name dropdowns → conversion builder + grouping.
+└── testing/                                 ← Verification flows. Browser-agent-executable test specs.
+    ├── testing.md                           ← Methodology, verification surfaces, index of all flows.
+    └── flows/                               ← One file per flow (consent-grant, click-id-capture, woocommerce-purchase, etc).
 ```
 
 Plugin source at `public_html/wp-content/plugins/unipixel/` has a thin `CLAUDE.md` breadcrumb but no `.claude/` folder — docs live upstream at the repo root.
@@ -150,6 +157,7 @@ Plugin source at `public_html/wp-content/plugins/unipixel/` has a thin `CLAUDE.m
 | `domain-knowledge/` | New platform quirks, tracking rules, licensing understanding |
 | `marketing-knowledge/` | Positioning shifts, active campaign tweaks, language rule changes |
 | `projects/` | Initiative starts, progresses, completes. Every release bump touches `release-log.md`. |
+| `testing/` | New feature → new flow file. Bug fix that slipped past tests → add a scenario. After each release, run affected flows. |
 
 ---
 
@@ -163,7 +171,8 @@ When you learn something new, where does it go?
 - **Fact about deploy / release / obfuscation / version bumping** → `app-knowledge/deploy-and-release.md`
 - **Platform quirk, tracking rule, consent edge case, licensing insight** → `domain-knowledge/` (pick the right file, or vocabulary.md if it's a term)
 - **Marketing positioning / pillar refinement / campaign move / competitor note** → `marketing-knowledge/` (positioning.md, campaigns.md, or priorities.md)
-- **Something we're actively building** → `projects/{initiative-name}.md`
+- **Something we're actively building** → `projects/{initiative-name}.md` (and a draft flow in `testing/flows/`)
+- **A way to verify behaviour (test scenario, expected payload, baseline fixture)** → `testing/flows/{flow-name}.md`
 - **Something that happened this session** → `session-state-rohan.md`
 - **A rule about how Claude and the team collaborate** → `CLAUDE.md`
 

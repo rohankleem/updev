@@ -103,7 +103,7 @@ function unipixel_get_help_icon($key)
         ],
         "Meta_PixelId"   => [
             "title" => "Pixel ID",
-            "content" => "Your unique identifier for your Meta Pixel. Found in Meta Events Manager under your Pixel settings.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-meta/' target='_blank'>See the full Meta setup guide</a>"
+            "content" => "Your unique identifier for your Meta Pixel. Found in Meta Events Manager under your Pixel settings.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-meta/' target='_blank'>See the full Meta setup guide</a>"
         ],
         "Meta_AccessToken"   => [
             "title" => "Access Token",
@@ -113,7 +113,7 @@ function unipixel_get_help_icon($key)
                     3. Assign Admin permissions and select your <b>Business Account</b>.<br/>
                     4. In the <b>Permissions</b> tab, ensure access to <b>Manage Ads</b>.<br/>
                     5. Click <b>Generate Access Token</b>.<br/>
-                    6. Copy and save the token securely.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-meta/' target='_blank'>See the full Meta setup guide</a>"
+                    6. Copy and save the token securely.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-meta/' target='_blank'>See the full Meta setup guide</a>"
         ],
         "Meta_PageView_ClientSideTurnOn"   => [
             "title" => "PageView Client-side event",
@@ -152,7 +152,7 @@ function unipixel_get_help_icon($key)
         "Google_Gtm"   => [
             "title" => "Pixel Setting",
             "content" => "This setting assumes the gtag script is already present on your site but included via Google Tag Manager (GTM). In that case we also need the GTM Container ID. Unipixel send the events you have setup in this plugin, and the other events you may have setup in GTM continue to be fired through GTM. 
-                <br/><br/>It is important to <a href='https://buildio.dev/unipixel-docs/using-unipixel-with-google-tag-manager-gtm/' target='_blank'>read the docs here</a> to setup your GTM tags and triggers correctly.
+                <br/><br/>It is important to <a href='https://unipixelhq.com/unipixel-docs/using-unipixel-with-google-tag-manager-gtm/' target='_blank'>read the docs here</a> to setup your GTM tags and triggers correctly.
                 <br/><br/><b>Note:</b> if using this option, you need to <b>set GTM's send_page_view setting to 'false'</b> in your Google tag configuration, to void doubling up this event - UniPixel already takes care of the page_view event, including consent checks, and logging. To do this, do the following:
                 <br/><br/><b>1.</b> In Google Tag Manager, go to the Tags list and edit your GA4 Configuration Tag.
                 <br/><b>2.</b> Edit the tag, and in configuration settings set the send_page_view parameter to 'false', or uncheck the option relating to this to prevent the page_view event running at GTM too when this configuration loads.
@@ -160,11 +160,11 @@ function unipixel_get_help_icon($key)
         ],
         "Google_MeasurementId"   => [
             "title" => "Measurement ID",
-            "content" => "This ID specifies your unique Google Analytics setup, ensuring data is sent to the correct property. It can be found in Google Analytics > Admin > Data Streams, under 'Measurement ID' (formatted as G-XXXXXXXXXX).<br/><br/><a href='https://buildio.dev/unipixel-docs/getting-ready-for-unipixel-what-you-need-from-google/' target='_blank'>See the full Google setup guide</a>"
+            "content" => "This ID specifies your unique Google Analytics setup, ensuring data is sent to the correct property. It can be found in Google Analytics > Admin > Data Streams, under 'Measurement ID' (formatted as G-XXXXXXXXXX).<br/><br/><a href='https://unipixelhq.com/unipixel-docs/getting-ready-for-unipixel-what-you-need-from-google/' target='_blank'>See the full Google setup guide</a>"
         ],
         "Google_ContainerId"   => [
             "title" => "Tag Manager Container Id",
-            "content" => "This ID identifies your specific Google Tag Manager container, which holds all your tracking tags, triggers, and variables. It can be found in Google Tag Manager > Admin > Container Settings, typically formatted as GTM-XXXXXXX. You'll need this in addition to your Measurement ID if your gtag is loaded via Google Tag Manager.<br/><br/><a href='https://buildio.dev/unipixel-docs/using-unipixel-with-google-tag-manager-gtm/' target='_blank'>See the GTM setup guide</a>"
+            "content" => "This ID identifies your specific Google Tag Manager container, which holds all your tracking tags, triggers, and variables. It can be found in Google Tag Manager > Admin > Container Settings, typically formatted as GTM-XXXXXXX. You'll need this in addition to your Measurement ID if your gtag is loaded via Google Tag Manager.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/using-unipixel-with-google-tag-manager-gtm/' target='_blank'>See the GTM setup guide</a>"
         ],
         "Google_ApiSecret"   => [
             "title" => "API Secret",
@@ -172,7 +172,7 @@ function unipixel_get_help_icon($key)
                     1. Go to <b>Google Analytics Admin</b>.<br/>
                     2. Under <b>Data Streams</b>, select your website stream.<br/>
                     3. Scroll down to <b>Measurement Protocol API Secret</b>.<br/>
-                    4. Click <b>Create</b>, name it (e.g., 'Server-Side Tracking'), and copy the API Secret.<br/><br/><a href='https://buildio.dev/unipixel-docs/getting-ready-for-unipixel-what-you-need-from-google/' target='_blank'>See the full Google setup guide</a>"
+                    4. Click <b>Create</b>, name it (e.g., 'Server-Side Tracking'), and copy the API Secret.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/getting-ready-for-unipixel-what-you-need-from-google/' target='_blank'>See the full Google setup guide</a>"
         ],
 
 
@@ -228,7 +228,7 @@ function unipixel_get_help_icon($key)
         ],
         "TikTok_PixelId" => [
             "title" => "Pixel ID",
-            "content" => "Your unique TikTok Pixel ID, available in your TikTok Ads Manager under Events > Manage > Pixel Settings.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-tiktok/' target='_blank'>See the full TikTok setup guide</a>"
+            "content" => "Your unique TikTok Pixel ID, available in your TikTok Ads Manager under Events > Manage > Pixel Settings.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-tiktok/' target='_blank'>See the full TikTok setup guide</a>"
         ],
         "TikTok_AccessToken" => [
             "title" => "Access Token",
@@ -237,12 +237,12 @@ function unipixel_get_help_icon($key)
                     2. Navigate to <b>Events</b> > <b>Manage</b> and select your Pixel.<br/>
                     3. Under <b>Settings</b>, find <b>Events API</b>.<br/>
                     4. Click <b>Generate Access Token</b>.<br/>
-                    5. Copy and save the token securely.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-tiktok/' target='_blank'>See the full TikTok setup guide</a>"
+                    5. Copy and save the token securely.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-tiktok/' target='_blank'>See the full TikTok setup guide</a>"
         ],
 
         "Pinterest_Enabled" => [
             "title" => "Turning On Pinterest Tracking",
-            "content" => "When enabled, UniPixel loads the Pinterest Tag and tracks events configured for this platform.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
+            "content" => "When enabled, UniPixel loads the Pinterest Tag and tracks events configured for this platform.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
         ],
         "Pinterest_Include" => [
             "title" => "Pixel Setting",
@@ -254,11 +254,11 @@ function unipixel_get_help_icon($key)
         ],
         "Pinterest_TagId" => [
             "title" => "Pinterest Tag ID",
-            "content" => "Your unique Pinterest Tag ID. Found in Pinterest Ads Manager under <b>Conversions</b> > <b>Set Up the Pinterest Tag</b>, or in your Tag settings.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
+            "content" => "Your unique Pinterest Tag ID. Found in Pinterest Ads Manager under <b>Conversions</b> > <b>Set Up the Pinterest Tag</b>, or in your Tag settings.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
         ],
         "Pinterest_AdAccountId" => [
             "title" => "Ad Account ID",
-            "content" => "Your Pinterest Ad Account ID. Found in Pinterest Ads Manager -- visible in the URL or under <b>Ads</b> > <b>Overview</b> in the account dropdown. Required for server-side Conversions API calls.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
+            "content" => "Your Pinterest Ad Account ID. Found in Pinterest Ads Manager -- visible in the URL or under <b>Ads</b> > <b>Overview</b> in the account dropdown. Required for server-side Conversions API calls.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
         ],
         "Pinterest_AccessToken" => [
             "title" => "Conversion Access Token",
@@ -266,7 +266,7 @@ function unipixel_get_help_icon($key)
                     1. Go to <b>Pinterest Ads Manager</b>.<br/>
                     2. Navigate to <b>Conversions</b> and select your Tag.<br/>
                     3. Under <b>Set Up Conversions API</b>, generate an access token.<br/>
-                    4. Copy and save the token securely.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
+                    4. Copy and save the token securely.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
         ],
         "Pinterest_PageView_ClientSideTurnOn" => [
             "title" => "Pinterest PageView Client-side",
@@ -283,11 +283,11 @@ function unipixel_get_help_icon($key)
         ],
         "Microsoft_Enabled" => [
             "title" => "Turning On Microsoft Tracking",
-            "content" => "When enabled, UniPixel loads the Microsoft UET tag and tracks events configured for this platform. When set to off, no Microsoft events are sent.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-microsoft/' target='_blank'>See the full Microsoft setup guide</a>"
+            "content" => "When enabled, UniPixel loads the Microsoft UET tag and tracks events configured for this platform. When set to off, no Microsoft events are sent.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-microsoft/' target='_blank'>See the full Microsoft setup guide</a>"
         ],
         "Microsoft_PixelId" => [
             "title" => "UET Tag ID",
-            "content" => "Your unique Microsoft UET Tag ID. Found in Microsoft Advertising under <b>Tools</b> > <b>UET tag</b>. It is the numeric ID shown next to your tag name, also visible in the UET code snippet as the value after <b>ti=</b>.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-microsoft/' target='_blank'>See the full Microsoft setup guide</a>"
+            "content" => "Your unique Microsoft UET Tag ID. Found in Microsoft Advertising under <b>Tools</b> > <b>UET tag</b>. It is the numeric ID shown next to your tag name, also visible in the UET code snippet as the value after <b>ti=</b>.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-microsoft/' target='_blank'>See the full Microsoft setup guide</a>"
         ],
         "Microsoft_AccessToken" => [
             "title" => "CAPI Access Token",
@@ -296,7 +296,7 @@ function unipixel_get_help_icon($key)
                     2. Navigate to <b>Tools</b> > <b>UET tag</b> and select your tag.<br/>
                     3. Look for the <b>Conversions API</b> section.<br/>
                     4. Generate or copy your access token.<br/>
-                    5. Save the token securely -- treat it like a password.<br/><br/>If you do not see the Conversions API option, your account may need to be opted in. Contact your Microsoft Advertising account manager.<br/><br/><a href='https://buildio.dev/unipixel-docs/setting-up-unipixel-with-microsoft/' target='_blank'>See the full Microsoft setup guide</a>"
+                    5. Save the token securely -- treat it like a password.<br/><br/>If you do not see the Conversions API option, your account may need to be opted in. Contact your Microsoft Advertising account manager.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-microsoft/' target='_blank'>See the full Microsoft setup guide</a>"
         ],
 
 
@@ -313,6 +313,16 @@ function unipixel_get_help_icon($key)
 
 
 
+
+        "Consent_PopupStyle" => [
+            "title" => "Popup style",
+            "content" => "Controls where the consent popup appears on the page. <b>Centred card</b> is the default and most prominent. <b>Bottom/top bars</b> stretch full-width and are less intrusive. <b>Corner cards</b> are the smallest, sitting in the bottom-left or bottom-right and not covering main content."
+        ],
+
+        "Consent_ForceChoice" => [
+            "title" => "Force choice (dimmed backdrop)",
+            "content" => "When ON, a dimmed backdrop is shown behind the popup and the visitor must click a button (Accept / Adjust / Reject) before they can interact with the rest of the page. When OFF, the popup is non-blocking &mdash; visitors can scroll and click around freely while the popup stays visible. <br><br><b>Either way, no tracking events are sent until the visitor makes a choice</b> &mdash; the difference is purely how aggressively the popup demands attention."
+        ],
 
     ];
 
@@ -1308,4 +1318,57 @@ function unipixel_get_advanced_matching_data($order = null)
     if (!empty($country)) $result['plcehldr_hashedCountry'] = hash('sha256', strtolower(trim($country)));
 
     return $result;
+}
+
+/**
+ * Match a URL pattern against a URL.
+ *
+ * Pattern semantics (must match unipixelMatchUrlPattern in unipixel-common.js):
+ * - Single special character: '*' (matches zero or more characters)
+ * - Patterns without '*' require exact match
+ * - If pattern contains '?', match against URL path + query; otherwise path only
+ * - Case-insensitive
+ * - Trailing-slash tolerant on the path component
+ *
+ * @param string $pattern URL pattern (e.g. '/thank-you/', '/thank-you*', '*')
+ * @param string $url     URL to test (full URL or path)
+ * @return bool
+ */
+function unipixel_url_pattern_match($pattern, $url) {
+    if (!is_string($pattern) || !is_string($url)) return false;
+    $pattern = trim($pattern);
+    if ($pattern === '') return false;
+
+    $parts = wp_parse_url($url);
+    $url_path  = isset($parts['path'])  ? $parts['path']  : '/';
+    $url_query = isset($parts['query']) ? $parts['query'] : '';
+
+    if (strpos($pattern, '?') === false) {
+        $target = $url_path;
+    } else {
+        $target = $url_path . ($url_query !== '' ? '?' . $url_query : '');
+    }
+
+    $target  = unipixel_strip_trailing_slash_from_path($target);
+    $pattern = unipixel_strip_trailing_slash_from_path($pattern);
+
+    $target_lc  = strtolower($target);
+    $pattern_lc = strtolower($pattern);
+
+    $regex = '#^' . str_replace('\*', '.*', preg_quote($pattern_lc, '#')) . '$#';
+
+    return (bool) preg_match($regex, $target_lc);
+}
+
+function unipixel_strip_trailing_slash_from_path($s) {
+    $qpos = strpos($s, '?');
+    if ($qpos === false) {
+        $stripped = rtrim($s, '/');
+        return $stripped === '' ? '/' : $stripped;
+    }
+    $path = substr($s, 0, $qpos);
+    $rest = substr($s, $qpos);
+    $path_stripped = rtrim($path, '/');
+    if ($path_stripped === '') $path_stripped = '/';
+    return $path_stripped . $rest;
 }

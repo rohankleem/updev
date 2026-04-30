@@ -212,7 +212,7 @@ function unipixel_page_pinterest_events()
                 <h2 class="mb-2"><?php echo esc_html__('Custom Events for', 'unipixel'); ?> <?php echo esc_html($platformName); ?></h2>
                 <p class="mb-3">
                     <?php echo esc_html__('Manage your own Custom Events and track user actions (form submissions, clicks, visible elements). Define a CSS selector, trigger, and event name to send.', 'unipixel'); ?>
-                    <br><small><?php echo esc_html__('Need help?', 'unipixel'); ?> <a href="https://buildio.dev/unipixel-docs/custom-event-tracking/" target="_blank" rel="noopener"><?php echo esc_html__('Learn how to set up custom events', 'unipixel'); ?></a></small>
+                    <br><small><?php echo esc_html__('Need help?', 'unipixel'); ?> <a href="https://unipixelhq.com/unipixel-docs/custom-event-tracking/" target="_blank" rel="noopener"><?php echo esc_html__('Learn how to set up custom events', 'unipixel'); ?></a></small>
                 </p>
 
                 <table id="event-settings-table" class="table">

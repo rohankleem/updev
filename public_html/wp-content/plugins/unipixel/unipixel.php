@@ -4,9 +4,9 @@
 
 /**
  * Plugin Name: UniPixel
- * Plugin URI: https://buildio.dev/unipixel
+ * Plugin URI: https://unipixelhq.com
  * Description: Server-side event tracking for Meta, Pinterest, TikTok, Google and Microsoft. One install to connect your site with event tracking APIs. Includes custom events and consent.
- * Version: 2.6.3
+ * Version: 2.6.6
  * Author: Buildio
  * Author URI: https://buildio.dev/
  * License: GPLv2 or later
@@ -15,7 +15,7 @@
 
 defined('ABSPATH') or die('Direct script access disallowed.');
 
-define('UNIPIXEL_VERSION', '2.6.3');
+define('UNIPIXEL_VERSION', '2.6.6');
 
 
 require_once plugin_dir_path(__FILE__) . 'config/schema.php'; 
@@ -25,6 +25,7 @@ require_once plugin_dir_path(__FILE__) . 'functions/send-server-event.php';
 require_once plugin_dir_path(__FILE__) . 'functions/send-server-event-handle-result.php';
 require_once plugin_dir_path(__FILE__) . 'functions/ajax-handle-log-client-event.php';
 require_once plugin_dir_path(__FILE__) . 'functions/consent.php';
+require_once plugin_dir_path(__FILE__) . 'functions/consent-i18n.php';
 require_once plugin_dir_path(__FILE__) . 'classes/class-unipixel-log.php';
 require_once plugin_dir_path(__FILE__) . 'woocomm-hook-handling/helpers.php';
 
@@ -138,6 +139,12 @@ function unipixel_check_version() {
 add_action('plugins_loaded', 'unipixel_check_version');
 
 
+function unipixel_load_textdomain() {
+    load_plugin_textdomain('unipixel', false, dirname(plugin_basename(__FILE__)) . '/languages');
+}
+add_action('plugins_loaded', 'unipixel_load_textdomain');
+
+
 
 add_action('wp_enqueue_scripts', 'unipixel_enqueue_consent_popup');
 
@@ -155,19 +162,51 @@ function unipixel_enqueue_consent_popup() {
 
     // Only enqueue if honour consent is ON and vendor is UniPixel
     if ($consentHonour === 1 && $consentUI === 'unipixel') {
+
+        // Asset version: plugin version + file mtime for the popup JS/CSS.
+        // The mtime suffix auto-invalidates the browser cache whenever these files
+        // are edited (essential during dev). In production it's stable across users
+        // because mtime is set once at unzip / SVN checkout.
+        $popup_js_path  = plugin_dir_path(__FILE__) . 'js/unipixel-consent-popup.js';
+        $popup_css_path = plugin_dir_path(__FILE__) . 'css/unipixel-consent-popup.css';
+        $popup_js_ver   = UNIPIXEL_VERSION . '.' . (file_exists($popup_js_path)  ? filemtime($popup_js_path)  : '0');
+        $popup_css_ver  = UNIPIXEL_VERSION . '.' . (file_exists($popup_css_path) ? filemtime($popup_css_path) : '0');
+
         wp_enqueue_script(
             'unipixel-consent-popup',
             plugin_dir_url(__FILE__) . 'js/unipixel-consent-popup.js',
             [],
-            UNIPIXEL_VERSION,
+            $popup_js_ver,
             true
+        );
+
+        wp_localize_script(
+            'unipixel-consent-popup',
+            'UnipixelConsentStrings',
+            unipixel_consent_get_strings()
+        );
+
+        $popup_style = isset($settings['consent_popup_style'])
+            ? unipixel_consent_normalise_popup_style($settings['consent_popup_style'])
+            : 'centred';
+
+        $force_choice = isset($settings['consent_force_choice']) ? (int) $settings['consent_force_choice'] : 1;
+
+        wp_localize_script(
+            'unipixel-consent-popup',
+            'UnipixelConsentConfig',
+            array(
+                'show_reject'  => isset($settings['consent_show_reject']) ? (int) $settings['consent_show_reject'] : 0,
+                'style'        => $popup_style,
+                'force_choice' => $force_choice,
+            )
         );
 
         wp_enqueue_style(
             'unipixel-consent-popup',
             plugin_dir_url(__FILE__) . 'css/unipixel-consent-popup.css',
             [],
-            UNIPIXEL_VERSION
+            $popup_css_ver
         );
     }
 }

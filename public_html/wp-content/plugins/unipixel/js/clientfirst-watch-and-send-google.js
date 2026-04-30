@@ -220,6 +220,16 @@
         // Iterate over the events to track
         UniPixelEventDataGoogle.eventsToTrack.forEach(function (event) {
             log_Initiate('UniPixel | Initiate | Google | Setting up tracking for event:', event);
+
+            if (event.trigger === "url") {
+                if (typeof window.unipixelMatchUrlPattern === 'function' &&
+                    window.unipixelMatchUrlPattern(event.elementRef, window.location.href) &&
+                    window.unipixelShouldFireUrlEvent('google', event.name, event.elementRef)) {
+                    clientFirstEventTriggered_Google(event, null);
+                }
+                return;
+            }
+
             document.querySelectorAll(event.elementRef).forEach(element => {
                 if (event.trigger === "click") {
                     //log_Initiate('Adding click event listener for:', event.elementRef);

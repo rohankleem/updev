@@ -1,0 +1,18 @@
+https://www.facebook.com/tr/?id=847558968297463&ev=Lead&dl=https%3A%2F%2Fupdev.local.site%2Fcontact%2F&rl=&if=false&ts=1777549036562&sw=1536&sh=960&v=2.9.310&r=stable&ec=0&o=4126&fbp=fb.1.1776564315190.939059285970616267&ler=empty&cdl=API_unavailable&pmd[locale]=en_US&it=1777549036356&coo=false&eid=event_1777549036529&rqm=GET
+
+# Diff baseline notes:
+# Variable fields (will differ each run, exclude from strict diff):
+#   ts            (timestamp)
+#   it            (init time)
+#   eid           (browser-generated event_id)
+#   fbp           (Meta browser cookie, may rotate)
+#   sw, sh        (screen dimensions)
+#   ec            (event count)
+#   o             (origin number)
+#   ler, cdl, pmd (Meta internal)
+#
+# Stable fields (assert on these):
+#   id            = 847558968297463 (configured pixel ID)
+#   ev            = Lead
+#   dl            = current URL (encoded)
+#   v             = 2.9.310 (or current Meta SDK version)

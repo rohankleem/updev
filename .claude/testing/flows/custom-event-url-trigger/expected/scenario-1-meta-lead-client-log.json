@@ -1,0 +1,12 @@
+{
+  "_log_table_row_id": 29,
+  "_method": "client",
+  "_party": "third",
+  "_event_order": "clientFirst",
+  "sent_data": {
+    "event_name": "Lead",
+    "event_params": [],
+    "event_id": "event_1777549036529"
+  },
+  "_baseline_notes": "event_id will differ each run. event_name and method/party/event_order are stable."
+}

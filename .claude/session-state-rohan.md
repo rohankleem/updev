@@ -4,10 +4,8 @@
 
 ## Where We Came From
 
-- Microsoft Conversions API (CAPI) — full implementation shipped as v2.6.0
+- **v2.6.3 shipped to wordpress.org** — Microsoft CAPI, AddToCart fragment pixel, InitiateCheckout session-based dedup, plus 2.6.1 / 2.6.3 compatibility fixes. Changelog in `readme.txt`.
 - Google Ads campaigns went live; advertiser verification finally unblocked serving (24 March)
-- v2.6.0 ready for obfuscation export — not yet deployed to wordpress.org
-- AddToCart quality improvement shipped — fragment-based client pixel for AJAX add-to-cart
 - Multi-tier click ID persistence spec written; feature not started
 
 ---
@@ -47,15 +45,6 @@ New structure:
 
 - Run the URL search-replace on the local `updev` DB (Rohan's plugin-based method) so internal links resolve to `updev.local.site` instead of prod `unipixelhq.com`.
 - Smoke test the local site + admin.
-
-### IMMEDIATE — Deploy v2.6.0 to wordpress.org
-
-Obf export ready, smart-quote check passed last session. Workflow:
-1. Pre-export checklist (see `.claude/app-knowledge/deploy-and-release.md` — smart quotes grep, php -l on source).
-2. `cd _obf && bash obf.sh export` — writes into SVN working copy at `C:\Users\RohanKleem\Documents\Rohan\buildio\plugin-unipixel\plugin-obf-exports`.
-3. Lint obfuscated output via filename + stdin (stdin matches wp.org's SVN hook behaviour — caught v2.6.0 stray-quote regression last time).
-4. Exclusion check — `.claude/` and `CLAUDE.md` must not be in export.
-5. TortoiseSVN commit + tag.
 
 ### IMMEDIATE — Monitor Google Ads post-verification
 

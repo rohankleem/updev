@@ -15,13 +15,21 @@
             var consentHonour = $('#enableConsentHonour').is(':checked') ? 1 : 0;
             var consentUI = $('#consentUI').val() || 'unipixel';
             var consentUIStyle = $('#consentUIStyle').val() || 1;
+            var consentLocaleOverride = $('#consentLocaleOverride').val() || 'auto';
+            var consentShowReject = $('#enableConsentShowReject').is(':checked') ? 1 : 0;
+            var consentPopupStyle = $('input[name="consent_popup_style"]:checked').val() || $('#consentPopupStyle').val() || 'centred';
+            var consentForceChoice = $('#enableConsentForceChoice').is(':checked') ? 1 : 0;
 
             var formData = {
                 action: 'unipixel_update_consent_settings',
                 nonce: unipixel_ajax_obj.nonce,
                 consent_honour: consentHonour,
                 consent_ui: consentUI,
-                consent_ui_style: consentUIStyle
+                consent_ui_style: consentUIStyle,
+                consent_locale_override: consentLocaleOverride,
+                consent_show_reject: consentShowReject,
+                consent_popup_style: consentPopupStyle,
+                consent_force_choice: consentForceChoice
             };
 
             this.toggleLoading(true);

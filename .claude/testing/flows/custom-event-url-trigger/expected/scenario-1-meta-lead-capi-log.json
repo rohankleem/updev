@@ -1,0 +1,20 @@
+{
+  "_log_table_row_id": 30,
+  "_method": "server",
+  "_party": "first",
+  "_event_order": "serverSecond",
+  "_dedup_key": "event_id matches the client-side row event_id (see scenario-1-meta-lead-client-log.json)",
+  "sent_data_partial": {
+    "body": {
+      "data": [
+        {
+          "event_name": "Lead",
+          "event_time": 1777549038,
+          "action_source": "website",
+          "event_id": "event_1777549036529"
+        }
+      ]
+    }
+  },
+  "_baseline_notes": "event_time differs each run. event_id MUST match the client-side row event_id (dedup contract). action_source must be 'website'. event_name must be 'Lead'."
+}

@@ -39,9 +39,9 @@ The plugin's internal `.claude/` and `CLAUDE.md` **do** get deployed to dev.unip
 
 ## 2. Release to wordpress.org
 
-The obfuscation export folder **IS the wordpress.org SVN working copy**. `obf.sh export` writes directly into that folder; TortoiseSVN commits from it. One mechanism, not two.
+`obf.sh export` writes the obfuscated plugin to the export folder defined in `_obf/obf.sh` (`DEFAULT_EXPORT`: `C:\Users\RohanKleem\Documents\Rohan\buildio\plugin-unipixel\plugin-obf-exports`). This is a scratch/staging folder — each run cleans and rewrites it, nothing important is lost.
 
-Path: `C:\Users\RohanKleem\Documents\Rohan\buildio\plugin-unipixel\plugin-obf-exports`.
+After export + post-export checks pass, Rohan manually pastes the obfuscated files into the wordpress.org SVN repository's tag folders and commits via TortoiseSVN. The export script itself does not touch SVN.
 
 ### The Release Gate — 4 files, always together
 
@@ -73,11 +73,11 @@ These exist because of real shipped-bug incidents. See `domain-knowledge/platfor
 ```bash
 cd C:/xampp/htdocs/updev/_obf
 bash obf.sh dry           # optional — preview
-bash obf.sh export        # writes into the SVN working copy
+bash obf.sh export        # writes obfuscated files to the scratch export folder
 ```
 
 Default behaviour:
-- Obfuscates to `C:\Users\RohanKleem\Documents\Rohan\buildio\plugin-unipixel\plugin-obf-exports`
+- Obfuscates to the scratch export folder (path set in `_obf/obf.sh`)
 - Applies: `--encode-strings --minify --strip-comments --verbose`
 - Loads `exclude-list.txt`:
   - `unipixel.php` (main file — keep clean for WP to read the plugin header)
@@ -101,12 +101,10 @@ Default behaviour:
    No FAIL output = good.
 2. **Exclusion check** — confirm `.claude/` and `CLAUDE.md` are NOT present in the export folder.
 
-### Commit to wordpress.org via TortoiseSVN
+### Paste into SVN, then commit via TortoiseSVN
 
-From the export/SVN working copy folder:
-
-1. TortoiseSVN → Commit — review the diff, commit to `trunk/` with a version-bump message.
-2. Tag the release — TortoiseSVN → Branch/tag... → copy `trunk` → `tags/X.Y.Z`.
+1. Copy the obfuscated contents from the export folder into the wp.org SVN repository's `tags/X.Y.Z/` folder (create the tag folder if needed). Update `trunk/` too if appropriate.
+2. TortoiseSVN → Commit — review the diff, commit with a version-bump message.
 3. wordpress.org typically picks up the new `Stable tag` within minutes.
 
 ### After release

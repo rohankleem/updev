@@ -1,0 +1,26 @@
+{
+  "platform_id": 1,
+  "platform_name": "Meta",
+  "options": [
+    "",
+    "AddPaymentInfo",
+    "AddToCart",
+    "AddToWishlist",
+    "CompleteRegistration",
+    "Contact",
+    "CustomizeProduct",
+    "Donate",
+    "FindLocation",
+    "InitiateCheckout",
+    "Lead",
+    "Purchase",
+    "Schedule",
+    "Search",
+    "StartTrial",
+    "SubmitApplication",
+    "Subscribe",
+    "ViewContent",
+    "__CUSTOM__"
+  ],
+  "_baseline_notes": "Hardcoded list in ajax-event-settings.js STANDARD_EVENTS_BY_PLATFORM[1]. Diff against this list on each run; any divergence means the JS source changed."
+}

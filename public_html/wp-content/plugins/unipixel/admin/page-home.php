@@ -97,27 +97,6 @@ function unipixel_home_page()
                 <?php endif; ?>
             </div>
 
-            <!-- PINTEREST -->
-            <div class="col-md-6 col-lg-3 mb-4">
-                <?php if ($is_pinterest_setup) : ?>
-                    <div class="card bg-light-red borderless w-100 h-100">
-                        <div class="card-body pb-0">
-                            <h1>Pinterest Tag</h1>
-                            <p>Manage Pinterest tracking with Conversions API, including custom events.</p>
-                            <a href="<?php echo esc_url(menu_page_url('unipixel_pinterest', false)); ?>" class="btn btn-primary">View Tag Setup</a>
-                        </div>
-                    </div>
-                <?php else : ?>
-                    <div class="card bg-light-red borderless w-100 h-100">
-                        <div class="card-body pb-0">
-                            <h1>Setup Pinterest Tag</h1>
-                            <p>Add your Pinterest Tag ID to get started.</p>
-                            <a href="<?php echo esc_url(menu_page_url('unipixel_pinterest', false)); ?>" class="btn btn-primary">Get Started</a>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            </div>
-
             <!-- TIKTOK -->
             <div class="col-md-6 col-lg-3 mb-4">
                 <?php if ($is_tiktok_setup) : ?>
@@ -160,10 +139,48 @@ function unipixel_home_page()
                 <?php endif; ?>
             </div>
 
+            <!-- PINTEREST -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <?php if ($is_pinterest_setup) : ?>
+                    <div class="card bg-pinterest-pink borderless w-100 h-100">
+                        <div class="card-body pb-0">
+                            <h1>Pinterest Tag</h1>
+                            <p>Manage Pinterest tracking with Conversions API, including custom events.</p>
+                            <a href="<?php echo esc_url(menu_page_url('unipixel_pinterest', false)); ?>" class="btn btn-primary">View Tag Setup</a>
+                        </div>
+                    </div>
+                <?php else : ?>
+                    <div class="card bg-pinterest-pink borderless w-100 h-100">
+                        <div class="card-body pb-0">
+                            <h1>Setup Pinterest Tag</h1>
+                            <p>Add your Pinterest Tag ID to get started.</p>
+                            <a href="<?php echo esc_url(menu_page_url('unipixel_pinterest', false)); ?>" class="btn btn-primary">Get Started</a>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+
         </div>
 
 
-        <hr />
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-primary shadow-sm">
+                    <div class="card-body">
+                        <h4 class="mb-2"><i class="fa-solid fa-bullseye text-primary"></i> Centralised Event Manager</h4>
+                        <p class="text-muted mb-3">
+                            Beyond WooCommerce events (which are tracked automatically), you can manage your custom events in one place across every enabled platform.
+                            Set up a Lead, Newsletter Signup, or any custom conversion once. UniPixel applies the right standard event names and dedup for each platform you choose.
+                            "Events" and "conversions" mean the same thing here.
+                        </p>
+                        <a href="admin.php?page=unipixel_conversions" class="btn btn-sm btn-outline-primary">
+                            <i class="fa-solid fa-arrow-right"></i> Open Event Manager
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
         <div class="row mt-2">
 

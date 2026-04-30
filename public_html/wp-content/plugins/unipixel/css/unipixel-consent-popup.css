@@ -1,14 +1,22 @@
-/* === General container styling === */
+/* === Card container — single source of truth ===
+ * Centering via left:0; right:0; margin: 0 auto — does NOT use any transform
+ * for centering. This means the keyframe animation can use a pure translateY
+ * without conflicting with horizontal positioning. Earlier we tried percentage-
+ * based transform centering (translate(-50%,0)) but browsers were unreliable
+ * about resolving the -50% during animation, causing horizontal drift.
+ */
 .unipixel-card {
   position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 1.5rem;
-  max-width: 700px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  bottom: 2rem;
+  max-width: 600px;
+  width: calc(100% - 2rem);
   background: var(--upx-bg, #fff);
   color: var(--upx-text, #222);
   border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   padding: 1rem 1.25rem;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   z-index: 9999;
@@ -155,15 +163,157 @@
   }
 }
 
-/* === Animation === */
+/* === Animation ===
+ * Pure translateY — horizontal centering is handled by left/right/margin on .unipixel-card
+ * and is NOT touched by this animation. Keeps the slide-up clean and prevents
+ * any horizontal drift during the animation.
+ */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translate(-50%, 1rem);
+    transform: translateY(1rem);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === Style modifiers ===
+ * Each style is a CSS class applied to the card (.unipixel-style-{id}) and overrides
+ * positioning. The default (.unipixel-style-centred) inherits the base .unipixel-card
+ * rules — it doesn't need its own block.
+ */
+
+/* Bottom bar — full-width strip stuck to the bottom */
+.unipixel-card.unipixel-style-bottom-bar {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  border-radius: 0;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+  padding: 1rem 1.5rem;
+}
+
+/* Top bar — full-width strip at top, slides down */
+.unipixel-card.unipixel-style-top-bar {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: auto;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  padding: 1rem 1.5rem;
+  animation: fadeInDown 0.3s ease-out;
+}
+
+/* Bottom-left corner — small card */
+.unipixel-card.unipixel-style-bottom-left {
+  left: 1.5rem;
+  right: auto;
+  bottom: 1.5rem;
+  margin: 0;
+  max-width: 380px;
+  width: calc(100% - 3rem);
+}
+
+/* Bottom-right corner — mirror */
+.unipixel-card.unipixel-style-bottom-right {
+  left: auto;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  margin: 0;
+  max-width: 380px;
+  width: calc(100% - 3rem);
+}
+
+/* Make the buttons row in bar styles align nicely with the body text on wide screens */
+.unipixel-card.unipixel-style-bottom-bar .unipixel-buttons,
+.unipixel-card.unipixel-style-top-bar .unipixel-buttons {
+  margin-top: 0.75rem;
+}
+
+/* Corner cards are inherently narrow — always stack buttons full-width.
+ * Equal-width stacked buttons read cleaner than two on top, one below. */
+.unipixel-card.unipixel-style-bottom-left .unipixel-buttons,
+.unipixel-card.unipixel-style-bottom-right .unipixel-buttons {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.unipixel-card.unipixel-style-bottom-left .upx-btn,
+.unipixel-card.unipixel-style-bottom-right .upx-btn {
+  width: 100%;
+  text-align: center;
+  white-space: normal;
+  word-wrap: normal;
+}
+
+/* Tame the oversized `-dark-main` padding inside narrow corner cards */
+.unipixel-card.unipixel-style-bottom-left .upx-btn-dark-main,
+.unipixel-card.unipixel-style-bottom-right .upx-btn-dark-main {
+  padding: 0.55rem 1rem;
+}
+
+/* === Mobile breakpoint — narrow viewports ===
+ * On phones, every style stacks buttons to avoid wrapping/overflow.
+ * Cards collapse to near-edge width with safe gutters. */
+@media (max-width: 600px) {
+  /* All card styles: shrink the oversized primary button */
+  .unipixel-card .upx-btn-dark-main {
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  /* Stack buttons full-width on narrow viewports for ALL styles */
+  .unipixel-card .unipixel-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .unipixel-card .upx-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Centred card — keep its corner radius and shadow but tighten horizontal padding */
+  .unipixel-card.unipixel-style-centred,
+  .unipixel-card:not([class*="unipixel-style-"]) {
+    padding: 1rem 1rem;
+  }
+
+  /* Corner cards behave like a centred mini-bar near the bottom */
+  .unipixel-card.unipixel-style-bottom-left,
+  .unipixel-card.unipixel-style-bottom-right {
+    left: 0.75rem;
+    right: 0.75rem;
+    max-width: none;
+    width: calc(100% - 1.5rem);
+  }
+
+  /* Bars stay full-width but tighten horizontal padding */
+  .unipixel-card.unipixel-style-bottom-bar,
+  .unipixel-card.unipixel-style-top-bar {
+    padding: 0.85rem 1rem;
   }
 }
 
@@ -185,20 +335,5 @@
   to { opacity: 1; }
 }
 
-/* === Card styling === */
-.unipixel-card {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 2rem;
-  max-width: 600px;
-  background: var(--upx-bg, #fff);
-  color: var(--upx-text, #222);
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  padding: 1rem 1.25rem;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  z-index: 9999;
-  animation: fadeInUp 0.3s ease-out;
-}
+/* (Card styling is consolidated at the top of this file.) */
 

@@ -39,6 +39,11 @@ if (!empty($has_hero)) {
 						<a class="nav-link" href="/unipixel-docs/">Documentation</a>
 					</li>
 
+					<!-- Shop -->
+					<li class="nav-item">
+						<a class="nav-link" href="/shop/">Shop</a>
+					</li>
+
 					<!-- Blog -->
 					<li class="hs-has-sub-menu nav-item">
 						<a id="blogMegaMenu" class="hs-mega-menu-invoker nav-link dropdown-toggle" href="#" role="button" aria-expanded="false">Blog</a>
