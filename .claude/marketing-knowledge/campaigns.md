@@ -103,6 +103,18 @@ Graphics 1 and 2 exist (Pain/Rainbow format). Graphic 3 is the new Pinpoint and 
 | "My Event Match Quality score is stuck at 'Poor'" | Meta can't match your events to real people because the browser strips the data it needs. UniPixel sends user data server-side — match quality goes up without you touching anything. |
 | *(source more from forums)* | |
 
+**v2.6.6 Pinpoint hooks (Centralised Event Manager):**
+
+| Pinpoint (3–8 words, real forum language) | Panorama (reframe + expand) |
+|---|---|
+| "How do I track a thank-you page?" | Thirty seconds in UniPixel: pick the page from a dropdown, pick "Lead", done. No GTM, no CSS, no copy-pasting the same event into five different platform settings pages. |
+| "What's the Meta Lead event called in TikTok?" | TikTok calls it "Contact". Google calls it "generate_lead". Pinterest calls it "Lead". UniPixel fills in the right one for each platform automatically. You set up "Lead" once. |
+| "Set up the same conversion 5 times in 5 places…" | UniPixel's Centralised Event Manager: one form, all five platforms, every standard event name handled. Edit once, propagates everywhere. |
+| "Tracking lead-gen on WordPress without WooCommerce" | UniPixel works the same on non-WooCommerce sites. Lead, Newsletter Signup, Contact, Registration — pre-mapped to every platform's standard event name. Pick a thank-you page, pick a conversion type, save. |
+| "Do I really need GTM just to fire Lead on /thank-you/?" | No. WordPress already runs PHP. UniPixel uses your existing server. Pick the page, pick the conversion, fires across Meta, Google, TikTok, Pinterest, Microsoft. |
+| "PixelYourSite paywalls custom events" | UniPixel includes every custom event flow at one price — clicks, page-shown triggers, URL-match triggers, the new Centralised Event Manager. Nothing behind a Pro tier. |
+| "Why does Google not let me have client AND server for Lead?" | Because for non-Purchase events Google permits one or the other. UniPixel enforces that rule for you in the Event Manager — one less thing to know, one less mis-configuration. |
+
 **Source Pinpoints from:** WP.org support forums (Meta for WooCommerce, Conversios, PixelYourSite), Reddit (r/woocommerce, r/PPC, r/FacebookAds), Facebook groups.
 
 ---
@@ -222,6 +234,11 @@ Search pool here is much larger than competitor brand terms — **this is the ma
 **Platform-Specific CAPI** (phrase match):
 `"facebook conversions api woocommerce"`, `"woocommerce facebook capi plugin"`, `"woocommerce meta pixel plugin"`, `"woocommerce tiktok pixel plugin"`, `"tiktok events api wordpress"`, `"google analytics woocommerce server side"`, `"pinterest conversions api wordpress"`
 
+**Lead-Gen / Non-WooCommerce** (phrase match) — new ad group post-v2.6.6 to capture the lead-gen and non-WC WordPress audience that previously had no first-class story. Targets Pillar 3 + audience C5:
+`"thank you page conversion tracking wordpress"`, `"lead tracking wordpress no gtm"`, `"meta lead event wordpress plugin"`, `"track form submission meta capi"`, `"wordpress lead gen tracking plugin"`, `"facebook lead event wordpress"`, `"google generate_lead wordpress"`, `"form submission conversion tracking wordpress"`
+
+Headlines anchor on the new positioning: "Track Lead Without GTM", "Thank-You Page in 30 Seconds", "Set Up Lead Once — All 5 Platforms", "No CSS, No Code, No GTM", "Built for Lead-Gen Sites Too", "Newsletter Signup Across Every Platform", "Pick a Page. Pick a Conversion. Done."
+
 Headlines and descriptions use the emotional arc. Opening hooks: "Better Data. Better Results.", "Are Your Conversions Missing?", "Every Sale Reported Accurately", "All Five APIs — One Install".
 
 ---
@@ -334,6 +351,7 @@ Active page → better ad delivery → more engagement → more profile visits
 | 4 | **Platform partnerships** | Research phase. Pinterest first (integration is fresh and complete). |
 | 5 | **Third-party advocates** | Start identifying targets. Outreach once videos and docs exist to point them to. |
 | 6 | **Paid ads** | Last for bootstrap, but Google Ads already live for competitor + category interception. Meta Ads planned. |
+| 7 | **GitHub presence** | Live as of May 2026. Information surface (no code), README with full positioning, releases mirror wp.org versions. SEO + trust + branded-search hygiene. See `projects/github-info-repo.md`. |
 
 ### Channel 1 — Community & forums
 
@@ -413,6 +431,24 @@ Real data point: ~1,000 clicks for ~$30. That's $0.03/click.
 **Phase 3: Revenue channel (post-Pro launch).** Once Pro is live, ads = revenue channel with real unit economics. At $1/install and 3% Pro conversion at $89/yr, that's ~$33 CAC for an $89/yr customer. Scaling ads = scaling revenue.
 
 **Current state:** Google Ads already live (Campaigns 3 & 4). Meta planned (Campaign 2). YouTube Ads — only viable once UniPixel's own videos exist.
+
+### Channel 7 — GitHub presence
+
+`github.com/unipixelhq` is a public-facing information surface for the UniPixel brand. Not a code repository: plugin source ships via wp.org SVN. The repo holds the README (full positioning, comparison tables, full version changelog), 20 topic tags for GitHub Topics discovery, and Releases that mirror wp.org versions. Each release page is independently indexable.
+
+**Why it works as a growth channel:**
+- DA-96 backlink to unipixelhq.com on every page of the repo
+- Branded-search hygiene: anyone googling "unipixel github" lands somewhere legitimate
+- GitHub Topic pages (`/topics/server-side-tracking`, `/topics/woocommerce`, `/topics/meta-conversions-api`, etc.) are discovery surfaces in their own right
+- Awesome-list eligibility (curated lists only link to repos)
+- Trust signal for the technical buyer who skews dev-flavoured
+- Public Issue tracker, when active, generates user-question long-tail SEO
+
+**What it isn't:** the source of truth for plugin code. Public unobfuscated source would undermine the obfuscation-based licensing strategy in `domain-knowledge/licensing-and-protection.md`. The repo states "ships via wp.org" up front so visitors don't expect code.
+
+**Status:** Live as of 2026-05-02. Full content surface complete. Account-level flag from launch-day automation velocity is restricting the `/releases` listing index page until cleared (direct release URLs work; sidebar widget on repo home shows all five releases). See `projects/github-info-repo.md` § Flag situation for detail.
+
+**Maintenance cost:** ~5 minutes per wp.org release (mirror the version + changelog into a GitHub Release).
 
 ---
 

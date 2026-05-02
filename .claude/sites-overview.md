@@ -1,6 +1,6 @@
 # UniPixel / Buildio — Site Reference
 
-Four sites across two product families.
+Four sites across two product families, plus one public brand surface on GitHub.
 
 ## At a glance
 
@@ -10,6 +10,12 @@ Four sites across two product families.
 | `dev.unipixelhq.com` | `updev.local.site` | `C:\xampp\htdocs\updev` | `rohankleem/updev` | Plugin dev base + central docs/recording hub |
 | `buildio.au` | `bdoau.local.site` | `C:\xampp\htdocs\bdoau` | `rohankleem/bdoau` | **The customer-facing Australian brand** — consultancy helping businesses navigate digital transformation for optimisation. A resignation to focus on Australia, making `.au` the flagship brand |
 | `buildio.dev` | `bdodev.local.site` | `C:\xampp\htdocs\bdodev` | `rohankleem/buildio` | Supporting role: forward-facing presentation of the `buildio.au` brand, general WordPress plugin presentation, and backend listener for UniPixel plugin offload services (logging, email sending — may migrate to `unipixelhq.com` later) |
+
+## Public brand surface (non-site)
+
+| Surface | URL | Purpose |
+|---|---|---|
+| **GitHub presence** | `github.com/unipixelhq` | Public information surface for UniPixel. README with full positioning, releases mirroring wp.org versions, topic tags for discovery. **Not a code repository** — plugin source ships through wp.org SVN. See `projects/github-info-repo.md` for full context, including the account-flag situation from launch. |
 
 ## Hosting
 
@@ -30,3 +36,4 @@ All four live on the same Interserver box (`vda4300.is.cc`, user `buildiod`), ma
 - `dev.unipixelhq.com` — live (local + remote)
 - `buildio.au` — live
 - `buildio.dev` — live
+- `github.com/unipixelhq` — live (account flag restricting `/releases` listing index until cleared)

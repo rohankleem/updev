@@ -117,7 +117,7 @@ CLAUDE.md                                    ← You are here. Operating manual.
 ├── session-state-rohan.md                   ← Rohan's rolling notes. Prune, don't append.
 ├── settings.json                            ← Team harness settings (committed). Permission rules for .md edits.
 ├── settings.local.json                      ← Per-machine harness settings (gitignored).
-├── sites-overview.md                        ← Cross-site reference: uphq / updev / buildio.dev / buildio.au.
+├── sites-overview.md                        ← Cross-site reference: uphq / updev / buildio.dev / buildio.au + the github.com/unipixelhq surface.
 ├── updev-setup.md                           ← How updev was set up as the dev base. Reference.
 ├── uphq-projects-truth.md                   ← Legacy uphq facts (low relevance here — ignore unless host-level).
 ├── app-knowledge/                           ← How the plugin is built.
@@ -139,7 +139,8 @@ CLAUDE.md                                    ← You are here. Operating manual.
 │   ├── release-log.md                       ← Version history, backlog with buckets, unreleased work staging.
 │   ├── multi-tier-clickid-persistence.md    ← Feature spec (not started).
 │   ├── consent-popup-i18n.md                ← Feature spec (not started) — multi-language + editable consent popup.
-│   └── centralised-event-builder.md         ← 3-phase feature: URL trigger → event name dropdowns → conversion builder + grouping.
+│   ├── centralised-event-builder.md         ← 3-phase feature: URL trigger → event name dropdowns → conversion builder + grouping.
+│   └── github-info-repo.md                  ← Public GitHub presence at `github.com/unipixelhq` — info-only repo, decisions, current state, flag situation, per-release maintenance.
 └── testing/                                 ← Verification flows. Browser-agent-executable test specs.
     ├── testing.md                           ← Methodology, verification surfaces, index of all flows.
     └── flows/                               ← One file per flow (consent-grant, click-id-capture, woocommerce-purchase, etc).

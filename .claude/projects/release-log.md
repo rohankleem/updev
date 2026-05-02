@@ -6,9 +6,9 @@ Single source of truth for release history, what's staged for the next release, 
 
 ## Current State
 
-- **Live on wordpress.org:** `v2.6.5`
+- **Live on wordpress.org:** `v2.6.6`
 - **Source version (`unipixel.php`):** `v2.6.6`
-- **Pending action:** deploy v2.6.6 to wordpress.org. Centralised Event Manager release (Phase 1 URL trigger, Phase 2 standard event name dropdowns, Phase 3 cross-platform conversion builder with grouping). Obf export + SVN commit pending.
+- **Pending action:** none. v2.6.6 shipped 2026-04-30.
 
 > When a release ships, update this block, move the "Staged for next release" items into a stamped entry in "Released History", and bump the version in the four release-gate files (see `/CLAUDE.md` § Release Gate).
 
@@ -72,6 +72,7 @@ _(empty — v2.6.6 ships now)_
 | 30 | Meta test event code field | Event Quality, UX | Hours | Not started | No field to paste the Events Manager "Test Events" code — users can't verify server-side events land in Meta's Test Events tab, only in the plugin's local log. Add input on Meta setup page, pass as `test_event_code` in CAPI payload (opt-in, per session). Source: user feedback review. |
 | 31 | Consent popup localization (multi-language + editable) | UX, Platform Coverage | Days | Not started | Built-in consent popup is single-language only AND strings are hardcoded, so even single-language stores can't change wording. Dealbreaker for multi-region stores. Full spec: `projects/consent-popup-i18n.md` — covers admin UI, `.po/.mo` + override hybrid, security (kses + escaping), phased delivery (Phase 1 = editable English, Phase 2 = multi-language, Phase 3 = polish). Source: user feedback review. |
 | 32 | Refresh "Cookie Consent & Tracking" docs article | Growth | Hours | Not started | Article at `unipixelhq.com/unipixel-docs/` was written before v2.6.4 + v2.6.5 work. Now significantly understates capabilities — needs to cover the 18-language popup, per-language editable wording, 5 layout styles, optional non-blocking mode, and Reject all toggle. Apply voice rules from `marketing-knowledge/writing-style.md`. Help-icon popovers in the plugin admin point at this URL, so it's high-traffic. |
+| 33 | GitHub presence at `github.com/unipixelhq` | Growth | Hours | **Done (live, listing index pending flag clear)** | Public information surface for UniPixel. Profile, full long-form README, About sidebar with 20 topics, social preview image, 5 releases (v2.5.3, v2.6.0, v2.6.4, v2.6.5, v2.6.6). Account-level flag from launch-day automation velocity is currently restricting the `/releases` listing index page; data is intact, will surface once flag clears. Full context, decisions, and per-release maintenance flow: `projects/github-info-repo.md`. |
 
 ---
 
@@ -135,6 +136,8 @@ _(empty — v2.6.6 ships now)_
 | 19 | Blog content | Ongoing | Not started |
 | 20 | YouTube tutorials | Ongoing | Not started |
 | 21 | Community seeding | Ongoing | **Active** |
+| 32 | Refresh Cookie Consent docs article | Hours | Not started |
+| 33 | GitHub presence (`github.com/unipixelhq`) | Hours | **Done (live, listing pending flag clear)** |
 
 ### Housekeeping
 | # | Feature | Effort | Status |

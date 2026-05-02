@@ -12,6 +12,10 @@ For voice / editorial rules see `writing-style.md`. For positioning and pillars 
 
 It is NOT the WordPress site that runs the plugin (that's separate). It's a public-facing WordPress install at `unipixelhq.com` whose only job is converting interested visitors into installs.
 
+### Related public surface: `github.com/unipixelhq`
+
+A separate brand surface, not part of this site. Different role: the GitHub presence is a discovery and trust hub that links *into* unipixelhq.com (and into wp.org). README, topic tags, releases. No plugin code lives there. See `projects/github-info-repo.md` for full context. Mentioned here so future doc-writing remembers there are now two indexable brand surfaces, not one.
+
 ---
 
 ## Top-level structure
@@ -53,6 +57,9 @@ The plugin's admin help-icon popovers and Need-help-? links point at these URLs.
 ### Gaps worth filling
 - No setup guide for "first time installing UniPixel" — a one-page index of "go through this in order"
 - Cookie Consent doc was written before the v2.6.4 / v2.6.5 multi-language + customisable popup work — needs a refresh
+- **Custom Event Tracking doc** (`/unipixel-docs/custom-event-tracking/`) predates v2.6.6 and now understates capability significantly. Needs rewrite covering URL trigger, page picker, "Any URL" mode, standard event name dropdowns, and the new Centralised Event Manager (cross-platform conversion setup, conceptual events like Lead / Newsletter Signup, group lifecycle).
+- **New doc: Centralised Event Manager guide** — could be a dedicated article alongside the refreshed Custom Events one. Walks through "set up a Lead conversion across all platforms in one go", screenshots of the builder, what propagates vs what stays per-platform.
+- **New doc: Tracking lead-gen / non-WooCommerce sites with UniPixel** — opens the new audience (B2B, services, membership, courses). Shows thank-you-page tracking, newsletter signup tracking, contact form tracking — all without GTM and without CSS for URL-based events.
 - No troubleshooting guide
 
 ---
@@ -79,7 +86,9 @@ Per `priorities.md` and `campaigns.md`, content for both Universal and Competiti
 - "Free Meta CAPI plugin for WordPress" (Competitive, intercepts buying-intent)
 - "Why your WordPress site doesn't need a GTM server container" (Universal, education)
 - "Server-side tracking on WordPress: the budget version" (Competitive, price-conscious search)
-- A v2.6.5 announcement / consent feature deep-dive
+- **v2.6.6 announcement: "Set up a Lead conversion once. UniPixel handles all five platforms."** (announcement + feature deep-dive). Captures the moment of the Centralised Event Manager release. The lede angle: every other tracking plugin makes you set the same conversion up five times in five different places with five different standard event names; UniPixel does it in one form.
+- **"Track form submissions and thank-you pages on WordPress without code"** (Universal + lead-gen audience). Targets the new C5 audience — lead-gen / B2B / service / course-creator WordPress sites. Hook: "If you've ever set up a Meta `Lead` event and then realised TikTok calls it `Contact`, this is for you."
+- **"WordPress lead-gen tracking without GTM, without CSS, without paying $359"** (Competitive, intercepts the "PYS for non-WC sites" search). Specifically counters the gap competitors leave: most tracking plugins lead with WooCommerce; non-WC sites are second-class.
 
 ---
 
