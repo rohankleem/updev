@@ -8,7 +8,7 @@ Foundational — what UniPixel is, how we talk about it, how we differentiate. S
 
 UniPixel is a WordPress plugin that sends conversion and event tracking data directly from the WordPress server to ad platforms — Meta, Pinterest, TikTok, Google, and Microsoft. It does server-side tracking without requiring GTM server containers, third-party cloud services, or paid subscriptions.
 
-The plugin handles WooCommerce ecommerce events automatically, provides an interface for custom event tracking (buttons, forms, interactions), includes a fully-featured built-in consent layer (multi-language popup with editable wording, multiple layout styles, optional non-blocking mode, plus passthrough integration with nine major third-party CMPs), and handles event deduplication automatically across all platforms.
+The plugin handles WooCommerce ecommerce events automatically, provides a Centralised Event Manager that lets users set up custom conversions across every platform in one shot (no per-platform repetition, no CSS for URL-based conversions, automatic standard event names per platform), includes a fully-featured built-in consent layer (multi-language popup with editable wording, multiple layout styles, optional non-blocking mode, plus passthrough integration with nine major third-party CMPs), and handles event deduplication automatically across all platforms.
 
 UniPixel is designed to be sold. The model is full-feature access with a lock-in gate — every user gets everything, then a paywall activates once they're embedded. Target price: $89/yr. The current free phase is validation — establishing UniPixel as the preferred plugin before pricing activates.
 
@@ -42,11 +42,11 @@ Other solutions force you into $100–150/mo cloud servers and complex GTM conta
 
 **The outcome:** Server-side tracking without the server. No cloud hosting to provision, no GTM expertise to learn, no infrastructure bills that grow with your traffic. It runs on what you already have.
 
-### Pillar 3: Track the actions that drive your business
+### Pillar 3: Track lead-gen, signups and any custom conversion — across every platform in one shot
 
-Not just page views and purchases — track the button clicks, form submissions, and interactions that actually matter to your business. Build smarter ad audiences based on what people do on your site, not just that they visited.
+Not just WooCommerce. Lead forms, newsletter signups, contact submissions, thank-you pages, post-checkout pages — set up the conversions that actually drive your business **once**, in the Centralised Event Manager, and UniPixel fires them across every ad platform you use. Pick a page from your site instead of writing CSS. Pick "Lead" once instead of typing the right standard event name into five different platform settings pages.
 
-**The outcome:** Your ad platforms learn which actions lead to sales. They find more people who take those actions. Your campaigns get smarter without you touching them.
+**The outcome:** Non-WooCommerce sites get first-class tracking too. Your ad platforms learn which actions lead to customers. They find more people who take those actions. Your campaigns get smarter without you touching them. And you never set up the same conversion five times again.
 
 ### Pillar 4: Privacy and consent without the headache
 
@@ -80,7 +80,7 @@ Meta, Google, TikTok, Pinterest, Microsoft — all connected, all tracking, all 
 
 **2. Tracking is event-driven now — not just page views.** Platforms are hugely event-driven — clicks, form submissions, interactions, purchases, add-to-carts. GTM exists to manage this but requires GTM expertise. Most site owners can't manage that.
 
-**3. Custom events need to be simple.** Customers need a simple way to track their own events — this button, that form, that popup. They need an interface to set them up without technical complexity or a developer.
+**3. Custom events need to be simple, AND they need to span platforms.** Customers need a simple way to track their own conversions — this thank-you page, this newsletter signup, this lead form. They need an interface that doesn't require GTM, doesn't require CSS expertise, and doesn't make them paste the same event into five different platform settings pages with five different standard event names.
 
 **4. Consent is non-negotiable.** Don't send data when customers haven't consented. The industry is cracking down. Real compliance risk.
 
@@ -109,7 +109,7 @@ But WordPress? Plugins run PHP on the server. UniPixel just uses that. It fires 
 
 1. **Server-side delivery.** Sends data through the protocols platforms have built — directly from the WordPress server.
 2. **Event-driven tracking.** Handles WooCommerce events automatically and doesn't require GTM.
-3. **Custom events.** Interface inside WordPress to set up and manage custom event triggers — buttons, forms, interactions. No GTM, no code.
+3. **Custom events.** Centralised Event Manager inside WordPress to set up custom conversions across every platform in one go. Pick a page from your site for thank-you-page or lead-page tracking (no CSS), or define a click target. Then pick a conversion type (Lead, Newsletter Signup, Contact, Registration, or your own) and UniPixel fills in each platform's correct standard event name automatically (Meta "Lead", Google "generate_lead", TikTok "Contact"). Edit a shared field once and it propagates to every linked platform. No GTM, no code, no per-platform repetition.
 4. **Consent.** Checks consent before any event fires. Provides its own built-in consent popup (18 languages out of the box, editable text per language, choice of layouts, optional non-blocking mode, mobile-responsive), or reads choices from any of 9 third-party CMPs if the visitor already uses one. Doesn't send data without permission.
 
 ### The solution
@@ -233,6 +233,9 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 | Multi-pixel support | No | Pro | Pro | ? | No |
 | GTM required | No | No | No | Yes (for SST) | No |
 | Product feed sync | No | No | No | Yes | Meta only |
+| Centralised cross-platform event setup (one-shot) | Yes | No | No | No | No |
+| Standard event name auto-fill per platform | Yes | No | No | No | No |
+| URL-based custom event triggers (no CSS) | Yes | No | No | No | No |
 
 ---
 
@@ -250,8 +253,10 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 - Consent management built in — PYS sells ConsentMagic separately
 - Simpler, cleaner interface — PYS UX widely criticised as cluttered
 - Self-hosted server-side with no external infrastructure (same as PYS here, but without the add-on pricing model)
+- Centralised cross-platform event setup — set up "Lead" once and UniPixel hits all 5 platforms with the right standard event name. PYS makes you configure each platform separately
+- URL-based event triggers — pick a thank-you page from a dropdown without writing CSS. PYS's custom event UI is selector-only
 
-**The pitch:** Everything PixelYourSite charges add-ons for, UniPixel includes. Same self-hosted approach, less complexity, no upsell treadmill.
+**The pitch:** Everything PixelYourSite charges add-ons for, UniPixel includes. Same self-hosted approach, less complexity, no upsell treadmill, plus a Centralised Event Manager that no other plugin has.
 
 ### vs Pixel Manager / SweetCode (~50k installs, $149–228/yr)
 
@@ -261,8 +266,10 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 - Self-hosted — Pixel Manager routes server-side data through SweetCode Cloud. Tracking depends on their infrastructure
 - Works on non-WooCommerce sites — Pixel Manager is WooCommerce-only
 - No vendor lock-in — if SweetCode raises prices or shuts down, users lose server-side tracking
+- Centralised Event Manager — Pixel Manager has no equivalent for cross-platform conversion creation
+- URL-based triggers + page picker for non-developers
 
-**The pitch:** Pixel Manager sends your data through someone else's servers. UniPixel sends it from yours. Works on any WordPress site.
+**The pitch:** Pixel Manager sends your data through someone else's servers. UniPixel sends it from yours. Works on any WordPress site, including lead-gen sites Pixel Manager doesn't support.
 
 ### vs Conversios (~60k installs, $250–499/yr)
 
@@ -273,8 +280,9 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 - Works on non-WooCommerce sites
 - Simpler setup — no GTM expertise needed
 - No invisible infrastructure costs
+- Centralised Event Manager — Conversios needs per-platform GTM tag setup for each conversion you want to track; UniPixel does it in one form
 
-**The pitch:** Conversios makes you build and maintain server infrastructure just to send conversion data. UniPixel uses the server you already have.
+**The pitch:** Conversios makes you build and maintain server infrastructure just to send conversion data. UniPixel uses the server you already have, and lets you set up a Lead conversion once across all platforms instead of building five separate GTM tags.
 
 ### vs Meta for WooCommerce (~500k installs, free)
 
@@ -319,9 +327,10 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 
 1. **Self-hosted server-side tracking — zero external dependencies.** Every competitor that does server-side either requires GTM server containers, routes through their cloud, or needs separate hosting. UniPixel fires directly from WP server to platform APIs.
 2. **All 5 platforms at one price, no add-on upsells.** Meta + Pinterest + TikTok + Google + Microsoft in the base product.
-3. **Works on non-WooCommerce sites.** Lead gen, SaaS, content sites — not just WooCommerce.
-4. **Consent layer is a real feature, not a checkbox.** Own popup ships with translations for 18 languages out of the box, every string is editable from the admin per language, choose from 5 layout styles (centred card, top/bottom bar, corner cards), optional non-blocking mode, mobile-responsive. Reads from 9 third-party CMPs (OneTrust, Cookiebot, Osano, Silktide, Orest Bida, Complianz, CookieYes, Moove GDPR, CookieAdmin/Softaculous) if visitors prefer to use one of those instead.
-5. **Lightweight — no build step, no external JS bundles.** Pure PHP + vanilla JS.
+3. **Centralised cross-platform event setup.** Set up Lead, Newsletter Signup, Contact, Registration, or any custom conversion ONCE. UniPixel applies it to every platform you've enabled with the correct standard event name (Meta `Lead`, Google `generate_lead`, TikTok `Contact`, Pinterest `Lead`, Microsoft `lead`). Edit a shared field once and it propagates to every linked platform. No competitor in the WordPress space offers this — every other plugin makes you set the same conversion up five times.
+4. **Lead-gen / non-WooCommerce sites are first-class.** URL-based triggers + Centralised Event Manager mean a thank-you-page conversion takes thirty seconds without touching CSS or GTM. The Lead, Newsletter Signup and Contact conceptual events target the lead-gen / B2B / service / membership market directly. Most tracking plugins lead with WooCommerce; UniPixel works the same on non-WC sites.
+5. **Consent layer is a real feature, not a checkbox.** Own popup ships with translations for 18 languages out of the box, every string is editable from the admin per language, choose from 5 layout styles (centred card, top/bottom bar, corner cards), optional non-blocking mode, mobile-responsive. Reads from 9 third-party CMPs (OneTrust, Cookiebot, Osano, Silktide, Orest Bida, Complianz, CookieYes, Moove GDPR, CookieAdmin/Softaculous) if visitors prefer to use one of those instead.
+6. **Lightweight — no build step, no external JS bundles.** Pure PHP + vanilla JS.
 
 ---
 
@@ -466,6 +475,8 @@ Industry freemium average: 1–3%. Lock-in gate model should outperform because 
 **C3: "I tried GTM server-side and it's too complex"** — attempted and failed/gave up. *Where they are:* Conversios/Stape support threads complaining about setup.
 
 **C4: "I'm using Meta for WooCommerce but it's terrible"** — installed the official plugin because free and official. Then it broke their site. *Where they are:* Meta for WooCommerce support forum, Facebook groups.
+
+**C5: "I run a non-WooCommerce WordPress site and tracking plugins feel WC-shaped"** — lead-gen sites, B2B services, agencies, course creators, membership sites, consultancy portfolios. They have form submissions and thank-you pages, not orders. They want to fire Meta `Lead` on `/thank-you/` and have Google get `generate_lead` for the same action. Most tracking plugins lead with WooCommerce, paywall custom events behind Pro tiers, and force per-platform setup. *Where they are:* WP.org searches like "lead tracking wordpress without gtm", "thank you page conversion tracking wordpress", "form submission meta capi wordpress", lead-gen Facebook groups, B2B WordPress communities.
 
 ### How the two pillars work together
 

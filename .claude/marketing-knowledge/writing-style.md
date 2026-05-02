@@ -59,6 +59,8 @@ Setup steps belong in docs, not blog/landing copy.
 ### 8. Em dash discipline
 The site uses em dashes (—) sparingly for emphasis. Don't pepper them in. If you can use a comma, full stop, or colon — use that instead. Comma-style asides are usually clearer than dash-style asides.
 
+**Plugin admin copy (separate from blog/docs voice): no em dashes.** Buttons, headings, helper text, descriptions inside the plugin itself avoid em dashes by default — they read as AI-generated in product UI. Use periods, commas, or colons. Hyphens in compound words (`send-mode`, `fire-once-per-session`, `post-redirect`) are fine; those are not em dashes.
+
 ### 9. Comparative tables for "vs" claims
 Whenever the article makes a comparison, include a tight table. Readers scan tables before reading prose. Make the table support the article's thesis without needing the prose.
 

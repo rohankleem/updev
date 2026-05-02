@@ -1,9 +1,9 @@
 # Project: Centralised Event Builder + URL Trigger
 
-**Status:** Planning — about to enter Active build
+**Status:** Complete — shipped in v2.6.6 (2026-04-30)
 **Created:** 2026-04-30
 **Owner:** Rohan
-**Phases:** 3 (URL trigger primitive → event name dropdowns → centralised builder + grouping)
+**Phases:** 3 (URL trigger primitive → event name dropdowns → centralised builder + grouping). All phases shipped together as v2.6.6 named "Centralised Event Manager".
 
 ---
 

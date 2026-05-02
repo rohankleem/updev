@@ -45,7 +45,11 @@
       "mcp__Claude_in_Chrome__read_console_messages",
       "Bash(node -c public_html/wp-content/plugins/unipixel/js/unipixel-common.js)",
       "Bash(echo \"exit=$?\")",
-      "Bash(php -l public_html/wp-content/plugins/unipixel/admin/admin-wpmenu.php public_html/wp-content/plugins/unipixel/admin/page-conversions.php public_html/wp-content/plugins/unipixel/admin/page-home.php)"
+      "Bash(php -l public_html/wp-content/plugins/unipixel/admin/admin-wpmenu.php public_html/wp-content/plugins/unipixel/admin/page-conversions.php public_html/wp-content/plugins/unipixel/admin/page-home.php)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "mcp__Claude_in_Chrome__switch_browser"
     ]
   }
 }

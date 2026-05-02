@@ -23,6 +23,14 @@ Medium-cadence file. What's done, what's blocking adoption, what that means for 
   - Optional Reject all button (force-choice friendly, GDPR-clean)
   - Mobile-responsive — buttons stack on phones and corner layouts
   - Reads 9 third-party CMPs (OneTrust, Cookiebot, Osano, Silktide, Orest Bida, Complianz, CookieYes, Moove GDPR, CookieAdmin / Softaculous)
+- **Centralised Event Manager (v2.6.6):**
+  - New top-level admin page for cross-platform conversion creation
+  - Conceptual event picker (Lead, Newsletter Signup, Contact, Registration, Search, ViewContent, or Custom) auto-fills the correct standard event name for each platform (Meta `Lead` → Google `generate_lead` → TikTok `Contact`, etc.)
+  - URL-based trigger for custom events: pick a page from your site (page picker), type a wildcard pattern, or fire on any URL — no CSS required for the most common conversion patterns (thank-you pages, lead pages, post-checkout pages)
+  - Standard event name dropdown per platform when configuring custom events directly (alongside the centralised flow)
+  - Fire-once-per-session guard for URL events (no double-counting on reload)
+  - Google client/server mutex (G-001) enforced inline — one less foot-gun for users who don't know Google permits one or the other for non-Purchase events
+  - Conversion grouping persists across edits: change a shared field (trigger, URL pattern) once and it propagates to every linked platform; per-platform overrides (event name, send-mode) stay independent
 
 ---
 
@@ -38,11 +46,11 @@ The plugin setup itself is simple. But before a user can configure UniPixel, the
 
 UniPixel can't control those platform interfaces but can mitigate with clear documentation on buildio.dev walking users through each platform step by step. Several of these docs already exist.
 
-### 3. Custom events UI — CSS selectors are a developer concept
+### 3. Custom events UI — element-clicked / element-shown still need CSS selectors
 
-Custom event tracking currently requires users to type CSS selectors (`#id`, `.class`) to identify which elements to track. This works for developers but is unintuitive for store owners. A user who wants to track "this button" shouldn't need to know what a CSS selector is. A visual element picker or guided wizard would open custom events to non-technical users. **This is the one real product gap that limits who can use the plugin.**
+**Substantially reduced in v2.6.6.** The most common non-WooCommerce conversion pattern (thank-you pages, lead pages, post-checkout pages) is now configurable without CSS. Users pick a page from their site or type a URL pattern via the new URL trigger + Centralised Event Manager. Lead-gen sites can fire Meta `Lead` / Google `generate_lead` / TikTok `Contact` on `/thank-you/` in under thirty seconds with no developer involvement.
 
-Stopgap: docs article explaining custom events setup exists, ready to publish.
+**Residual gap:** the click-element and shown-element triggers still require CSS selectors. This matters less than it did because URL-based conversions cover the highest-volume use cases, but a visual element picker would still help users tracking specific buttons or visible elements outside the URL flow. Lower priority than it was; no longer the headline blocker.
 
 ---
 
@@ -51,8 +59,9 @@ Stopgap: docs article explaining custom events setup exists, ready to publish.
 The product is past the "does it work" stage. It's now "can people get to the point where it works for them." A fundamentally different problem — and the right problem to have.
 
 - **Distribution comes first** — people can't hit onboarding friction if they never find the plugin. Growth work (forums, Google Ads, YouTube, docs, partnerships) dominates near-term attention. See `campaigns.md`.
-- **Onboarding docs are partially in place** — keep publishing platform-specific setup guides on buildio.dev / unipixelhq.com.
-- **Custom events wizard is the highest-impact remaining product work** — once distribution moves, this is the biggest unlock for the addressable user base.
+- **Onboarding docs need a refresh** — Custom Event Tracking doc and Cookie Consent doc both predate v2.6.x work and now understate capability. Refresh urgent.
+- **v2.6.6 unlocks the lead-gen / non-WC market** — the URL trigger + Centralised Event Manager makes UniPixel a credible answer for B2B / service / course / membership sites that previously couldn't easily configure custom conversions. New audience worth targeting in growth.
+- **Visual element picker remains** as a smaller residual product gap — affects click/shown triggers only. Low priority.
 
 ---
 
@@ -100,8 +109,8 @@ Making server-side tracking optional (v2.5.1) removes the credential wall from i
 
 | Feature | Effort | Why | Status |
 |---|---|---|---|
-| Setup wizard / onboarding flow | Days | Most deactivations in first 10 minutes. Guided first-run (connect, verify). Must come before custom events wizard. | Needs assessment |
-| Custom events wizard | Days | Current CSS-selector UI unintuitive for non-developers. Visual element picker + templates + validation + test/preview. The highest-impact product work remaining. Stopgap docs article exists. | Needs assessment |
+| Setup wizard / onboarding flow | Days | Most deactivations in first 10 minutes. Guided first-run (connect, verify). | Needs assessment |
+| Visual element picker for click / shown triggers | Days | Residual gap from v2.6.6. The Centralised Event Manager + URL trigger now cover thank-you-page conversions without CSS, but click/shown triggers still need selectors. Lower priority than before — affects a smaller slice of users now. | Not started |
 | Event diagnostics dashboard | Days | Users can't tell if the plugin is working. Health screen: last event, success/fail counts, connection status per platform. Data already in `unipixel_event_log`. | Not started |
 
 ### Tier 3: Known gaps, lower urgency
