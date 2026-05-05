@@ -27,6 +27,19 @@ Cross-session audit findings as platform reports are assessed and code is audite
 
 ---
 
+### TT-003: Reserved event names auto-map to Standard events — TERMINOLOGY QUIRK
+
+**Source:** TikTok Events API docs (Custom Events / Reserved Events)
+**Surface impact:** Bespoke event flow (centralised Event Manager + per-platform Custom Events table)
+
+**The quirk:** TikTok defines a set of "Reserved Event Names" that the platform automatically maps to its existing Standard Events. If a user creates a Bespoke event with a Reserved name, TikTok will NOT report it under that bespoke name — it gets silently rolled into the matched Standard event. The user sees no custom-named data flowing.
+
+**Cross-reference:** `event-terminology.md` § Platform-specific quirks. The per-platform inline hint for TikTok carries "Avoid Reserved names" as the warning surface.
+
+**Action when surfacing in UI:** When a user enters a bespoke Platform Event Reference for TikTok, validate against the reserved list and warn inline. Don't block (TikTok still accepts the call); just inform.
+
+---
+
 ### TT-002: Parameter ordering bug in Purchase & Checkout server calls — FIXED
 
 **Found during:** TT-001 investigation
@@ -228,3 +241,35 @@ _(No platform reports processed yet)_
 ## Microsoft
 
 _(No reports processed yet)_
+
+---
+
+## Pinterest
+
+### PIN-001: Custom event tier accepts only 6 sub-types — TERMINOLOGY QUIRK
+
+**Source:** Pinterest Conversions API event-type spec
+**Surface impact:** Bespoke event flow (centralised Event Manager + per-platform Custom Events table)
+
+**The quirk:** Pinterest's "custom" event tier is itself a finite list, not a free-form name. Accepted values: `custom`, `lead`, `search`, `signup`, `view_category`, `watch_video`. Anything outside this set is dropped or ignored when sent as the event_name on a Pinterest Tag / CAPI call.
+
+**Implication for our UX:** Bespoke Platform Event References for Pinterest are not truly free-form. A user who types `MyBespokeEvent` for Pinterest will see no data. Either:
+- Validate the bespoke value on input against the 6 allowed sub-types and warn, or
+- Restrict the dropdown to these 6 values when Pinterest is the active platform context.
+
+**Cross-reference:** `event-terminology.md` § Platform-specific quirks.
+
+---
+
+## Google
+
+### G-002: GA4 event-name validation — INFORMATIONAL
+
+**Source:** GA4 event naming docs
+**Surface impact:** Bespoke event flow for Google.
+
+**The rules:** GA4 event names must start with a letter, contain only letters / numbers / underscores, and not exceed 40 chars. Spaces, hyphens, and special characters are rejected.
+
+**Implication:** Our canonical bespoke example `MyBespokeEvent` is technically valid (starts with letter, only letters). It violates GA4's snake_case style convention but is accepted. No validation needed — but worth a soft inline note where space allows.
+
+**Cross-reference:** `event-terminology.md` § Platform-specific quirks.

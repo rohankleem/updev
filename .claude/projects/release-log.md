@@ -7,18 +7,18 @@ Single source of truth for release history, what's staged for the next release, 
 ## Current State
 
 - **Live on wordpress.org:** `v2.6.6`
-- **Source version (`unipixel.php`):** `v2.6.6`
-- **Pending action:** none. v2.6.6 shipped 2026-04-30.
+- **Source version (`unipixel.php`):** `v2.6.7`
+- **Pending action:** v2.6.7 obfuscated and exported 2026-05-03; awaiting TortoiseSVN commit to wordpress.org.
 
 > When a release ships, update this block, move the "Staged for next release" items into a stamped entry in "Released History", and bump the version in the four release-gate files (see `/CLAUDE.md` § Release Gate).
 
 ---
 
-## Staged for next release (Done since v2.6.6)
+## Staged for next release (Done since v2.6.7)
 
 > This is the staging area for unreleased work. When it's time to release, review this list, decide on a version number (patch/minor/major), then update readme, marketing, backlog accordingly. Rohan chooses the version number based on the weight of changes.
 
-_(empty — v2.6.6 ships now)_
+_(empty — v2.6.7 ships now)_
 
 ---
 
@@ -154,6 +154,7 @@ _(empty — v2.6.6 ships now)_
 
 > Populated when a release ships. Each block should capture: version number, ship date, headline changes, files touched (summary), notable post-release observations.
 
+- **v2.6.7** (2026-05-03) — Terminology pass renaming "Custom events" → "Site events" across admin (general-settings, home page Event Manager card, conversion-groups UI, notice strings). Help icons added to the Event Manager (send-client / send-server / log-response). Plus two fixes: defensive guard in `unipixel-enqueue.php` around `array_merge` of plugin options (prevents front-end fatal if `unipixel_logging_options` or `unipixel_consent_settings` ever holds a non-array value), and brand-correct platform label map in `admin-wpmenu.php` (TikTok casing). Per-version detail: `public_html/wp-content/plugins/unipixel/readme.txt` changelog.
 - **v2.6.6** (2026-04-30) — Centralised Event Manager release. New top-level admin page for cross-platform conversion creation: pick a conceptual event (Lead, Newsletter Signup, etc.) and UniPixel fills in each platform's standard event name automatically. New URL-based trigger for custom events (fire on thank-you pages, lead pages, post-checkout pages with wildcard URL patterns). Standard event name dropdowns when defining custom events per platform. Page/URL picker reusable component. Fire-once-per-session guard for URL events. G-001 mutex enforced inline (Google client OR server, not both, except Purchase). Schema: new `unipixel_conversion_groups` table + `conversion_group_id` link column on `unipixel_events_settings`. Per-version detail: `public_html/wp-content/plugins/unipixel/readme.txt` changelog.
 - **v2.6.5** — popup style options (5 layouts: centred / top bar / bottom bar / bottom-left / bottom-right corner card), optional Reject all button (off by default, translated into all 18 locales), CookieAdmin (Softaculous) third-party CMP support, mobile-responsive popup (buttons stack on phones), popup animation centering fix, auto cache-bust for popup assets via filemtime suffix, plus admin polish (Test the popup section, Languages save-mode hint, dropdown label rename, plugin homepage URL update). Per-version detail: `public_html/wp-content/plugins/unipixel/readme.txt` changelog.
 - **v2.6.4** — multi-language consent popup (18 bundled locales + admin Languages & Content override accordion + popup language control). Per-version detail: `public_html/wp-content/plugins/unipixel/readme.txt` changelog.

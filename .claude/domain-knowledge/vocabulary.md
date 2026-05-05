@@ -6,11 +6,22 @@ For operating-manual terms (plugin, host, session, project, etc.) see `/CLAUDE.m
 
 ---
 
+> **Event terminology framework:** the structural rules (hierarchy, ordering, copy patterns, per-platform hints) live in `event-terminology.md`. Pinned short definitions live below.
+
 ## Core tracking concepts
 
 | Term | Definition |
 |---|---|
-| **Event** | A discrete action we tell an ad platform about: PageView, ViewContent, AddToCart, InitiateCheckout, Purchase, or a custom click event. |
+| **Event** | A discrete action we tell an ad platform about: PageView, ViewContent, AddToCart, InitiateCheckout, Purchase, or a site event. The umbrella term — preferred over "conversion" in structural naming. |
+| **WooCommerce events** | Events fired automatically from WooCommerce hooks (AddToCart, InitiateCheckout, Purchase, etc.). Cross-platform by nature — one hook fires every enabled platform. Managed with toggles + Apply Recommended Settings on each platform's Events Setup page. |
+| **Site events** | Events the user configures themselves on non-WooCommerce interactions: clicks, visible elements, page URLs, form submissions on URL. The umbrella term in admin UI (replaces "Custom Events" as of 2026-05-03). External surfaces (marketplace, blog, ads) still say "Custom Events" for SEO recognition — see `event-terminology.md`. |
+| **Standard event** | A site event whose Platform Event Reference is from that platform's recognised list (Meta `Lead`, Google `generate_lead`, etc.). Recognised by the platform's Events Manager. |
+| **Bespoke event** | A site event with a free-form Platform Event Reference. Recorded by the platform but not tracked as a known event type. Replaces "Custom event" in the free-form tier specifically — disambiguates the previously overloaded "custom". |
+| **Trigger** | When a site event fires: `click`, `shown`, `url`, `form_submit_on_url`. |
+| **Trigger Target** | The thing the trigger acts upon. CSS selector for click/shown; URL pattern for url/form_submit_on_url. Replaces "Element Reference". Structural / docs term — pairs with "Trigger" when explaining the data model. **User-facing label is "Acts On"** (column headers + form labels) for plainer English. |
+| **Platform Event Reference** | The string sent to the platform's pixel/CAPI as the event identifier. Full prose: "Platform Event Reference". Column headers: "Platform Event Ref" (keep the "Platform" prefix; only abbreviate "Reference" to "Ref"). |
+| **Cross-platform event** | An event configured once that creates linked rows across multiple platforms. Replaces "conversion" in the centralised builder context. |
+| **Conversion** | Reserved for marketing copy and SEO. Not used in admin labels or doc field names. The industry is collapsing "conversions" back into "events" — keep our structural vocabulary aligned. |
 | **Pixel** | The client-side JS that fires events from the browser (e.g. `fbq()`, `ttq.track()`, `gtag()`, `uetq.push()`). Each platform has its own pixel. |
 | **CAPI / Conversions API** | A platform's server-to-server API for receiving events. Meta CAPI, Pinterest CAPI, TikTok Events API, Microsoft UET CAPI, GA4 Measurement Protocol. UniPixel calls these from the WordPress server. |
 | **Server-first** | Event flow where the server fires first (via CAPI), then inline JS fires the browser pixel with a matching eventId. Used for WooCommerce events. |

@@ -5,6 +5,8 @@
 **Owner:** Rohan
 **Phases:** 3 (URL trigger primitive → event name dropdowns → centralised builder + grouping). All phases shipped together as v2.6.6 named "Centralised Event Manager".
 
+> **Terminology:** this doc, the admin UI, and supporting docs all use the framework defined in `.claude/domain-knowledge/event-terminology.md`. Key terms: **Site events** (the umbrella for what was historically called "Custom Events"), **Standard event** vs **Bespoke event** (the two tiers within a site event), **Platform Event Reference** (the string sent to the platform), **Trigger** + **Trigger Target**. "Conversion" is reserved for marketing copy only and not used in admin labels going forward.
+
 ---
 
 ## Why
@@ -23,6 +25,7 @@ This project addresses all four frictions in three layered phases. Together they
 
 ## Out of scope
 
+- **WooCommerce events.** WC events are not part of the Centralised Event Manager and never will be. They live on each platform's Events Setup page, are hook-based (auto-tracked, no trigger config), and are managed with per-event toggles (Send Client / Send Server / Log Response) plus the per-platform "Apply Recommended Settings" button. They're already cross-platform by nature (one WC hook fires every enabled platform), so the cross-platform builder adds nothing. The Conversions list page links out to each platform's Events Setup to make this routing explicit.
 - **Visual element picker** (popup-navigate-and-point). High build cost, wrong tool for this market — UniPixel's pitch is "simpler than GTM," not "as powerful as GTM."
 - **Regex URL patterns.** Wildcard `*` covers 95%+ of cases without bad-input crash surface. Defer to v2 if asked.
 - **Value / currency on custom events.** Custom events currently don't carry monetary value. Lead and similar conversion events don't require it. Defer.
@@ -190,7 +193,7 @@ User can override per-platform name in any row. Mapping is just the smart defaul
 When the conceptual event is *not* Purchase:
 - Google row's `Client` and `Server` toggles act as a radio pair — turning one on turns the other off
 - Inline note: *"Google allows client OR server tracking for this event type, not both. Both are only allowed for Purchase events."*
-- Default state for Google + Lead: Server only (most reliable from MP)
+- Default state for Google (non-Purchase events): **Client only** (changed from Server only on 2026-05-03 — client-side is the more familiar starting point for users coming from gtag/GA4 setups; users can toggle to server-side per event)
 
 When the conceptual event is Purchase:
 - Both toggles independent, no enforcement

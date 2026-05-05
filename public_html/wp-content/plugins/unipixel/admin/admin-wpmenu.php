@@ -144,7 +144,15 @@ function unipixel_render_platform_header_nav($platform, $active)
 {
     // Normalize inputs
     $platform_key   = sanitize_key($platform);                 // 'meta' | 'google'
-    $platform_label = ucfirst($platform_key);
+    // Brand-correct labels (ucfirst breaks TikTok's two-capital casing).
+    $platform_labels = [
+        'meta'      => 'Meta',
+        'pinterest' => 'Pinterest',
+        'tiktok'    => 'TikTok',
+        'google'    => 'Google',
+        'microsoft' => 'Microsoft',
+    ];
+    $platform_label = $platform_labels[$platform_key] ?? ucfirst($platform_key);
     $active_key     = sanitize_key($active);                   // 'setup' | 'events'
 
     // Page slug per platform
@@ -229,7 +237,7 @@ function unipixel_render_notice_from_query()
     $map = [
         'pv_updated'     => __('PageView settings updated.', 'unipixel'),
         'woo_updated'    => __('Woo events updated.', 'unipixel'),
-        'custom_updated' => __('Custom events updated.', 'unipixel'),
+        'custom_updated' => __('Site events updated.', 'unipixel'),
     ];
     foreach ($map as $key => $msg) {
         if (isset($_GET[$key])) {

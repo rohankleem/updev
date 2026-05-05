@@ -29,9 +29,36 @@ Most flows depend on a specific admin configuration (which platforms are enabled
 
 | Approach | When to use |
 |---|---|
-| **WP CLI** (`wp option update unipixel_xyz value` via Bash) | Default. Setting up state before a flow. Fast, deterministic, idempotent, easy to restore. |
-| **Direct DB write** (mysql query into `wp_options`) | Fallback if WP CLI isn't available. Same effect. |
+| **PHP via WP bootstrap** (`/c/xampp/php/php.exe -r '...wp-load.php; update_option(...)'`) | **Default on this dev box.** WP CLI is not installed and the bundled MariaDB mysql client throws `caching_sha2_password.dll` on connect. PHP+wp-load is the only working path; verified 2026-05-03. |
 | **Click through admin UI** (browser agent) | Only when testing the admin UI itself (e.g. `admin-pixel-config` flow). Otherwise too slow + fragile. |
+| **WP CLI / `mysql` client** | Add to allowlist + paths if/when installed; the docs reference these for completeness, but treat them as future state, not current. |
+
+**PHP one-shot template (read state):**
+```bash
+/c/xampp/php/php.exe -r "
+\$_SERVER['HTTP_HOST']='updev.local.site';
+\$_SERVER['REQUEST_URI']='/';
+require 'C:/xampp/htdocs/updev/public_html/wp-load.php';
+global \$wpdb;
+\$p = \$wpdb->prefix;  // wx4gk_, NOT wp_
+print_r(\$wpdb->get_results(\"SELECT * FROM {\$p}unipixel_platform_settings\", ARRAY_A));
+"
+```
+
+**PHP one-shot template (mutate option, snapshot original first):**
+```bash
+/c/xampp/php/php.exe -r "
+\$_SERVER['HTTP_HOST']='updev.local.site';
+\$_SERVER['REQUEST_URI']='/';
+require 'C:/xampp/htdocs/updev/public_html/wp-load.php';
+\$orig = get_option('unipixel_logging_options');
+file_put_contents('C:/tmp/snap.json', json_encode(\$orig));
+\$new = \$orig; \$new['enableLogging_SendEvents'] = true;
+update_option('unipixel_logging_options', \$new);
+"
+```
+
+Restore: read the snapshot file, `update_option()` the original back.
 
 ### Setup state contract
 
@@ -235,6 +262,40 @@ First run of a flow: every capture is `[NEEDS REVIEW: no baseline yet]`. The use
 
 ---
 
+## Run depth — full vs light vs baseline
+
+Not every change warrants running every flow. Three depths, each with a clear trigger.
+
+| Depth | When | What it runs |
+|---|---|---|
+| **Baseline** | First time a flow runs, or after an intentional behaviour change. | The single flow whose captures need re-blessing. Output goes into `expected/` once eyeballed. |
+| **Light check** | Day-to-day after a targeted code change. | Only flows whose `Covers:` line touches the changed surfaces. See scoping table below. |
+| **Full check** | Before every `_obf/` export and SVN release; after architectural refactors; quarterly hygiene pass. | Every Active flow in the index. Failing flow blocks release. |
+
+### Scoping a light check
+
+Match the changed file paths to the flows that exercise them. Read the diff first, then pick.
+
+| Changed file / area | Flows to run |
+|---|---|
+| `functions/consent-*`, `js/unipixel-consent-popup.js`, `unipixel_consent_settings` schema | consent-grant-first-visit, consent-decline-first-visit, consent-revoke, consent-granular, consent-honour-bypass |
+| `trackers/*`, `js/pixel-*-gtag.js`, per-platform CAPI dispatch | The platform-specific WC flows + platform-master-toggles |
+| `woocomm-hook-handling/*` | woocommerce-viewcontent, woocommerce-add-to-cart, woocommerce-purchase |
+| `functions/clickid-*` | click-id-capture |
+| `admin/page-*-events.php`, `admin/page-meta-setup.php` | admin-pixel-config (the platform's scenario) |
+| `admin/page-conversions.php`, conversion_groups schema, URL-trigger code | custom-event-url-trigger, centralised-conversion-builder, conversion-group-management |
+| `trackers/event-log.php`, `wp_unipixel_event_log` schema | event-log-response-toggle |
+| `functions/advanced-matching*` | advanced-matching-payload |
+| Pure docs / marketing / project notes | None — skip the test gate entirely |
+
+If the change spans multiple rows, run the union. If you can't tell which surface a change affects, default to a full check — speed isn't worth a missed regression on release day.
+
+### What "skip" actually means
+
+A skipped flow's most recent run log stays the contract until a code change in its scope demands a re-run. Don't redundantly re-verify untouched surfaces — but do trust the last run only as far back as the last code change in that area. Run logs older than the last touch in their scope are stale and should be re-run before treating them as ground truth.
+
+---
+
 ## Index of flows
 
 | Flow | Status | Covers |
@@ -253,6 +314,10 @@ First run of a flow: every capture is `[NEEDS REVIEW: no baseline yet]`. The use
 | [event-name-dropdown](flows/event-name-dropdown.md) | Draft | Phase 2 — `event_name` field becomes platform-specific dropdown with Custom escape hatch |
 | [centralised-conversion-builder](flows/centralised-conversion-builder.md) | Draft | Phase 3 — builder UI creates linked rows, G-001 enforced inline, conceptual event mapping |
 | [conversion-group-management](flows/conversion-group-management.md) | Draft | Phase 3 — group edit/delete/detach/add-platform lifecycle |
+| [platform-master-toggles](flows/platform-master-toggles.md) | Draft | `platform_enabled` and `serverside_global_enabled` master switches and their override behaviour against per-event flags |
+| [event-log-response-toggle](flows/event-log-response-toggle.md) | Draft | `send_server_log_response` toggle — what populates `wp_unipixel_event_log.response_message` and what doesn't (the verification-trap toggle) |
+| [advanced-matching-payload](flows/advanced-matching-payload.md) | Draft | `advanced_matching_enabled` toggle — hashed `user_data` block in WC purchase CAPI payload, hashing format contract |
+| [consent-honour-bypass](flows/consent-honour-bypass.md) | Draft | `enableConsentHonour` toggle — bypass mode fires events without consent, runtime toggle change behaviour |
 
 _(More flows added as features ship. New flow → add a row here.)_
 

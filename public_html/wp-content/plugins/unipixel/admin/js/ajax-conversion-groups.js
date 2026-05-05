@@ -21,6 +21,16 @@
 
     var TRIGGER_LABELS = {click: 'On Element Clicked', shown: 'On Element Shown', url: 'On Page URL Match'};
 
+    // Per-platform inline hints for the Platform Event Reference field.
+    // Source of truth: .claude/domain-knowledge/event-terminology.md § Per-platform inline hints.
+    var PLATFORM_EVENT_REF_HINTS = {
+        1: 'Sent to Meta. Pick a Standard name (e.g. <code>Lead</code>) or use a Bespoke name (e.g. <code>MyBespokeEvent</code>).',
+        2: 'Sent to Pinterest. Pick a Standard name (e.g. <code>lead</code>) or use a Bespoke name (e.g. <code>MyBespokeEvent</code>).',
+        3: 'Sent to TikTok. Pick a Standard name (e.g. <code>Contact</code>) or use a Bespoke name (e.g. <code>MyBespokeEvent</code>). Avoid TikTok Reserved names for Bespoke values.',
+        4: 'Sent to Google Analytics. Pick a Standard name (e.g. <code>generate_lead</code>) or use a Bespoke name (e.g. <code>MyBespokeEvent</code>).',
+        5: 'Sent to Microsoft Ads (as the UET Event Action). Pick a Standard name (e.g. <code>purchase</code>) or use a Bespoke name (e.g. <code>MyBespokeEvent</code>).'
+    };
+
     var state = {
         platforms: [],
         pages: [],
@@ -51,14 +61,14 @@
         postAjax('unipixel_conversions_list')
             .done(function (resp) {
                 if (!resp || !resp.success) {
-                    $('#conversions-list-container').html('<div class="notice notice-error"><p>' + escapeHtml((resp && resp.data && resp.data.message) || 'Failed to load.') + '</p></div>');
+                    $('#conversions-list-container').html('<div class="notice notice-error"><p>' + escapeHtml((resp && resp.data && resp.data.message) || 'Failed to load events.') + '</p></div>');
                     return;
                 }
                 state.platforms = resp.data.platforms || [];
                 renderList(resp.data.groups || [], resp.data.enabled_platform_count || 0);
             })
             .fail(function () {
-                $('#conversions-list-container').html('<div class="notice notice-error"><p>Network error loading conversions.</p></div>');
+                $('#conversions-list-container').html('<div class="notice notice-error"><p>Network error loading events.</p></div>');
             });
     }
 
@@ -90,13 +100,13 @@
             return;
         }
 
-        $('#conversions-count').text(groups.length === 0 ? 'No conversions yet.' : (groups.length + ' conversion' + (groups.length === 1 ? '' : 's')));
+        $('#conversions-count').text(groups.length === 0 ? 'No events yet.' : (groups.length + ' event' + (groups.length === 1 ? '' : 's')));
         if (groups.length === 0) {
-            $container.html('<div class="card"><div class="card-body text-center text-muted py-5"><i class="fa-solid fa-bullseye fa-2x mb-3"></i><p>No conversions configured yet. Click <strong>Create new conversion</strong> to get started.</p></div></div>');
+            $container.html('<div class="card"><div class="card-body text-center text-muted py-5"><i class="fa-solid fa-bullseye fa-2x mb-3"></i><p>No events configured yet. Click <strong>Create new event</strong> to get started.</p></div></div>');
             return;
         }
         var html = '<div class="table-responsive"><table class="table table-hover wp-list-table widefat striped">';
-        html += '<thead><tr><th>Conversion</th><th>Trigger</th><th>Target</th><th>Coverage</th><th></th></tr></thead><tbody>';
+        html += '<thead><tr><th>Event</th><th>Trigger</th><th>Acts On</th><th>Coverage</th><th></th></tr></thead><tbody>';
         groups.forEach(function (g) {
             var editUrl = 'admin.php?page=unipixel_conversions&action=builder&group_id=' + g.id;
             var coverage = (g.platform_count || 0) + ' of ' + (enabledCount || 0) + ' enabled platforms';
@@ -151,7 +161,7 @@
                             state.editing = gRes.data.group;
                             populateBuilderFromGroup(state.editing);
                         } else {
-                            showFeedback('Could not load this conversion.', 'error');
+                            showFeedback('Could not load this event.', 'error');
                         }
                         $('#builder-loading').hide();
                         $('#unipixel-conversion-builder-form').show();
@@ -277,13 +287,13 @@
             return;
         }
         $wrap.show();
+        $label.text('Acts On');
         if (v === 'url') {
-            $label.text('URL pattern');
             $modes.show();
             $target.attr('placeholder', '/thank-you* or *');
+            $help.text('URL pattern that the page must match. Use * as wildcard.');
             applyUrlMode();
         } else {
-            $label.text('CSS selector');
             $modes.hide();
             $target.attr('placeholder', '#contact-form or .cta-button').prop('disabled', false);
             $help.text('CSS selector for the element to track.');
@@ -357,7 +367,7 @@
         var conceptual = $('#builder-conceptual-event').val();
         var customName = $('#builder-custom-name').val();
         if (!conceptual) {
-            $container.html('<div class="text-muted">Pick a conversion type above to populate platform rows.</div>');
+            $container.html('<div class="text-muted">Pick an event type above to populate platform rows.</div>');
             return;
         }
         var enabled = state.platforms.filter(function (p) { return p.enabled; });
@@ -365,27 +375,72 @@
             $container.html('<div class="notice notice-warning"><p>No platforms enabled. Enable at least one platform first.</p></div>');
             return;
         }
-        var html = '<div class="table-responsive"><table class="table align-middle">';
-        html += '<thead><tr><th>Include</th><th>Platform</th><th>Event name</th><th>Client</th><th>Server</th><th>Log response</th></tr></thead><tbody>';
+        var icons = window.unipixel_help_icons || {};
+        var iconClient   = icons.send_client  || '';
+        var iconServer   = icons.send_server  || '';
+        var iconLogResp  = icons.log_response || '';
+
+        var html = '<table class="table align-middle">';
+        html += '<thead><tr>'
+            + '<th>Include</th>'
+            + '<th>Platform</th>'
+            + '<th>Platform Event Ref <small class="text-muted fw-normal">(sent to that platform)</small></th>'
+            + '<th class="colSendClientSide">Send<br />Client-side ' + iconClient + '</th>'
+            + '<th class="colSendServerSide">Send<br />Server-side ' + iconServer + '</th>'
+            + '<th class="colLogResponse">Log Server-side Response ' + iconLogResp + '</th>'
+            + '</tr></thead><tbody>';
         enabled.forEach(function (p) {
             var defaultName = getEventNameForPlatform(p.id, conceptual, customName);
             var standardEvents = STANDARD_EVENTS_BY_PLATFORM[p.id] || [];
             var isStandard = standardEvents.indexOf(defaultName) !== -1;
-            var defaultServer = (parseInt(p.id, 10) === 4) ? 0 : 1; // G-001: Google defaults to server-only for non-Purchase
+            var isGoogle = parseInt(p.id, 10) === 4;
+            // Default toggles: client ON for all, server ON for all except Google.
+            // Google defaults to client-only per G-001 (mutual exclusion enforced for non-Purchase events).
+            var clientChecked = true;
+            var serverChecked = !isGoogle;
             html += '<tr class="builder-platform-row" data-platform-id="' + p.id + '">'
                 + '<td><div class="form-check form-switch"><input type="checkbox" class="form-check-input platform-include" checked></div></td>'
                 + '<td>' + escapeHtml(p.platform_name) + '</td>'
                 + '<td>' + buildPlatformEventNameCell(p.id, defaultName, isStandard) + '</td>'
-                + '<td><div class="form-check form-switch"><input type="checkbox" class="form-check-input platform-send-client"' + (parseInt(p.id, 10) !== 4 ? ' checked' : '') + '></div></td>'
-                + '<td><div class="form-check form-switch"><input type="checkbox" class="form-check-input platform-send-server"' + (defaultServer ? ' checked' : '') + (parseInt(p.id, 10) === 4 ? ' checked' : '') + '></div></td>'
+                + '<td><div class="form-check form-switch"><input type="checkbox" class="form-check-input platform-send-client"' + (clientChecked ? ' checked' : '') + '></div></td>'
+                + '<td><div class="form-check form-switch"><input type="checkbox" class="form-check-input platform-send-server"' + (serverChecked ? ' checked' : '') + '></div></td>'
                 + '<td><div class="form-check form-switch"><input type="checkbox" class="form-check-input platform-log-response" checked></div></td>'
                 + '</tr>';
         });
-        html += '</tbody></table></div>';
+        html += '</tbody></table>';
         if (enabled.some(function(p){ return parseInt(p.id, 10) === 4; }) && !isPurchaseConceptual()) {
             html += '<div class="text-muted small mt-1"><em>Note:</em> Google allows client OR server tracking for this event type, not both. Toggling one off enables the other.</div>';
         }
         $container.html(html);
+        initPopoversIn($container[0]);
+    }
+
+    // Initialise Bootstrap popovers on any triggers within `root` that aren't already
+    // initialised. Mirrors the hover-with-grace-period pattern used by admin-common.js
+    // for static popovers, but scoped to a dynamically-rendered region.
+    function initPopoversIn(root) {
+        if (!root || typeof bootstrap === 'undefined' || !bootstrap.Popover) return;
+        var triggers = root.querySelectorAll('[data-bs-toggle="popover"]');
+        triggers.forEach(function (el) {
+            if (bootstrap.Popover.getInstance(el)) return;
+            var pop = new bootstrap.Popover(el, {
+                trigger: 'manual',
+                html: true,
+                container: 'body',
+                customClass: 'UniPixelPopover'
+            });
+            var hideTimeout;
+            el.addEventListener('mouseenter', function () {
+                clearTimeout(hideTimeout);
+                pop.show();
+                var popEl = (bootstrap.Popover.getInstance(el) && bootstrap.Popover.getInstance(el)._popover) || document.querySelector('.popover');
+                if (popEl) {
+                    popEl.addEventListener('mouseenter', function () { clearTimeout(hideTimeout); });
+                    popEl.addEventListener('mouseleave', function () { hideTimeout = setTimeout(function () { pop.hide(); }, 50); });
+                }
+            });
+            el.addEventListener('mouseleave', function () { hideTimeout = setTimeout(function () { pop.hide(); }, 50); });
+        });
     }
 
     function buildPlatformEventNameCell(platformId, value, isStandard) {
@@ -395,14 +450,16 @@
         var optionsHtml = standardEvents.map(function (n) {
             return '<option value="' + escapeHtml(n) + '"' + (n === selectValue ? ' selected' : '') + '>' + escapeHtml(n) + '</option>';
         }).join('');
+        var hint = PLATFORM_EVENT_REF_HINTS[platformId] || '';
         return ''
             + '<select class="form-control form-control-sm platform-event-name-select">'
             +   '<option value="" disabled' + (selectValue === '' ? ' selected' : '') + '>Choose…</option>'
             +   optionsHtml
-            +   '<option value="__CUSTOM__"' + (selectValue === '__CUSTOM__' ? ' selected' : '') + '>Custom…</option>'
+            +   '<option value="__CUSTOM__"' + (selectValue === '__CUSTOM__' ? ' selected' : '') + '>Bespoke (your own name)…</option>'
             + '</select>'
-            + '<input type="text" class="form-control form-control-sm mt-1 platform-event-name-custom" placeholder="Custom name" value="' + escapeHtml(inCustomMode ? value : '') + '"' + (inCustomMode ? '' : ' style="display:none"') + '>'
-            + '<input type="hidden" class="platform-event-name-value" value="' + escapeHtml(value) + '">';
+            + '<input type="text" class="form-control form-control-sm mt-1 platform-event-name-custom" placeholder="MyBespokeEvent" value="' + escapeHtml(inCustomMode ? value : '') + '"' + (inCustomMode ? '' : ' style="display:none"') + '>'
+            + '<input type="hidden" class="platform-event-name-value" value="' + escapeHtml(value) + '">'
+            + (hint ? '<small class="text-muted d-block mt-1">' + hint + '</small>' : '');
     }
 
     function setPlatformEventName($row, value) {
@@ -476,7 +533,7 @@
         e.preventDefault();
         var data = collectFormData();
         if (!data.event_trigger || !data.trigger_target || !data.conceptual_event) {
-            showFeedback('Please fill in trigger, target, and conversion type.', 'error');
+            showFeedback('Please fill in trigger, trigger target, and event type.', 'error');
             return;
         }
         var includedPlatforms = data.platforms.filter(function (p) { return p.include; });
@@ -486,7 +543,7 @@
         }
         for (var i = 0; i < includedPlatforms.length; i++) {
             if (!includedPlatforms[i].event_name) {
-                showFeedback('Each included platform needs an event name.', 'error');
+                showFeedback('Each included platform needs a Platform Event Reference.', 'error');
                 return;
             }
         }
@@ -496,21 +553,21 @@
         if (state.groupId > 0) payload.group_id = state.groupId;
         postAjax(action, payload).done(function (resp) {
             if (resp && resp.success) {
-                showFeedback(state.groupId > 0 ? 'Conversion saved.' : 'Conversion created.', 'success');
+                showFeedback(state.groupId > 0 ? 'Event saved.' : 'Event created.', 'success');
                 setTimeout(function () { window.location.href = 'admin.php?page=unipixel_conversions'; }, 700);
             } else {
                 showFeedback((resp && resp.data && resp.data.message) || 'Save failed.', 'error');
-                $('#builder-save-btn').prop('disabled', false).text(state.groupId > 0 ? 'Save changes' : 'Create conversion');
+                $('#builder-save-btn').prop('disabled', false).text(state.groupId > 0 ? 'Save changes' : 'Create event');
             }
         }).fail(function () {
             showFeedback('Network error during save.', 'error');
-            $('#builder-save-btn').prop('disabled', false).text(state.groupId > 0 ? 'Save changes' : 'Create conversion');
+            $('#builder-save-btn').prop('disabled', false).text(state.groupId > 0 ? 'Save changes' : 'Create event');
         });
     }
 
     function onBuilderDelete() {
         if (state.groupId <= 0) return;
-        if (!window.confirm('Delete this conversion? All linked platform events will also be deleted.')) return;
+        if (!window.confirm('Delete this event? All linked platform rows will also be deleted.')) return;
         postAjax('unipixel_conversions_delete', {group_id: state.groupId}).done(function (resp) {
             if (resp && resp.success) {
                 window.location.href = 'admin.php?page=unipixel_conversions';

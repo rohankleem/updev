@@ -42,9 +42,9 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    // Build the event_name cell. Renders a select with standard events + Custom..., a
-    // conditionally-visible text input for the custom value, and a hidden field that
-    // carries the actual submitted value (kept in sync by the change handlers below).
+    // Build the event_name cell. Renders a select with the platform's Standard events + a
+    // Bespoke option, a conditionally-visible text input for the bespoke value, and a hidden
+    // field that carries the actual submitted value (kept in sync by the change handlers below).
     function eventNameCellHtml(value, platformId) {
         var standardEvents = STANDARD_EVENTS_BY_PLATFORM[platformId] || [];
         var platformName = PLATFORM_NAMES[platformId] || 'platform';
@@ -61,11 +61,11 @@
             + '<select class="form-control event-name-select" required>'
             +   '<option value="" disabled' + (selectValue === '' ? ' selected' : '') + '>Choose event…</option>'
             +   optionsHtml
-            +   '<option value="' + CUSTOM_SENTINEL + '"' + (selectValue === CUSTOM_SENTINEL ? ' selected' : '') + '>Custom…</option>'
+            +   '<option value="' + CUSTOM_SENTINEL + '"' + (selectValue === CUSTOM_SENTINEL ? ' selected' : '') + '>Bespoke (your own name)…</option>'
             + '</select>'
-            + '<input type="text" class="form-control event-name-custom mt-1" placeholder="Enter custom event name" value="' + escapeHtml(inCustomMode ? safeValue : '') + '"' + (inCustomMode ? '' : ' style="display:none"') + '>'
+            + '<input type="text" class="form-control event-name-custom mt-1" placeholder="MyBespokeEvent" value="' + escapeHtml(inCustomMode ? safeValue : '') + '"' + (inCustomMode ? '' : ' style="display:none"') + '>'
             + '<input type="hidden" name="event_name[]" class="event-name-value" value="' + escapeHtml(safeValue) + '">'
-            + '<small class="text-muted d-block mt-1">Standard events get full reporting in ' + escapeHtml(platformName) + '’s Events Manager. Pick “Custom…” for any other name.</small>';
+            + '<small class="text-muted d-block mt-1">Standard names get full reporting in ' + escapeHtml(platformName) + '’s Events Manager. Pick Bespoke for any other name.</small>';
     }
 
     var UniPixelEventSettings = {
@@ -185,15 +185,15 @@
             return `
             <tr data-id="${event.id}">
                 <td>
-                    <input type="text" class="form-control element-ref-input" name="element_ref[]" value="${event.element_ref || ''}" placeholder="${refUi.placeholder}" required>
-                    <small class="element-ref-help text-muted">${refUi.help}</small>
-                </td>
-                <td>
                     <select class="form-control event-trigger-select" name="event_trigger[]" required>
                         <option value="click" ${trigger === 'click' ? 'selected' : ''}>On Element Clicked</option>
                         <option value="shown" ${trigger === 'shown' ? 'selected' : ''}>On Element Shown</option>
                         <option value="url"   ${trigger === 'url'   ? 'selected' : ''}>On Page URL Match</option>
                     </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control element-ref-input" name="element_ref[]" value="${event.element_ref || ''}" placeholder="${refUi.placeholder}" required>
+                    <small class="element-ref-help text-muted">${refUi.help}</small>
                 </td>
                 <td>${eventNameCellHtml(event.event_name, platformId)}</td>
                 <td><input type="text" class="form-control" name="event_description[]" value="${event.event_description ?? ''}"></td>
@@ -233,15 +233,15 @@
             var newRow = `
             <tr>
                 <td>
-                    <input type="text" class="form-control element-ref-input" name="element_ref[]" placeholder="${refUi.placeholder}" required>
-                    <small class="element-ref-help text-muted">${refUi.help}</small>
-                </td>
-                <td>
                     <select class="form-control event-trigger-select" name="event_trigger[]" required>
                         <option value="click">On Element Clicked</option>
                         <option value="shown">On Element Shown</option>
                         <option value="url">On Page URL Match</option>
                     </select>
+                </td>
+                <td>
+                    <input type="text" class="form-control element-ref-input" name="element_ref[]" placeholder="${refUi.placeholder}" required>
+                    <small class="element-ref-help text-muted">${refUi.help}</small>
                 </td>
                 <td>${eventNameCellHtml('', platformId)}</td>
                 <td><input type="text" class="form-control" name="event_description[]"></td>

@@ -209,19 +209,19 @@ function unipixel_page_tiktok_events()
             <!-- Section 3: Custom events (table)  -->
             <!-- ================================= -->
             <section id="tiktok-custom-section" class="mb-3">
-                <h2 class="mb-2"><?php echo esc_html__('Custom Events for', 'unipixel'); ?> <?php echo esc_html($platformName); ?></h2>
+                <h2 class="mb-2"><?php echo esc_html__('Site Events for', 'unipixel'); ?> <?php echo esc_html($platformName); ?></h2>
                 <p class="mb-3">
-                    <?php echo esc_html__('Manage your own Custom Events and track user actions (form submissions, clicks, visible elements). Define a CSS selector, trigger, and event name to send.', 'unipixel'); ?>
-                    <br><small><?php echo esc_html__('Need help?', 'unipixel'); ?> <a href="https://unipixelhq.com/unipixel-docs/custom-event-tracking/" target="_blank" rel="noopener"><?php echo esc_html__('Learn how to set up custom events', 'unipixel'); ?></a></small>
+                    <?php echo esc_html__('Track form submissions, clicks, visible elements, or page URL matches. For each event pick a Trigger, what it acts on, then a Platform Event Reference: a Standard name recognised by', 'unipixel'); ?> <?php echo esc_html($platformName); ?><?php echo esc_html__(', or a Bespoke one of your own. Avoid TikTok Reserved names for Bespoke values.', 'unipixel'); ?>
+                    <br><small><?php echo esc_html__('Need help?', 'unipixel'); ?> <a href="https://unipixelhq.com/unipixel-docs/custom-event-tracking/" target="_blank" rel="noopener"><?php echo esc_html__('Learn how to set up site events', 'unipixel'); ?></a></small>
                 </p>
 
                 <table id="event-settings-table" class="table">
                     <thead>
                         <tr>
-                            <th><?php echo esc_html__('Element Reference', 'unipixel'); ?><br><small class="fw-normal"><?php echo esc_html__('Element to track e.g. #signupForm, .cta-button', 'unipixel'); ?></small></th>
-                            <th><?php echo esc_html__('Event Trigger', 'unipixel'); ?><br><small class="fw-normal"><?php echo esc_html__('Action that triggers the event', 'unipixel'); ?></small></th>
-                            <th><?php echo esc_html__('Event Name', 'unipixel'); ?><br><small class="fw-normal"><?php echo esc_html__('Reference logged to', 'unipixel'); ?> <?php echo esc_html($platformName); ?></small></th>
-                            <th><?php echo esc_html__('Event Description', 'unipixel'); ?><br><small class="fw-normal"><?php echo esc_html__('Your note', 'unipixel'); ?></small></th>
+                            <th><?php echo esc_html__('Trigger', 'unipixel'); ?><br><small class="fw-normal"><?php echo esc_html__('What action causes the event to fire', 'unipixel'); ?></small></th>
+                            <th><?php echo esc_html__('Acts On', 'unipixel'); ?><br><small class="fw-normal"><?php echo esc_html__('the thing the trigger acts upon. CSS selector or URL pattern. e.g.', 'unipixel'); ?> <code>#signupForm</code>, <code>/thank-you/*</code></small></th>
+                            <th><?php echo esc_html__('Platform Event Ref', 'unipixel'); ?><br><small class="fw-normal"><?php echo esc_html__('sent to', 'unipixel'); ?> <?php echo esc_html($platformName); ?>. <?php echo esc_html__('e.g.', 'unipixel'); ?> <code>Contact</code>, <code>MyBespokeEvent</code></small></th>
+                            <th><?php echo esc_html__('Description', 'unipixel'); ?><br><small class="fw-normal"><?php echo esc_html__('Your note', 'unipixel'); ?></small></th>
                             <th class="colSendClientSide">Send<br />Client-side <?php echo wp_kses(unipixel_get_help_icon('SendClientSide'), $icon_allow); ?></th>
                             <th class="colSendServerSide">Send<br />Server-side <?php echo wp_kses(unipixel_get_help_icon('SendServerSide'), $icon_allow); ?></th>
                             <th class="colLogResponse">Log Server-side Response <?php echo wp_kses(unipixel_get_help_icon('LogServerSideResponse'), $icon_allow); ?></th>

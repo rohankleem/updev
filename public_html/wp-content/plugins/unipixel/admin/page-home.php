@@ -82,7 +82,7 @@ function unipixel_home_page()
                     <div class="card bg-light-green borderless w-100 h-100">
                         <div class="card-body pb-0">
                             <h1>Pixel for Meta (Facebook)</h1>
-                            <p>Manage Meta pixel with Conversion API, including custom events.</p>
+                            <p>Manage Meta pixel with Conversions API, including site events.</p>
                             <a href="<?php echo esc_url(menu_page_url('unipixel_meta', false)); ?>" class="btn btn-primary">View Pixel Setup</a>
                         </div>
                     </div>
@@ -145,7 +145,7 @@ function unipixel_home_page()
                     <div class="card bg-pinterest-pink borderless w-100 h-100">
                         <div class="card-body pb-0">
                             <h1>Pinterest Tag</h1>
-                            <p>Manage Pinterest tracking with Conversions API, including custom events.</p>
+                            <p>Manage Pinterest tracking with Conversions API, including site events.</p>
                             <a href="<?php echo esc_url(menu_page_url('unipixel_pinterest', false)); ?>" class="btn btn-primary">View Tag Setup</a>
                         </div>
                     </div>
@@ -169,9 +169,8 @@ function unipixel_home_page()
                     <div class="card-body">
                         <h4 class="mb-2"><i class="fa-solid fa-bullseye text-primary"></i> Centralised Event Manager</h4>
                         <p class="text-muted mb-3">
-                            Beyond WooCommerce events (which are tracked automatically), you can manage your custom events in one place across every enabled platform.
-                            Set up a Lead, Newsletter Signup, or any custom conversion once. UniPixel applies the right standard event names and dedup for each platform you choose.
-                            "Events" and "conversions" mean the same thing here.
+                            Beyond WooCommerce events (which are tracked automatically), manage your <strong>site events</strong> in one place across every enabled platform.
+                            Set up a Lead, Newsletter Signup, or any bespoke event once. UniPixel applies the right Standard event names and dedup for each platform you choose.
                         </p>
                         <a href="admin.php?page=unipixel_conversions" class="btn btn-sm btn-outline-primary">
                             <i class="fa-solid fa-arrow-right"></i> Open Event Manager

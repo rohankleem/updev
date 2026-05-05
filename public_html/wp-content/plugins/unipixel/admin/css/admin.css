@@ -146,20 +146,22 @@
     background-color: #FFCCDE;
 }
 
-/* Phase 3 conversions builder: override the WP-admin default .card max-width
-   so the form uses the full content area instead of being capped at 520px. */
+/* Centralised Event Manager: shell uses the full content area (no max-width cap)
+   so the Platforms table at the bottom has the room to show all six columns
+   without horizontal scrolling. Cards stretch to the shell width via .card max-width:100%
+   override (the WP-admin default of ~520px would otherwise box them in).
+   Form controls inside the cards inherit the global .UniPixelShell .form-control
+   max-width: 500px so dropdowns and text inputs stay a readable width.
+   In the Platforms table, .form-control-sm inside <td> is naturally bounded by
+   cell width, so the 500px cap is a soft ceiling, not a layout constraint. */
 .unipixel-conversion-builder,
 .unipixel-conversions-list {
-    max-width: 1200px;
+    max-width: none;
 }
 .unipixel-conversion-builder .card,
 .unipixel-conversions-list .card {
     max-width: 100%;
     width: 100%;
-}
-.unipixel-conversion-builder .form-control,
-.unipixel-conversions-list .form-control {
-    max-width: 100%;
 }
 
 

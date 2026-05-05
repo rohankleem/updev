@@ -149,6 +149,7 @@ Plugin source at `C:\xampp\htdocs\updev\public_html\wp-content\plugins\unipixel\
 - No bundler. Files are loaded directly.
 - Enqueued via `wp_enqueue_script()` in `trackers/*-enqueue.php` and `functions/hooks.php`.
 - Frontend scripts use jQuery (dependency auto-loaded).
+- **Hard-refresh after CSS / JS edits during development.** Assets are enqueued with `UNIPIXEL_VERSION` as the cache-bust query string. Until that version is bumped (release-gate), edits don't change the URL, and browsers serve the cached file on a normal reload. `Ctrl+F5` (Win) / `Cmd+Shift+R` (Mac) forces revalidation and picks up the new content. If you spend more than a minute thinking "my CSS change isn't taking effect", check the browser cache before suspecting the code.
 
 ### Testing locally
 

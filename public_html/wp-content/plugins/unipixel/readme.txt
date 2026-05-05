@@ -4,7 +4,7 @@ Tags: meta conversion api, pinterest conversions api, server-side tracking, tikt
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.0
-Stable tag: 2.6.6
+Stable tag: 2.6.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -155,6 +155,11 @@ For more details on privacy policies and terms of use, please visit the followin
 
 
 == Changelog ==
+
+= 2.6.7 =
+* Renamed "Custom events" to "Site events" across the admin for clearer wording.
+* Added help icons in the Event Manager.
+* Fixed - issue with plugin debugging settings causing WordPress error in some scenarios.
 
 = 2.6.6 =
 * New: Centralised Event Manager. New admin page where you can set up a custom event across every platform in one go. Pick a conversion type (Lead, Newsletter Signup, Contact, Registration, Search or your own) and UniPixel fills in each platform's standard event name automatically.

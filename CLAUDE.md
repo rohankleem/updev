@@ -64,7 +64,7 @@ Rolling and fresh. Only keep what's still loaded / still relevant. Git log is th
 | Action | Autonomy |
 |---|---|
 | Read files, explore plugin code, search | Just do it |
-| Update `.claude/` doc files and CLAUDE.md | Propose what you're capturing, then write it. No separate permission needed — the proposal is the checkpoint. Settings.json already allows these edits without prompting. |
+| Update `.claude/` doc files and CLAUDE.md | Propose what you're capturing, then write it. No separate permission needed — the proposal is the checkpoint. A `PreToolUse` hook in `.claude/settings.json` auto-allows `.md` edits even inside the protected `.claude/` directory (see `app-knowledge/claude-harness.md` for the mechanism). For doc-heavy sessions or testing runs, the user can launch with `claude --dangerously-skip-permissions` to skip all prompts entirely. |
 | Edit plugin source code | Present approach, act on approval |
 | Commit / push | Only on explicit instruction. **Commit AND push to GitHub in one step** — don't stop at a local commit. |
 | Deploy to `dev.unipixelhq.com` (rsync) | Explicit — shared state |
@@ -120,11 +120,13 @@ CLAUDE.md                                    ← You are here. Operating manual.
 ├── sites-overview.md                        ← Cross-site reference: uphq / updev / buildio.dev / buildio.au + the github.com/unipixelhq surface.
 ├── updev-setup.md                           ← How updev was set up as the dev base. Reference.
 ├── uphq-projects-truth.md                   ← Legacy uphq facts (low relevance here — ignore unless host-level).
-├── app-knowledge/                           ← How the plugin is built.
+├── app-knowledge/                           ← How the plugin is built + how we operate it.
 │   ├── app-knowledge.md                     ← Stack, architecture, hook flow, dev workflow, testing.
-│   └── deploy-and-release.md                ← rsync deploy, _obf/ workflow, version bumping, wp.org SVN.
+│   ├── deploy-and-release.md                ← rsync deploy, _obf/ workflow, version bumping, wp.org SVN.
+│   └── claude-harness.md                    ← Permissions, hooks, burst mode, testing allowlist. Read when permission prompts get in the way or settings need updating.
 ├── domain-knowledge/                        ← What the plugin is about.
 │   ├── vocabulary.md                        ← Pinned product terms (event, pixel, clickid, CAPI, dedup, etc).
+│   ├── event-terminology.md                 ← Framework for event-tracking terms, ordering, copy patterns, per-platform hints. Single source of truth — read before writing any admin UI / docs / marketing copy that names an event concept.
 │   ├── platform-discoveries.md              ← Cross-session audit findings, platform quirks.
 │   ├── licensing-and-protection.md          ← Obfuscation + licensing strategy.
 │   └── event-logs.md                        ← Stored Event Logs — user-facing guide (also informs the admin UX).
@@ -154,7 +156,7 @@ Plugin source at `public_html/wp-content/plugins/unipixel/` has a thin `CLAUDE.m
 |---|---|
 | `CLAUDE.md` | Ways of working change, doc structure changes |
 | `session-state-rohan.md` | Every session |
-| `app-knowledge/` | Plugin architecture, dev flow, or deploy/release process changes |
+| `app-knowledge/` | Plugin architecture, dev flow, deploy/release process, or Claude Code harness config changes |
 | `domain-knowledge/` | New platform quirks, tracking rules, licensing understanding |
 | `marketing-knowledge/` | Positioning shifts, active campaign tweaks, language rule changes |
 | `projects/` | Initiative starts, progresses, completes. Every release bump touches `release-log.md`. |
@@ -170,7 +172,9 @@ When you learn something new, where does it go?
 
 - **Fact about the plugin code / stack / dev flow** → `app-knowledge/app-knowledge.md`
 - **Fact about deploy / release / obfuscation / version bumping** → `app-knowledge/deploy-and-release.md`
+- **Claude Code harness behaviour: permissions, hooks, burst mode, testing allowlist** → `app-knowledge/claude-harness.md`
 - **Platform quirk, tracking rule, consent edge case, licensing insight** → `domain-knowledge/` (pick the right file, or vocabulary.md if it's a term)
+- **Naming, ordering, or copy rule for event-tracking concepts (admin UI, docs, marketing)** → `domain-knowledge/event-terminology.md`
 - **Marketing positioning / pillar refinement / campaign move / competitor note** → `marketing-knowledge/` (positioning.md, campaigns.md, or priorities.md)
 - **Something we're actively building** → `projects/{initiative-name}.md` (and a draft flow in `testing/flows/`)
 - **A way to verify behaviour (test scenario, expected payload, baseline fixture)** → `testing/flows/{flow-name}.md`

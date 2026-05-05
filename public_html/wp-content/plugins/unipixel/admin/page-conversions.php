@@ -29,6 +29,11 @@ function unipixel_conversions_router()
 function unipixel_page_conversions_list()
 {
     $builder_url = admin_url('admin.php?page=unipixel_conversions&action=builder');
+    $meta_events_url      = admin_url('admin.php?page=unipixel_meta&section=events');
+    $google_events_url    = admin_url('admin.php?page=unipixel_google&section=events');
+    $tiktok_events_url    = admin_url('admin.php?page=unipixel_tiktok&section=events');
+    $pinterest_events_url = admin_url('admin.php?page=unipixel_pinterest&section=events');
+    $microsoft_events_url = admin_url('admin.php?page=unipixel_microsoft&section=events');
     ?>
     <div class="wrap UniPixelShell unipixel-conversions-list">
         <div class="d-flex justify-content-between align-items-start">
@@ -37,22 +42,31 @@ function unipixel_page_conversions_list()
         </div>
 
         <p class="text-muted">
-            "Events" and "conversions" mean the same thing here. Pick whichever term you're used to.
-            Custom events can be added two ways: <strong>per-platform individually</strong> in each platform's Events Setup,
-            or <strong>centrally from here</strong>. Events created here are <strong>grouped</strong> across the platforms
-            you choose. Edit a shared field (trigger, URL pattern) once and it propagates to every linked platform.
-            Per-platform overrides (event name, send-mode, log response) stay independent.
+            Add a <strong>site event</strong> (form submission, click, page URL match) once here and it fires across every platform you choose.
+            Events created here are <strong>grouped</strong>: edit a shared field (trigger, URL pattern) once and it propagates to every linked platform.
+            Per-platform overrides (Platform Event Reference, send-mode, log response) stay independent.
+            Site events can also be added <strong>per-platform individually</strong> from each platform's Events Setup page.
+        </p>
+
+        <p class="text-muted">
+            <strong>Looking for eCommerce events?</strong>
+            WooCommerce events (AddToCart, InitiateCheckout, Purchase, etc.) are auto-tracked and managed with toggles plus an Apply Recommended Settings button on each platform's Events Setup page:
+            <a href="<?php echo esc_url($meta_events_url); ?>">Meta</a>,
+            <a href="<?php echo esc_url($google_events_url); ?>">Google</a>,
+            <a href="<?php echo esc_url($tiktok_events_url); ?>">TikTok</a>,
+            <a href="<?php echo esc_url($pinterest_events_url); ?>">Pinterest</a>,
+            <a href="<?php echo esc_url($microsoft_events_url); ?>">Microsoft</a>.
         </p>
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <span id="conversions-count" class="text-muted">Loading…</span>
             <a href="<?php echo esc_url($builder_url); ?>" class="btn btn-primary">
-                <i class="fa-solid fa-plus"></i> Create new conversion
+                <i class="fa-solid fa-plus"></i> Create new event
             </a>
         </div>
 
         <div id="conversions-list-container">
-            <div class="text-muted py-4 text-center" id="conversions-loading">Loading conversions…</div>
+            <div class="text-muted py-4 text-center" id="conversions-loading">Loading events…</div>
         </div>
     </div>
     <?php
@@ -68,18 +82,18 @@ function unipixel_page_conversions_builder()
         <div class="d-flex justify-content-between align-items-start">
             <h1 class="mb-3">
                 <a href="<?php echo esc_url($list_url); ?>" class="text-decoration-none text-muted me-2"><i class="fa-solid fa-arrow-left"></i></a>
-                <?php echo $is_edit ? 'Edit Conversion' : 'New Conversion'; ?>
+                <?php echo $is_edit ? 'Edit Event' : 'New Event'; ?>
             </h1>
             <?php if (function_exists('unipixel_render_feedback_buttons')) unipixel_render_feedback_buttons(); ?>
         </div>
 
-        <div id="builder-loading" class="text-muted py-4 text-center" <?php echo $is_edit ? '' : 'style="display:none"'; ?>>Loading conversion…</div>
+        <div id="builder-loading" class="text-muted py-4 text-center" <?php echo $is_edit ? '' : 'style="display:none"'; ?>>Loading event…</div>
 
         <form id="unipixel-conversion-builder-form" class="unipixel-builder-form" <?php echo $is_edit ? 'style="display:none"' : ''; ?>>
             <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">1. Trigger</h5>
-                    <p class="card-text text-muted small">When does this conversion fire?</p>
+                    <p class="card-text text-muted small">When does this event fire? Pick what action triggers it, then specify the target (the element or URL it watches).</p>
 
                     <div class="mb-3">
                         <label class="form-label">Trigger type</label>
@@ -92,7 +106,7 @@ function unipixel_page_conversions_builder()
                     </div>
 
                     <div class="mb-3" id="builder-trigger-target-wrap" style="display:none">
-                        <label class="form-label" id="builder-trigger-target-label">Target</label>
+                        <label class="form-label" id="builder-trigger-target-label">Acts On</label>
 
                         <div id="builder-url-modes" style="display:none">
                             <div class="form-check">
@@ -122,27 +136,27 @@ function unipixel_page_conversions_builder()
 
             <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">2. Conversion</h5>
-                    <p class="card-text text-muted small">What is this conversion called? Pick a standard name to get full reporting in each platform's Events Manager.</p>
+                    <h5 class="card-title">2. Platform Event Reference</h5>
+                    <p class="card-text text-muted small">The name each platform receives. Pick a <strong>Standard</strong> event type to get full reporting in each platform's Events Manager, or a <strong>Bespoke</strong> name to track something the platforms don't recognise as a known type. Examples appear next to each platform below.</p>
 
                     <div class="mb-3">
-                        <label class="form-label">Conceptual event</label>
+                        <label class="form-label">Event type</label>
                         <select class="form-control" id="builder-conceptual-event" required>
-                            <option value="">Choose a conversion type…</option>
-                            <option value="Lead">Lead — generic lead generation</option>
+                            <option value="">Choose an event type…</option>
+                            <option value="Lead">Lead (generic lead generation)</option>
                             <option value="ContactFormSubmitted">Contact Form Submitted</option>
                             <option value="NewsletterSignup">Newsletter Signup</option>
                             <option value="Registration">Registration / Sign Up</option>
                             <option value="Search">Search</option>
                             <option value="ViewContent">View Content / Page</option>
-                            <option value="__CUSTOM__">Custom…</option>
+                            <option value="__CUSTOM__">Bespoke (your own name)…</option>
                         </select>
                     </div>
 
                     <div class="mb-3" id="builder-custom-name-wrap" style="display:none">
-                        <label class="form-label">Custom event name</label>
-                        <input type="text" class="form-control" id="builder-custom-name" placeholder="myConversion">
-                        <small class="text-muted">This name is used for every platform unless you override it below.</small>
+                        <label class="form-label">Bespoke event name</label>
+                        <input type="text" class="form-control" id="builder-custom-name" placeholder="MyBespokeEvent">
+                        <small class="text-muted">This name is sent to every platform unless you override it on a row below. The plugin sends it as-is, no case conversion.</small>
                     </div>
 
                     <div class="mb-3">
@@ -155,9 +169,9 @@ function unipixel_page_conversions_builder()
             <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">3. Platforms</h5>
-                    <p class="card-text text-muted small">Each enabled platform will send this conversion. Untick a platform to skip it.</p>
+                    <p class="card-text text-muted small">Each enabled platform will send this event. Untick a platform to skip it. The Platform Event Reference can be overridden per platform.</p>
 
-                    <div id="builder-platforms-rows" class="text-muted">Pick a conversion type above to populate platform rows.</div>
+                    <div id="builder-platforms-rows" class="text-muted">Pick an event type above to populate platform rows.</div>
 
                     <div class="text-muted small mt-3" id="builder-platforms-disabled-hint" style="display:none">
                         <em>Don't see a platform?</em> Enable it in:
@@ -170,10 +184,10 @@ function unipixel_page_conversions_builder()
                 <a href="<?php echo esc_url($list_url); ?>" class="btn btn-outline-secondary">Cancel</a>
                 <div>
                     <button type="button" id="builder-delete-btn" class="btn btn-outline-danger me-2" <?php echo $is_edit ? '' : 'style="display:none"'; ?>>
-                        <i class="fa-solid fa-trash"></i> Delete conversion
+                        <i class="fa-solid fa-trash"></i> Delete event
                     </button>
                     <button type="submit" class="btn btn-primary" id="builder-save-btn">
-                        <?php echo $is_edit ? 'Save changes' : 'Create conversion'; ?>
+                        <?php echo $is_edit ? 'Save changes' : 'Create event'; ?>
                     </button>
                 </div>
             </div>

@@ -52,6 +52,68 @@ Every version bump touches:
 3. `public_html/wp-content/plugins/unipixel/readme.txt` — `Stable tag: X.Y.Z` + changelog entry
 4. `.claude/projects/release-log.md` — move "Staged for next release" into Released History, update "Current State"
 
+### Release notes — write the changelog entry, then present for sign-off BEFORE obfuscation
+
+The wp.org changelog entry in `readme.txt` ships to every existing user as the visible diff between versions. It is read by busy store owners, not developers. Get this wrong and the release feels noisy, amateur, or oversharing — even when the code is fine.
+
+**Process — non-negotiable order**:
+
+1. Draft the entry in `readme.txt`.
+2. Update `release-log.md` Released History (longer-form internal note, different audience).
+3. **Show the proposed `= X.Y.Z =` changelog entry to the user in chat. Stop. Wait for explicit approval or edits.**
+4. Only then run `obf.sh export`. Re-running the export burns time and patience — get the wording right first.
+
+**Security rule (top priority)** — fixes for crashes, fatals, auth gaps, injection, or any vulnerability MUST be described in a way that does not disclose:
+
+- the **trigger / attack vector** ("if X happens", "after Y state", "when Z is set")
+- the **state required** to reproduce the bug
+- the **mechanism of the fix** (what now happens that didn't before)
+- the **internal name** of the affected code path or option
+
+Why this matters: every existing install on the previous version is exposed until they auto-update. A descriptive changelog turns the release note into a how-to-attack-old-versions guide, with the patched code as the diff key. The fewer installs that have auto-updated, the more harmful a verbose note is.
+
+Use the **bare-symptom** form. "Fixed - issue with plugin debugging settings causing WordPress error in some scenarios" is enough. The detail belongs in `release-log.md` (internal) and the git commit (internal). Not in `readme.txt`.
+
+If a fix is genuinely too sensitive to describe even at symptom level — a real vulnerability with active risk — coordinate the disclosure separately and say nothing in the changelog beyond "Security and stability fixes."
+
+---
+
+**Voice rules** (apply every release):
+
+- **One short line per change.** Customer-visible only.
+- **No mechanism, no internals.** Don't describe how the bug worked, what code path, what the fix does under the hood, or what state the user "could be in." Users do not need reassurance about defaults, fallbacks, restores, or hiccups.
+- **Skip cosmetic-only changes that don't matter to a busy store owner** — typos, brand-casing, dev-only logging tweaks. They count as housekeeping, not user-facing news.
+- **Match `marketing-knowledge/writing-style.md`** voice. Plain English. No marketing fluff. No emoji. No "we're excited to announce." No "rare edge case." No long compound sentences.
+- **Lead with what changed**, not why or how. The user's mental model is "what's different in my admin / on my site?" — answer that.
+- **Group by visible surface**, not by code area. Users don't know what `unipixel-enqueue.php` is.
+
+**Anti-pattern (do not do this)**:
+
+```
+* Fix: Front-end could fatal if the plugin's logging settings ended up in an unexpected
+  state (e.g. after a database hiccup or partial restore). Now safely falls back to
+  defaults instead of breaking the page.
+* Fix: "TikTok" was rendered as "Tiktok" on the TikTok Setup page header. Brand casing
+  now correct.
+```
+
+Why bad: explains the inner workings, names internal code paths in user voice, includes a cosmetic typo nobody noticed.
+
+**Good shape**:
+
+```
+= 2.6.7 =
+* Renamed "Custom events" to "Site events" across the admin for clearer wording.
+* Added help icons in the Event Manager.
+* Fixed - issue with plugin debugging settings causing WordPress error in some scenarios.
+```
+
+Why good: each line is what the user will see / experience, in their language, no internals, casing typo dropped.
+
+**If unsure whether something belongs**: ask "would a store owner with 50 things on their plate want to read this?" If no, it's not for the changelog. Internals go in `release-log.md` Released History only.
+
+---
+
 ### Pre-export checklist (mandatory)
 
 These exist because of real shipped-bug incidents. See `domain-knowledge/platform-discoveries.md` § RQ-001 and RQ-002 for the backstory.

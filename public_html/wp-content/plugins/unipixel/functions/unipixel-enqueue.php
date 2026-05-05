@@ -44,6 +44,10 @@ function unipixel_enqueue_common_data_script() {
 
     $logging_options = get_option('unipixel_logging_options', $logging_defaults);
     $consent_options = get_option('unipixel_consent_settings', $consent_defaults);
+    // Defensive: get_option returns the stored value even if it's not an array
+    // (e.g. corrupted to '' or null). Fall back to defaults to keep array_merge safe.
+    if (!is_array($logging_options)) { $logging_options = $logging_defaults; }
+    if (!is_array($consent_options)) { $consent_options = $consent_defaults; }
     $unipixel_settings = array_merge($logging_defaults, $logging_options, $consent_defaults, $consent_options);
 
     wp_localize_script('unipixel-common', 'UniPixelAjax', [

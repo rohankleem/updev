@@ -85,6 +85,12 @@ function unipixel_admin_enqueue($hook) {
             'nonce' => wp_create_nonce('unipixel_ajax_nonce')
         ));
 
+        wp_localize_script('unipixel-ajax-conversion-groups', 'unipixel_help_icons', array(
+            'send_client'  => unipixel_get_help_icon('SendClientSide'),
+            'send_server'  => unipixel_get_help_icon('SendServerSide'),
+            'log_response' => unipixel_get_help_icon('LogServerSideResponse'),
+        ));
+
     }
 }
 add_action('admin_enqueue_scripts', 'unipixel_admin_enqueue');

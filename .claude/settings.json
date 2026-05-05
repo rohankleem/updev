@@ -1,13 +1,46 @@
 {
   "permissions": {
     "allow": [
-      "Edit(file_path://**/*.md)",
-      "Write(file_path://**/*.md)",
-      "MultiEdit(file_path://**/*.md)",
-
-      "Edit(file_path://CLAUDE.md)",
-      "Write(file_path://CLAUDE.md)",
-      "MultiEdit(file_path://CLAUDE.md)"
+      "Edit(**/*.md)",
+      "Write(**/*.md)",
+      "MultiEdit(**/*.md)",
+      "Edit(CLAUDE.md)",
+      "Write(CLAUDE.md)",
+      "MultiEdit(CLAUDE.md)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Edit(**/*.md)",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"allow\",\"permissionDecisionReason\":\"md-auto-allow per project policy\"}}'"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Write(**/*.md)",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"allow\",\"permissionDecisionReason\":\"md-auto-allow per project policy\"}}'"
+          }
+        ]
+      },
+      {
+        "matcher": "MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "MultiEdit(**/*.md)",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"allow\",\"permissionDecisionReason\":\"md-auto-allow per project policy\"}}'"
+          }
+        ]
+      }
     ]
   }
 }

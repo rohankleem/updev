@@ -113,7 +113,7 @@ function unipixel_page_general_settings()
             <div class="mb-3 row">
                 <div class="col-3 col-sm-3">
                     <label for="dbstore_custom_events" class="form-check-label">
-                        Store Custom Events
+                        Store Site Events
                     </label>
                 </div>
                 <div class="col-9 col-sm-9">
@@ -191,7 +191,7 @@ function unipixel_page_general_settings()
                 <div class="mb-3 row">
                     <div class="col-3 col-sm-3">
                         <label for="enableLogging_InitiateEvents" class="form-check-label">
-                            See Initiation (Setup) of Custom Events <?php echo unipixel_get_help_icon("Logging_InitiateEvents"); ?>
+                            See Initiation (Setup) of Site Events <?php echo unipixel_get_help_icon("Logging_InitiateEvents"); ?>
                         </label>
                     </div>
                     <div class="col-9 col-sm-9">
