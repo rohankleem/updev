@@ -2,7 +2,7 @@
 
 Voice and structural rules for content published at `unipixelhq.com`. Distinct from `positioning.md` (which sets *what* we say); this file is *how* we say it. Apply to every blog post, docs article, syndicated piece, and email reply.
 
-For content inventory and where things live, see `unipixelhq-content.md`. For positioning rules (comparative claims, no cost-as-value, etc.) see `positioning.md`.
+For content inventory and where things live, see `unipixelhq-content.md`. For positioning rules (comparative claims, no cost-as-value, etc.) see `positioning.md`. For the catalogue of article hook formulas (I-statement question, vs/alternatives, watch-out warning, hidden-cost gotcha, universal fear, category capture, X without Y, how-to) and how to pick one deliberately for each article, see `article-hook-patterns.md`.
 
 ---
 
@@ -56,10 +56,18 @@ Setup steps belong in docs, not blog/landing copy.
 
 (The reverse: docs should NOT lean on marketing claims. Just tell them how.)
 
-### 8. Em dash discipline
-The site uses em dashes (—) sparingly for emphasis. Don't pepper them in. If you can use a comma, full stop, or colon — use that instead. Comma-style asides are usually clearer than dash-style asides.
+### 8. No em dashes. Anywhere.
+**Em dashes (—) are not used in any UniPixel content.** Not in blog. Not in docs. Not in plugin admin copy. Not in ads, not in readme, not in social posts, not in this doc going forward.
 
-**Plugin admin copy (separate from blog/docs voice): no em dashes.** Buttons, headings, helper text, descriptions inside the plugin itself avoid em dashes by default — they read as AI-generated in product UI. Use periods, commas, or colons. Hyphens in compound words (`send-mode`, `fire-once-per-session`, `post-redirect`) are fine; those are not em dashes.
+Em dashes read as AI-generated in 2026. Even one in an article telegraphs "this was written by an LLM" to a reader who's developed the eye for it, and that perception is now widespread enough to undermine credibility.
+
+Use periods, commas, colons, semicolons, or parentheses instead. A comma-style aside is almost always clearer than a dash-style aside. A full stop is almost always cleaner than a continuation dash.
+
+Hyphens in compound words (`send-mode`, `fire-once-per-session`, `post-redirect`, `lead-gen`) are fine. Those are not em dashes — they're hyphens, and they belong inside multi-word adjectives and compound terms.
+
+En dashes (–) for ranges (`$149–228`, `2013–2026`) are also fine. They're a different mark with a different purpose.
+
+**Style checklist enforcement:** the published-piece checklist below has been updated. Em dash count target: 0.
 
 ### 9. Comparative tables for "vs" claims
 Whenever the article makes a comparison, include a tight table. Readers scan tables before reading prose. Make the table support the article's thesis without needing the prose.
@@ -173,7 +181,7 @@ Docs URLs are referenced from the plugin code (help icons, Need-help links). **N
 - [ ] At least one specific number, version, or platform name in the first 200 words
 - [ ] No words from the anti-hype list
 - [ ] Comparative claims (not absolute)
-- [ ] Em dashes used sparingly — count them, aim for under 5 per article
+- [ ] Zero em dashes (—). Count them. The target is 0. Use periods, commas, colons, semicolons, or parentheses.
 - [ ] Comparison table if it's a "vs" / "alternatives" piece
 - [ ] CTA is "Try UniPixel — [benefit]" linked to wp.org
 - [ ] UK spelling consistent throughout

@@ -75,7 +75,8 @@
       "Bash(git -C /c/xampp/htdocs/updev log --oneline -15)",
       "Bash(git -C /c/xampp/htdocs/updev diff HEAD -- public_html/wp-content/plugins/unipixel/admin/page-tiktok-events.php public_html/wp-content/plugins/unipixel/admin/page-pinterest-events.php public_html/wp-content/plugins/unipixel/admin/page-microsoft-events.php)",
       "Read(//c/ProgramData/**)",
-      "Read(//c/Program Files/**)"
+      "Read(//c/Program Files/**)",
+      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\public_html\\\\wp-content\\\\plugins\\\\unipixelhq-schema\\\\unipixelhq-schema.php\")"
     ]
   }
 }

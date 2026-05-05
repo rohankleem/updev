@@ -198,7 +198,7 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 | Plugin | Installs | Rating | Price/yr | Server-Side | Notes |
 |---|---|---|---|---|---|
 | **PixelYourSite Pro** | ~500k | 4.3/5 | $359 | Yes | Market leader. Pinterest/Bing paid add-ons. UX criticised as cluttered. |
-| **Pixel Manager** (SweetCode) | ~50k | 4.9/5 | $149–228 | Via their cloud | Highest rated. WooCommerce-only. Requires SweetCode Cloud (vendor lock-in). |
+| **Pixel Manager** (SweetCode) | ~50k | 4.9/5 | $149–228 | Direct CAPI from your server | Highest rated, on wp.org since 2013. WooCommerce-only by design. Strong Pro features (ACR nightly recovery, Google Enhanced Conversions, payment-gateway accuracy reporting). Microsoft/Pinterest/TikTok/server-side gated to Pro. |
 | **Conversios** | ~60k | 4.3/5 | $250–499 | Needs GTM | Bundles product feed management. Server-side requires GTM server container. |
 | **Meta for WooCommerce** | ~500k | 2.2/5 | Free | Meta CAPI only | Official Meta plugin. 308 one-star reviews. Breaks frequently. Meta-only. |
 | **Google Site Kit** | ~5M | 4.2/5 | Free | No | Dashboard/reporting tool, not a conversion tracker. |
@@ -224,7 +224,7 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 | Snapchat | No | No | Pro | Pro | No |
 | LinkedIn | No | No | Pro | Pro | No |
 | Server-side (no GTM) | Yes | Yes | Yes (via Cloud) | Needs GTM | Yes (Meta only) |
-| Self-hosted (no vendor) | Yes | Yes | No (SweetCode Cloud) | No (GTM hosting) | Yes (Meta only) |
+| Self-hosted (no vendor) | Yes | Yes | Yes | No (GTM hosting) | Yes (Meta only) |
 | WooCommerce events | Yes | Yes | Yes | Yes | Partial |
 | Custom click events | Yes | Pro | Pro | Pro | No |
 | Non-WooCommerce sites | Yes | Yes | No | No | No |
@@ -236,6 +236,7 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 | Centralised cross-platform event setup (one-shot) | Yes | No | No | No | No |
 | Standard event name auto-fill per platform | Yes | No | No | No | No |
 | URL-based custom event triggers (no CSS) | Yes | No | No | No | No |
+| Hashed PII / Enhanced Conversions / Advanced Matching | Yes — Meta, Google, TikTok, Pinterest, Microsoft | Pro (per-platform) | Pro (Google Enhanced Conversions, Meta) | Pro | Meta only |
 
 ---
 
@@ -260,16 +261,18 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 
 ### vs Pixel Manager / SweetCode (~50k installs, $149–228/yr)
 
-**Their strength:** Highest rated plugin in the space (4.9/5). Clean interface. Good documentation.
+**Their strength:** Highest-rated tracking plugin in the WP ecosystem (4.9/5, ~400 reviews). On wp.org since August 2013 — twelve years of WooCommerce-specific depth. Direct-from-server CAPI in Pro (no cloud routing). Real Pro-only features we don't match: **Automatic Conversion Recovery (ACR)** nightly retroactive replay of missed WC orders, Google Ads Enhanced Conversions, Conversion Adjustments, payment-gateway accuracy reporting, HPOS depth, 15+ CMP integrations.
 
 **Where UniPixel wins:**
-- Self-hosted — Pixel Manager routes server-side data through SweetCode Cloud. Tracking depends on their infrastructure
-- Works on non-WooCommerce sites — Pixel Manager is WooCommerce-only
-- No vendor lock-in — if SweetCode raises prices or shuts down, users lose server-side tracking
-- Centralised Event Manager — Pixel Manager has no equivalent for cross-platform conversion creation
-- URL-based triggers + page picker for non-developers
+- **Non-WooCommerce sites are first-class** — Pixel Manager is WooCommerce-shaped end-to-end (events follow WC orders). Lead-gen / B2B / service / membership / course sites have no real path inside Pixel Manager. UniPixel's URL trigger + Centralised Event Manager + page picker target this directly.
+- **All five platforms in the base product** — Pixel Manager's free tier is Google Ads + GA4 + Meta + Hotjar; Microsoft, Pinterest, TikTok, Snapchat, Reddit, LinkedIn are all Pro-gated. Server-side delivery is also Pro-only. UniPixel ships every platform with server-side included.
+- **Centralised Event Manager** — Pixel Manager has no equivalent for setting up a Lead / Newsletter Signup / Contact conversion once across all platforms with the right standard event name per platform.
+- **Built-in consent popup** — Pixel Manager integrates with 15+ third-party CMPs but ships no popup of its own. UniPixel ships its own popup (18 languages, editable per language, 5 layouts, optional non-blocking, mobile-responsive) AND reads from 9 CMPs if the visitor prefers one.
+- **Hashed PII across every platform** — UniPixel sends Advanced Matching / Enhanced-Conversions-equivalent data to Meta, Google, TikTok, Pinterest, and Microsoft uniformly. Pixel Manager's equivalents are platform-specific Pro features.
 
-**The pitch:** Pixel Manager sends your data through someone else's servers. UniPixel sends it from yours. Works on any WordPress site, including lead-gen sites Pixel Manager doesn't support.
+**The pitch:** Pixel Manager is the strongest WC-shaped tracking plugin on wp.org, and if your site is a WooCommerce store with offsite payment gateways, ACR alone may justify it. UniPixel is the alternative when your site isn't shaped like a WC store, when you want every platform without a Pro upgrade, or when you want cross-platform conversions configured in one form.
+
+**Don't claim:** that Pixel Manager routes data through a cloud (it doesn't — Pro CAPI is direct from the server). That framing was wrong in earlier versions of this doc and must not appear in articles or ads.
 
 ### vs Conversios (~60k installs, $250–499/yr)
 
@@ -325,7 +328,7 @@ All UniPixel ads and content use one of three directional techniques. Choosing t
 
 ## UniPixel's genuine differentiators
 
-1. **Self-hosted server-side tracking — zero external dependencies.** Every competitor that does server-side either requires GTM server containers, routes through their cloud, or needs separate hosting. UniPixel fires directly from WP server to platform APIs.
+1. **Self-hosted server-side tracking — zero external dependencies.** Conversios needs a GTM server container; Stape and the GTM-server ecosystem need separate cloud hosting; SaaS players (wetracked.io) route through their own cloud. UniPixel and PYS Pro both run direct CAPI from the WP server; Pixel Manager Pro also runs direct CAPI but is WC-only. The honest framing: "no external infrastructure required, no container, no SaaS" — true against Conversios / Stape / wetracked, level with PYS / Pixel Manager Pro on this dimension specifically.
 2. **All 5 platforms at one price, no add-on upsells.** Meta + Pinterest + TikTok + Google + Microsoft in the base product.
 3. **Centralised cross-platform event setup.** Set up Lead, Newsletter Signup, Contact, Registration, or any custom conversion ONCE. UniPixel applies it to every platform you've enabled with the correct standard event name (Meta `Lead`, Google `generate_lead`, TikTok `Contact`, Pinterest `Lead`, Microsoft `lead`). Edit a shared field once and it propagates to every linked platform. No competitor in the WordPress space offers this — every other plugin makes you set the same conversion up five times.
 4. **Lead-gen / non-WooCommerce sites are first-class.** URL-based triggers + Centralised Event Manager mean a thank-you-page conversion takes thirty seconds without touching CSS or GTM. The Lead, Newsletter Signup and Contact conceptual events target the lead-gen / B2B / service / membership market directly. Most tracking plugins lead with WooCommerce; UniPixel works the same on non-WC sites.

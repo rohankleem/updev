@@ -82,13 +82,47 @@ Universal-pillar content; don't lead with UniPixel:
 - Your Ad Platforms Are Making Decisions With Missing Data (Apr 6 2026) — fits Pillar 1 ("ads wasting money you can't see")
 
 ### Gaps / next articles to write
-Per `priorities.md` and `campaigns.md`, content for both Universal and Competitive pillars is on the backlog. Likely candidates:
-- "Free Meta CAPI plugin for WordPress" (Competitive, intercepts buying-intent)
-- "Why your WordPress site doesn't need a GTM server container" (Universal, education)
-- "Server-side tracking on WordPress: the budget version" (Competitive, price-conscious search)
-- **v2.6.6 announcement: "Set up a Lead conversion once. UniPixel handles all five platforms."** (announcement + feature deep-dive). Captures the moment of the Centralised Event Manager release. The lede angle: every other tracking plugin makes you set the same conversion up five times in five different places with five different standard event names; UniPixel does it in one form.
-- **"Track form submissions and thank-you pages on WordPress without code"** (Universal + lead-gen audience). Targets the new C5 audience — lead-gen / B2B / service / course-creator WordPress sites. Hook: "If you've ever set up a Meta `Lead` event and then realised TikTok calls it `Contact`, this is for you."
-- **"WordPress lead-gen tracking without GTM, without CSS, without paying $359"** (Competitive, intercepts the "PYS for non-WC sites" search). Specifically counters the gap competitors leave: most tracking plugins lead with WooCommerce; non-WC sites are second-class.
+
+**Pick the hook deliberately.** Each candidate below is tagged with the article hook pattern from `article-hook-patterns.md`. Aim for a balanced mix of awareness stages: currently the published blog skews 4/5 toward buying-shopping comparison pieces. The biggest gap is **Pattern 1 (I-Statement Question)** for problem-aware visitors. Article patterns are catalogued and cross-referenced in `article-hook-patterns.md`.
+
+**Pattern 1 — I-Statement Question** (the gap, write next):
+- "I installed the pixel. So why aren't my conversions showing?" (lead-gen + WC audience; covers form submissions, thank-you pages, button clicks; routes to Centralised Event Manager + server-side delivery)
+- "Why does Meta say I have 12 purchases but WooCommerce says 47?" (correlation question; comparative claim only)
+- "I set up CAPI and my events are doubling" (deduplication explainer)
+- "How do I track a thank-you page on WordPress?" (map to URL trigger + page picker)
+- "What's the Meta Lead event called in TikTok?" (standard event name vocabulary; Centralised Event Manager auto-fill)
+
+**Pattern 2 — Vs / Alternatives Comparison** (buying-intent):
+- "Pixel Manager Pro vs UniPixel: WordPress Tracking in 2026" (drafted, ready to publish)
+- "UniPixel vs Meta for WooCommerce: A Working Alternative to the Official Plugin"
+
+**Pattern 3 — Watch-Out Warning** (mid-evaluation):
+- "Before You Sign Up to Stape, Read This"
+- "What Pixel Manager's Pro Page Doesn't Tell You About the Free Tier"
+
+**Pattern 4 — Hidden-Cost Gotcha**:
+- "Pixel Manager Pro Alternatives? Read the Free-Tier Fine Print First"
+- "Server Container Pricing? Check What's Behind the $20/mo Headline"
+
+**Pattern 5 — Universal Fear**:
+- "Your WooCommerce Numbers Don't Match Meta. Here's Why."
+- "Why Your Ads Cost More Than They Should"
+
+**Pattern 6 — Category Capture**:
+- "Server-Side Tracking Plugins for WordPress in 2026"
+- "Lead-Gen Conversion Tracking Plugins for WordPress in 2026"
+
+**Pattern 7 — X Without Y**:
+- "Track Form Submissions on WordPress Without Code"
+- "WordPress Lead-Gen Tracking Without GTM, Without CSS"
+- "Custom Events on WordPress Without Google Tag Manager"
+
+**Pattern 8 — How-To** (blog-appropriate, not docs):
+- "How to Set Up Meta CAPI on WooCommerce Without a Server Container"
+- "How to Track Lead Conversions Across Five Ad Platforms in One Setup"
+
+**v2.6.6-anchored announcement (Pattern 5 + Pattern 7 hybrid):**
+- "Set Up a Lead Conversion Once. UniPixel Handles All Five Platforms." (Centralised Event Manager release deep-dive)
 
 ---
 
