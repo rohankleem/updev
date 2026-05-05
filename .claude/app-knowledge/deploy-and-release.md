@@ -43,7 +43,7 @@ The plugin's internal `.claude/` and `CLAUDE.md` **do** get deployed to dev.unip
 
 After export + post-export checks pass, Rohan manually pastes the obfuscated files into the wordpress.org SVN repository's tag folders and commits via TortoiseSVN. The export script itself does not touch SVN.
 
-### The Release Gate — 4 files, always together
+### The Release Gate — 5 files, always together
 
 Every version bump touches:
 
@@ -51,6 +51,7 @@ Every version bump touches:
 2. `public_html/wp-content/plugins/unipixel/unipixel.php` — `define('UNIPIXEL_VERSION', 'X.Y.Z');`
 3. `public_html/wp-content/plugins/unipixel/readme.txt` — `Stable tag: X.Y.Z` + changelog entry
 4. `.claude/projects/release-log.md` — move "Staged for next release" into Released History, update "Current State"
+5. **On `unipixelhq.com` (separate site at `C:\xampp\htdocs\uphq\`):** `public_html/wp-content/plugins/unipixelhq-seo/unipixelhq-seo.php` — bump `UPHQ_PLUGIN_VERSION` constant. Drives `softwareVersion` in the `SoftwareApplication` JSON-LD on the marketing site. Without this bump, search engines and AI crawlers see the old version on the marketing site even after wp.org has the new one. Deploy via `cd /c/xampp/htdocs/uphq/_deploy && ./deploy_all_LIVE.sh`. Full context in `.claude/projects/structured-data-implementation.md`.
 
 ### Release notes — write the changelog entry, then present for sign-off BEFORE obfuscation
 

@@ -98,12 +98,13 @@ Rolling and fresh. Only keep what's still loaded / still relevant. Git log is th
 
 ## Release Gate
 
-Every version bump touches **four files**. Release isn't complete until all four are updated in the same change:
+Every version bump touches **five files**. Release isn't complete until all five are updated in the same change:
 
 1. `public_html/wp-content/plugins/unipixel/unipixel.php` — `Version: X.Y.Z` header line
 2. `public_html/wp-content/plugins/unipixel/unipixel.php` — `define('UNIPIXEL_VERSION', 'X.Y.Z');`
 3. `public_html/wp-content/plugins/unipixel/readme.txt` — `Stable tag: X.Y.Z` + changelog entry
 4. `.claude/projects/release-log.md` — move "Done Since v[X]" items into a stamped released block, update "current live version"
+5. **On `unipixelhq.com` (separate site, `C:\xampp\htdocs\uphq\`):** `public_html/wp-content/plugins/unipixelhq-seo/unipixelhq-seo.php` — bump `UPHQ_PLUGIN_VERSION` constant. This drives `softwareVersion` in the `SoftwareApplication` JSON-LD on the marketing site. Without this bump, search engines and AI crawlers see the old version. Deploy via `cd /c/xampp/htdocs/uphq/_deploy && ./deploy_all_LIVE.sh`. See `.claude/projects/structured-data-implementation.md`.
 
 See `.claude/app-knowledge/deploy-and-release.md` for the full release workflow (including pre-export checks — smart quotes scan, PHP lint, etc.) that protects against recurring release-quality issues.
 

@@ -1,356 +1,182 @@
-# Structured Data Implementation for unipixelhq.com
+# Custom SEO + GEO Layer for unipixelhq.com
 
-> **Status:** Not started.
-> **Goal:** Implement JSON-LD schema.org markup + GEO infrastructure (llms.txt, robots.txt) on unipixelhq.com using a custom WordPress plugin. Lifts traditional SEO (rich results in Google/Bing) and AI-engine visibility (ChatGPT search, Perplexity, Google AI Overviews, Claude search, Bing Copilot).
+> **Status:** Live. Deployed 2026-05-05.
+> **Replaces:** Yoast SEO (deactivated 2026-05-05; data preserved in postmeta).
+> **Result:** Fully custom JSON-LD schema, Open Graph, Twitter Cards, meta description, canonical, title-tag, robots-tag, plus `llms.txt` and AI-crawler-allowed `robots.txt`. Zero third-party SEO plugin dependencies. Author identity hard-coded to **UniPixelHQ** across schema and visible bylines.
 
-## Why custom over Rank Math / Yoast
+---
 
-- **Author identity control.** Rank Math and Yoast attribute articles to the WordPress user (login or display name) by default. We want every article attributed to **UniPixelHQ** as the brand. Configuring this in those plugins is fiddly and overridable when they update.
-- **Tight schema control.** The plugin landing page's `SoftwareApplication` schema needs specific fields (downloadUrl, applicationCategory, softwareVersion, aggregateRating). Custom PHP gives full control without plugin-UI gymnastics.
-- **One file, no third-party plugin updates.** A single custom plugin file. No premium-feature paywalls, no settings UI for non-developers to drift out of alignment.
-- **Lighter footprint.** Rank Math is a multi-megabyte plugin. We use maybe 5% of it. The custom file is ~200 lines.
+## Why custom
 
-## Architecture
+- **Author identity control.** Yoast and Rank Math attribute articles to the WordPress user by default. Every article on `unipixelhq.com` must be attributed to *UniPixelHQ* as the brand. Plugin UI gymnastics make this fragile.
+- **Tight SoftwareApplication schema.** The plugin landing schema needs specific fields (`downloadUrl`, `applicationCategory`, `softwareVersion`, eventually `aggregateRating`). Direct PHP gives full control.
+- **One self-contained file.** No premium-feature paywalls, no sprawling settings UI, no third-party plugin updates to track.
+- **GEO-ready.** AI engines (ChatGPT search, Perplexity, Google AI Overviews, Claude search, Bing Copilot) parse schema.org for entity disambiguation. Custom output gives clean, factual, citation-friendly metadata.
 
-One small WordPress plugin at `wp-content/plugins/unipixelhq-schema/unipixelhq-schema.php`. Activated like any plugin. Hooks into `wp_head` and outputs JSON-LD based on the page context.
+---
 
-Page-type detection via WordPress conditionals (`is_front_page()`, `is_singular('post')`, `is_page()`, etc.). Each branch outputs its own schema block.
+## What's deployed
 
-**Author identity hard-coded to "UniPixelHQ" everywhere.** No reliance on WP user objects.
+### File: `wp-content/plugins/unipixelhq-seo/unipixelhq-seo.php`
 
-## What schema goes where
+One self-contained plugin. PHP-lint clean. Every concern below handled in a single file.
 
-| Page | Schema types |
+| Concern | Implementation |
 |---|---|
-| Every page | `Organization` (publisher / brand) |
-| Home | `WebSite` (with search action), `Organization` |
-| Plugin landing page | `SoftwareApplication`, `Organization` |
-| Blog post | `BlogPosting` (author: UniPixelHQ), `Organization` |
-| Docs setup guide | `Article` or `HowTo` (author: UniPixelHQ), `Organization` |
-| FAQ-style docs | `FAQPage` (deferred, needs structured content), `Organization` |
+| **JSON-LD schema** | `Organization` (every page), `WebSite` (home), `SoftwareApplication` (home), `BlogPosting` (posts), `Article` (docs pages). Full graph with `@id` cross-references. |
+| **Open Graph** | `og:locale`, `og:type`, `og:title`, `og:description`, `og:url`, `og:site_name`, `og:image`, `og:image:width`, `og:image:height`. On posts: `article:published_time`, `article:modified_time`, `article:author`, `article:publisher`. |
+| **Twitter Cards** | `summary_large_image` with title, description, image, site, creator. |
+| **Meta description** | Yoast `_yoast_wpseo_metadesc` (preserved) → post excerpt → trimmed content → default. Placeholder syntax expanded. |
+| **Title tag** | Yoast `_yoast_wpseo_title` (preserved, placeholders expanded) → "Post Title \| Site Name" default. Also removes WP core's `_wp_render_title_tag` to avoid duplicates. |
+| **Canonical** | Yoast `_yoast_wpseo_canonical` override (preserved) → permalink. Removes WP core's `rel_canonical` to avoid duplicates. |
+| **Robots tag** | Per-page `noindex` from Yoast `_yoast_wpseo_meta-robots-noindex` (preserved). Default: `index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1`. |
+| **Author identity** | Hard-coded as UniPixelHQ. `the_author`, `get_the_author_display_name`, `get_the_author_user_nicename`, `get_the_author_nickname` filters all force the brand name. Schema uses Organization-as-author. |
+| **Yoast/Rank Math kill** | Both legacy filters (`wpseo_json_ld_output`, `wpseo_opengraph`, `wpseo_twitter`, `wpseo_metadesc`, `wpseo_canonical`) and Yoast v14+ presenter filters (`wpseo_frontend_presenter_classes`, `wpseo_frontend_presentation`). Same for Rank Math (`rank_math/json_ld`, `rank_math/opengraph/*`, etc.). Defensive — works whether either plugin is active or not. |
+| **Sitemap** | WordPress core's `/wp-sitemap.xml` (built in since 5.5). Yoast's old paths (`sitemap_index.xml`, `sitemap.xml`, `post-sitemap.xml`, `page-sitemap.xml`, `category-sitemap.xml`) 301-redirect to core sitemap so any Google-cached references continue to resolve. |
+| **WP noise** | `<meta name="generator">` removed. |
 
-## Implementation: PHP
+### File: `public_html/llms.txt`
 
-```php
-<?php
-/**
- * Plugin Name: UniPixelHQ Schema
- * Description: Outputs JSON-LD schema.org structured data for unipixelhq.com. Site-wide Organization + per-page schema (BlogPosting, Article, SoftwareApplication, WebSite). All articles attributed to UniPixelHQ regardless of WordPress user.
- * Version: 1.0.0
- * Author: UniPixelHQ
- */
+Markdown index for AI engines. Lists the plugin (wp.org + home), all docs setup guides, all blog articles, and brand surfaces (GitHub, wp.org, Buildio).
 
-if (!defined('ABSPATH')) {
-    exit;
-}
+### File: `public_html/robots.txt`
 
-// Global brand constants. Update here, propagates everywhere.
-define('UPHQ_BRAND_NAME', 'UniPixelHQ');
-define('UPHQ_BRAND_URL', 'https://unipixelhq.com');
-define('UPHQ_BRAND_LOGO', 'https://unipixelhq.com/wp-content/uploads/unipixel-logo.png');
-define('UPHQ_PLUGIN_LANDING_SLUG', 'unipixel-plugin'); // Adjust to actual slug
-define('UPHQ_WPORG_URL', 'https://wordpress.org/plugins/unipixel/');
-define('UPHQ_PLUGIN_VERSION', '2.6.6'); // Update per release
+Explicit `Allow: /` for: GPTBot, ChatGPT-User, ClaudeBot, anthropic-ai, Claude-Web, PerplexityBot, Google-Extended, CCBot, cohere-ai, Applebot-Extended, Googlebot, Bingbot, DuckDuckBot. Default `User-agent: *` blocks `/wp-admin/` only. Sitemap line points at `/wp-sitemap.xml`.
 
-add_action('wp_head', 'uphq_output_schema', 1);
+---
 
-function uphq_output_schema() {
-    $schemas = [];
+## Yoast deactivation, data preservation
 
-    // Organization is always present
-    $schemas[] = uphq_organization_schema();
+Yoast was deactivated on 2026-05-05. The plugin reads Yoast's stored data so nothing was lost.
 
-    if (is_front_page()) {
-        $schemas[] = uphq_website_schema();
-    } elseif (is_page(UPHQ_PLUGIN_LANDING_SLUG)) {
-        $schemas[] = uphq_software_application_schema();
-    } elseif (is_singular('post')) {
-        $schemas[] = uphq_blog_posting_schema();
-    } elseif (is_singular('page') && uphq_is_docs_page()) {
-        $schemas[] = uphq_article_schema();
-    }
+### Data sources read by the plugin
 
-    foreach ($schemas as $schema) {
-        if ($schema === null) continue;
-        echo "<script type=\"application/ld+json\">\n";
-        echo wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-        echo "\n</script>\n";
-    }
-}
+Per-post (from `wp_postmeta`):
+- `_yoast_wpseo_title`
+- `_yoast_wpseo_metadesc`
+- `_yoast_wpseo_opengraph-title`
+- `_yoast_wpseo_opengraph-description`
+- `_yoast_wpseo_opengraph-image`
+- `_yoast_wpseo_twitter-title`
+- `_yoast_wpseo_twitter-description`
+- `_yoast_wpseo_twitter-image`
+- `_yoast_wpseo_canonical`
+- `_yoast_wpseo_meta-robots-noindex`
 
-function uphq_organization_schema() {
-    return [
-        '@context' => 'https://schema.org',
-        '@type' => 'Organization',
-        'name' => UPHQ_BRAND_NAME,
-        'url' => UPHQ_BRAND_URL,
-        'logo' => UPHQ_BRAND_LOGO,
-        'sameAs' => [
-            UPHQ_WPORG_URL,
-            'https://github.com/unipixelhq',
-            'https://www.facebook.com/unipixelhq',
-            // add LinkedIn, X/Twitter when live
-        ],
-    ];
-}
+Site-level (from `wpseo_titles` option):
+- `title-page`, `metadesc-page` (when home is a static front page)
+- `title-home-wpseo`, `metadesc-home-wpseo` (when home is a blog)
 
-function uphq_website_schema() {
-    return [
-        '@context' => 'https://schema.org',
-        '@type' => 'WebSite',
-        'name' => UPHQ_BRAND_NAME,
-        'url' => UPHQ_BRAND_URL,
-        'publisher' => [
-            '@type' => 'Organization',
-            'name' => UPHQ_BRAND_NAME,
-        ],
-        'potentialAction' => [
-            '@type' => 'SearchAction',
-            'target' => UPHQ_BRAND_URL . '/?s={search_term_string}',
-            'query-input' => 'required name=search_term_string',
-        ],
-    ];
-}
+### Yoast placeholder expansion
 
-function uphq_blog_posting_schema() {
-    $post = get_post();
-    if (!$post) return null;
+The plugin expands Yoast's title placeholder syntax to plain text:
 
-    $featured_image = get_the_post_thumbnail_url($post->ID, 'large');
+| Placeholder | Expanded to |
+|---|---|
+| `%%title%%` | post title |
+| `%%sitename%%` | `get_bloginfo('name')` |
+| `%%sitedesc%%` | `get_bloginfo('description')` |
+| `%%sep%%` | `\|` |
+| `%%page%%` | (stripped) |
+| `%%excerpt%%` | post excerpt |
+| `%%date%%` | post date |
+| `%%modified%%` | modified date |
+| `%%id%%` | post ID |
+| `%%name%%` | author display name |
+| `%%currentyear%%` | current year |
+| `%%currenttime%%`, `%%currentdate%%` | (stripped) |
+| Any other `%%...%%` | stripped (defensive) |
 
-    return [
-        '@context' => 'https://schema.org',
-        '@type' => 'BlogPosting',
-        'headline' => get_the_title($post),
-        'description' => uphq_get_excerpt($post),
-        'image' => $featured_image ?: UPHQ_BRAND_LOGO,
-        'datePublished' => get_the_date('c', $post),
-        'dateModified' => get_the_modified_date('c', $post),
-        'author' => [
-            '@type' => 'Organization', // Brand as author, not Person
-            'name' => UPHQ_BRAND_NAME,
-            'url' => UPHQ_BRAND_URL,
-        ],
-        'publisher' => [
-            '@type' => 'Organization',
-            'name' => UPHQ_BRAND_NAME,
-            'logo' => [
-                '@type' => 'ImageObject',
-                'url' => UPHQ_BRAND_LOGO,
-            ],
-        ],
-        'mainEntityOfPage' => [
-            '@type' => 'WebPage',
-            '@id' => get_permalink($post),
-        ],
-    ];
-}
+### Do NOT delete Yoast with "remove all data"
 
-function uphq_article_schema() {
-    $post = get_post();
-    if (!$post) return null;
+Yoast can be safely deactivated or even uninstalled. Do **not** tick the "remove all plugin data" option in Yoast's uninstall flow — that wipes the `_yoast_wpseo_*` postmeta records and breaks our title/description fallthrough. As long as those records remain, the SEO output stays correct.
 
-    $featured_image = get_the_post_thumbnail_url($post->ID, 'large');
+---
 
-    return [
-        '@context' => 'https://schema.org',
-        '@type' => 'Article',
-        'headline' => get_the_title($post),
-        'description' => uphq_get_excerpt($post),
-        'image' => $featured_image ?: UPHQ_BRAND_LOGO,
-        'datePublished' => get_the_date('c', $post),
-        'dateModified' => get_the_modified_date('c', $post),
-        'author' => [
-            '@type' => 'Organization',
-            'name' => UPHQ_BRAND_NAME,
-            'url' => UPHQ_BRAND_URL,
-        ],
-        'publisher' => [
-            '@type' => 'Organization',
-            'name' => UPHQ_BRAND_NAME,
-            'logo' => [
-                '@type' => 'ImageObject',
-                'url' => UPHQ_BRAND_LOGO,
-            ],
-        ],
-        'mainEntityOfPage' => [
-            '@type' => 'WebPage',
-            '@id' => get_permalink($post),
-        ],
-    ];
-}
+## Validation results (live, post-deactivation)
 
-function uphq_software_application_schema() {
-    return [
-        '@context' => 'https://schema.org',
-        '@type' => 'SoftwareApplication',
-        'name' => 'UniPixel',
-        'applicationCategory' => 'BusinessApplication',
-        'applicationSubCategory' => 'Conversion Tracking',
-        'operatingSystem' => 'WordPress',
-        'description' => 'Server-side conversion tracking for WordPress and WooCommerce. Sends events directly to Meta, Google, TikTok, Pinterest, and Microsoft from your WordPress server. No GTM container, no cloud hosting, no separate infrastructure.',
-        'url' => UPHQ_BRAND_URL,
-        'downloadUrl' => UPHQ_WPORG_URL,
-        'softwareVersion' => UPHQ_PLUGIN_VERSION,
-        'author' => [
-            '@type' => 'Organization',
-            'name' => UPHQ_BRAND_NAME,
-            'url' => UPHQ_BRAND_URL,
-        ],
-        'publisher' => [
-            '@type' => 'Organization',
-            'name' => UPHQ_BRAND_NAME,
-        ],
-        'offers' => [
-            '@type' => 'Offer',
-            'price' => '0',
-            'priceCurrency' => 'USD',
-        ],
-        // Uncomment once wp.org has 5+ reviews:
-        // 'aggregateRating' => [
-        //     '@type' => 'AggregateRating',
-        //     'ratingValue' => '5.0',
-        //     'reviewCount' => '6',
-        // ],
-    ];
-}
+### Home (`https://unipixelhq.com/`)
+- `<title>`: 1 (Yoast-stored value preserved)
+- `og:title`: 1
+- JSON-LD blocks: 3 (`Organization`, `WebSite`, `SoftwareApplication`)
+- Yoast HTML comments: 0
 
-function uphq_get_excerpt($post) {
-    $excerpt = get_the_excerpt($post);
-    if (!$excerpt) {
-        $excerpt = wp_trim_words(strip_tags($post->post_content), 30, '...');
-    }
-    return $excerpt;
-}
+### Blog post (`/i-just-wanted-tracking-so-why-am-i-being-offered-cloud-hosting/`)
+- Title: `I just wanted tracking. So why am I being offered cloud hosting? \| UniPixel`
+- Meta description: Yoast-stored value preserved
+- `og:type`: `article`
+- `article:published_time`, `article:author`, `article:publisher` all present
+- JSON-LD: `Organization` + `BlogPosting` with `WebPage` + `ImageObject` cross-references
 
-function uphq_is_docs_page() {
-    $post = get_post();
-    if (!$post) return false;
+### Docs page (`/unipixel-docs/setting-up-unipixel-with-meta/`)
+- Title from postmeta
+- JSON-LD: `Organization` + `Article`
+- Canonical correct
 
-    // Adjust to match how docs are structured on unipixelhq.com.
-    // Option 1: parent page slug check (most likely match given /unipixel-docs/ URL pattern)
-    if ($post->post_parent) {
-        $parent_slug = get_post_field('post_name', $post->post_parent);
-        if ($parent_slug === 'unipixel-docs') {
-            return true;
-        }
-    }
+---
 
-    // Option 2: URL contains /unipixel-docs/
-    if (strpos($_SERVER['REQUEST_URI'], '/unipixel-docs/') !== false) {
-        return true;
-    }
+## Per-release maintenance
 
-    return false;
-}
+When a new UniPixel plugin version ships:
+
+**Update `UPHQ_PLUGIN_VERSION`** in `unipixelhq-seo.php` to match the plugin's `Stable Tag` on wp.org. One-line change. Without this, `softwareVersion` in the `SoftwareApplication` schema lags the live version.
+
+This is the fifth release-gate item, captured in `CLAUDE.md` § Release Gate.
+
+Deploy: `cd /c/xampp/htdocs/uphq/_deploy && ./deploy_all_LIVE.sh`.
+
+## Other maintenance
+
+- **`llms.txt`**: update when major site surfaces change (new docs section, navigation overhaul). Otherwise static.
+- **`robots.txt`**: update when a new high-priority AI crawler emerges. Currently covers all major ones as of 2026-05.
+- **`UPHQ_BRAND_LOGO` / `UPHQ_BRAND_OG_IMAGE`**: update if the logo or share image URL changes.
+- **`aggregateRating` schema block**: currently commented out. Uncomment and populate once wp.org has 5+ reviews.
+
+---
+
+## Deploy infrastructure
+
+The marketing site uses `_deploy/deploy_all_LIVE.sh` (rsync over SSH to `buildiod@vda4300.is.cc`).
+
+### Changes made to deploy infrastructure during this implementation
+
+- **`_rsync/.rsync_all`**: whitelisted `+ public_html/wp-content/plugins/unipixelhq-seo/***` BEFORE the `- public_html/wp-content/plugins/**` exclude line. The default rsync config excludes all plugins; new plugins must be opted in by name.
+- **`_deploy/deploy_all_LIVE.sh` and `deploy_all_TEST.sh`**: added `-o StrictHostKeyChecking=accept-new` to the SSH transport flag to handle first-connect host key verification automatically. Replaces the older interactive workflow that didn't work cleanly with cwrsync's bundled SSH on Git Bash.
+
+Deploy command:
+
+```bash
+cd /c/xampp/htdocs/uphq/_deploy
+./deploy_all_TEST.sh   # dry run
+./deploy_all_LIVE.sh   # live
 ```
 
-## Override author display on the front-end too
+---
 
-The schema fix above handles JSON-LD, which is what AI engines and Google's rich results parsers read. If the visible byline on blog posts also says "Posted by [WP username]", visitors and AI engines that read body text will see a mismatch. Force the visible author to UniPixelHQ as well:
+## File map
 
-```php
-add_filter('the_author', function($display_name) {
-    return UPHQ_BRAND_NAME;
-});
+| Path | Role |
+|---|---|
+| `C:\xampp\htdocs\uphq\public_html\wp-content\plugins\unipixelhq-seo\unipixelhq-seo.php` | The custom plugin |
+| `C:\xampp\htdocs\uphq\public_html\llms.txt` | AI engine index |
+| `C:\xampp\htdocs\uphq\public_html\robots.txt` | Crawler allowlist |
+| `C:\xampp\htdocs\uphq\_rsync\.rsync_all` | Deploy whitelist (includes new plugin path) |
+| `C:\xampp\htdocs\uphq\_deploy\deploy_all_*.sh` | Deploy scripts (now with `accept-new` SSH flag) |
 
-add_filter('get_the_author_display_name', function($display_name) {
-    return UPHQ_BRAND_NAME;
-});
-```
+---
 
-(Some themes pull the author from `get_the_author_meta('display_name')` or `get_user_meta`. Check the theme's `single.php` and `content.php` if the byline still shows the WP user after activating the plugin.)
+## External validation tools
 
-## llms.txt
+- [Google Rich Results Test](https://search.google.com/test/rich-results?url=https%3A%2F%2Funipixelhq.com%2F)
+- [Schema.org Validator](https://validator.schema.org/#url=https%3A%2F%2Funipixelhq.com%2F)
+- [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/?q=https%3A%2F%2Funipixelhq.com%2F) (click "Scrape Again" to flush FB cache after deploy)
+- [Twitter Card Validator](https://cards-dev.twitter.com/validator)
 
-Static file at `https://unipixelhq.com/llms.txt`. Markdown. Tells AI engines what's on the site, in priority order. Update when major surfaces change.
-
-```markdown
-# UniPixel
-
-> Server-side conversion tracking for WordPress. Free WordPress plugin that sends events directly to Meta, Google, TikTok, Pinterest, and Microsoft from your WordPress server. No GTM container, no cloud hosting, no GTM expertise required.
-
-## Plugin
-
-- [UniPixel on WordPress.org](https://wordpress.org/plugins/unipixel/): Free plugin download, install instructions, and reviews
-- [UniPixel home page](https://unipixelhq.com/): Overview, features, getting started
-
-## Documentation
-
-- [Setting Up UniPixel With Meta](https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-meta/)
-- [Setting Up UniPixel With Google](https://unipixelhq.com/unipixel-docs/getting-ready-for-unipixel-what-you-need-from-google/)
-- [Setting Up UniPixel With TikTok](https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-tiktok/)
-- [Setting Up UniPixel With Pinterest](https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-pinterest/)
-- [Setting Up UniPixel With Microsoft](https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-microsoft/)
-- [Custom Event Tracking](https://unipixelhq.com/unipixel-docs/custom-event-tracking/)
-- [Cookie Consent and Tracking](https://unipixelhq.com/unipixel-docs/cookie-consent/)
-
-## Articles
-
-- [The Best Stape Alternatives for WordPress](https://unipixelhq.com/blog/...)
-- [Pixel Manager Pro vs UniPixel: WordPress Tracking in 2026](https://unipixelhq.com/blog/...)
-- [I just wanted tracking. So why am I being offered cloud hosting?](https://unipixelhq.com/blog/...)
-- [Your Ad Platforms Are Making Decisions With Missing Data](https://unipixelhq.com/blog/...)
-
-## Brand
-
-- GitHub: [github.com/unipixelhq](https://github.com/unipixelhq)
-- Built by Buildio (Elure Pty Ltd, Australia)
-```
-
-## robots.txt
-
-Allow major AI crawlers explicitly. Either edit via a plugin's robots.txt UI or upload a static `robots.txt` to site root.
-
-```
-User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: *
-Allow: /
-
-Sitemap: https://unipixelhq.com/sitemap.xml
-Sitemap: https://unipixelhq.com/sitemap_index.xml
-```
-
-## Implementation steps
-
-1. Create `wp-content/plugins/unipixelhq-schema/unipixelhq-schema.php` with the PHP above
-2. Confirm `UPHQ_BRAND_LOGO` URL is correct (update with actual logo URL on unipixelhq.com)
-3. Confirm `UPHQ_PLUGIN_LANDING_SLUG` matches the actual page slug
-4. Adjust `uphq_is_docs_page()` if the docs structure differs from `/unipixel-docs/` parent pattern
-5. Activate the plugin
-6. Validate output:
-   - [Google Rich Results Test](https://search.google.com/test/rich-results)
-   - [Schema.org Validator](https://validator.schema.org/)
-7. Confirm visible byline on blog posts shows "UniPixelHQ" not the WP user. Apply theme fixes if not.
-8. Upload `/llms.txt` to site root
-9. Update `robots.txt` to allow AI crawlers
-10. Once wp.org has 5+ reviews, uncomment and populate `aggregateRating` in `uphq_software_application_schema()`
-
-## Maintenance cadence
-
-- **Per UniPixel release:** update `UPHQ_PLUGIN_VERSION` constant. One-line edit. Worth adding to the existing release-gate checklist as the fifth item alongside the four files in CLAUDE.md.
-- **Per major content surface change:** update `llms.txt`. Otherwise it's static.
-- **Schema validation:** run Google Rich Results Test after deployment, then on demand if anything looks broken.
+---
 
 ## Cross-references
 
-- Plugin landing page schema must match the live wp.org listing (name, version, description). Source of truth for version is the plugin's `unipixel.php` header.
-- Author identity rule (UniPixelHQ, not WP user) ties to brand consistency on `unipixelhq.com`, GitHub presence, social profiles. Documented in `marketing-knowledge/positioning.md` § What UniPixel Is.
-- Release-gate checklist in `CLAUDE.md` § Release Gate currently lists four files; this is a candidate for a fifth item if the plugin is deployed on unipixelhq.com.
+- **Authoritative version source for `UPHQ_PLUGIN_VERSION`:** the plugin's `unipixel.php` header in `public_html/wp-content/plugins/unipixel/` (in this `updev` repo).
+- **Author-as-brand rule:** documented in `marketing-knowledge/positioning.md` § What UniPixel Is.
+- **Release Gate (now five files, not four):** `CLAUDE.md` § Release Gate.
+- **GEO context (why structured data matters for AI engines):** discussed inline above; broader content strategy in `marketing-knowledge/unipixelhq-content.md`.

@@ -76,7 +76,21 @@
       "Bash(git -C /c/xampp/htdocs/updev diff HEAD -- public_html/wp-content/plugins/unipixel/admin/page-tiktok-events.php public_html/wp-content/plugins/unipixel/admin/page-pinterest-events.php public_html/wp-content/plugins/unipixel/admin/page-microsoft-events.php)",
       "Read(//c/ProgramData/**)",
       "Read(//c/Program Files/**)",
-      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\public_html\\\\wp-content\\\\plugins\\\\unipixelhq-schema\\\\unipixelhq-schema.php\")"
+      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\public_html\\\\wp-content\\\\plugins\\\\unipixelhq-schema\\\\unipixelhq-schema.php\")",
+      "Bash(curl -sS -A \"Mozilla/5.0 UniPixelHQ-Validator\" \"https://unipixelhq.com/\" -o /tmp/uphq_home.html)",
+      "Read(//tmp/**)",
+      "Bash(sed -n '/<head>/,/<\\\\/head>/p' /tmp/uphq_home.html)",
+      "Bash(./deploy_all_LIVE.sh)",
+      "Bash(curl -sS -A \"Mozilla/5.0 UniPixelHQ-Validator\" \"https://unipixelhq.com/\" -o /tmp/uphq_home2.html)",
+      "Bash(sed -n '/<head>/,/<\\\\/head>/p' /tmp/uphq_home2.html)",
+      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\uphq\\\\public_html\\\\wp-content\\\\plugins\\\\unipixelhq-seo\\\\unipixelhq-seo.php\")",
+      "Bash(curl -sS -A \"Mozilla/5.0 UniPixelHQ-Validator\" \"https://unipixelhq.com/\" -o /tmp/uphq_home3.html)",
+      "Bash(curl -sS -A \"Mozilla/5.0 Validator\" \"https://unipixelhq.com/\" -o /tmp/h.html)",
+      "Bash(curl -sS \"https://unipixelhq.com/blog/\" -A \"Mozilla/5.0\")",
+      "Bash(grep -v '/blog/$\\\\|/blog/\"')",
+      "Bash(grep -v 'wp-content\\\\|wp-includes\\\\|/blog/\"\\\\|/blog/$\\\\|wp-json')",
+      "Bash(curl -sS -A \"Mozilla/5.0 V\" \"https://unipixelhq.com/i-just-wanted-tracking-so-why-am-i-being-offered-cloud-hosting/\" -o /tmp/p.html)",
+      "Bash(curl -sS -A \"Mozilla/5.0 V\" \"https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-meta/\" -o /tmp/d.html)"
     ]
   }
 }

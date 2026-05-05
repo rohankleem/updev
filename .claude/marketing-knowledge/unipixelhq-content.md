@@ -156,3 +156,17 @@ The unipixelhq.com publication is always the **canonical source**. Syndication i
 - Docs articles: write whenever a new feature ships or a recurring support question emerges
 - Cookie Consent doc: needs urgent refresh post v2.6.4 + v2.6.5 (multi-language + customisation features)
 - Setup guides: review when platforms change their admin UI (rare but happens — e.g. Meta Business Suite renames)
+
+---
+
+## SEO + GEO infrastructure (technical)
+
+`unipixelhq.com` runs a **fully custom SEO layer**, not Yoast or Rank Math. One self-contained plugin at `wp-content/plugins/unipixelhq-seo/unipixelhq-seo.php` outputs all JSON-LD schema, Open Graph tags, Twitter Cards, meta description, canonical, title tag, and robots tag. Every article is attributed to **UniPixelHQ** as a brand-level Organization, never to a WordPress user.
+
+Two static files at the site root: `/llms.txt` (markdown index for AI engines) and `/robots.txt` (explicit allow for GPTBot, ClaudeBot, PerplexityBot, Google-Extended, and other major AI crawlers). Sitemap is WordPress core's `/wp-sitemap.xml`.
+
+Yoast was deactivated 2026-05-05 but its stored postmeta (per-post titles, descriptions, OG, Twitter, canonicals, noindex) is preserved and read by the custom plugin so existing SEO work was not lost.
+
+**Per-release maintenance:** when the UniPixel plugin ships a new version, bump `UPHQ_PLUGIN_VERSION` in the SEO plugin so `softwareVersion` in the `SoftwareApplication` schema stays in sync with wp.org. Now item #5 in the Release Gate (`CLAUDE.md`).
+
+**Implementation reference:** `.claude/projects/structured-data-implementation.md` (full plugin details, Yoast data fallthrough behaviour, validation results, deploy infrastructure changes).
