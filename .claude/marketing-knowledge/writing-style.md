@@ -75,6 +75,20 @@ Whenever the article makes a comparison, include a tight table. Readers scan tab
 ### 10. UK spelling
 `organise`, `optimise`, `colour`, `behaviour`, `analyse`, `realise`. Buildio is Australian; the WordPress plugin ecosystem leans US but our voice stays UK-Australian.
 
+### 11. No time estimates
+Don't tell users how long setup, configuration, or any process will take. Leave the duration off entirely.
+
+- ❌ "~5 minutes"
+- ❌ "Setup takes about 10 minutes"
+- ❌ "In just 30 seconds..."
+- ❌ "This usually only takes a couple of minutes"
+- ✅ "By the end, server-side events will fire from your site directly to Meta."
+- ✅ "Once this is done, your pixel will be live on every page."
+
+Estimates set expectations that get broken. A user who hits a snag and takes 20 minutes feels like they did something wrong. Platform UIs differ across regions, account types, and recent redesigns, so any time we give is a per-user guess. The downside (user mistrusts us when their experience differs) outweighs the upside (small reassurance).
+
+Applies to: plugin admin copy, wizards, docs, blog, ads, social, readme, support replies. Internal scoping (effort columns in `release-log.md`, project planning docs) is team-facing not user-facing, so exempt.
+
 ---
 
 ## Blog voice — additional rules
@@ -152,6 +166,67 @@ Docs URLs are referenced from the plugin code (help icons, Need-help links). **N
 
 ---
 
+## Email / support replies — additional rules
+
+Direct customer-support replies: feedback-widget responses, email back to a user, forum DMs, anything one-to-one. Universal voice rules above still apply, but the register is more casual and the structure is conversational, not article-shaped.
+
+### 1. Open with the answer
+First line is the verdict, not a preamble.
+- ✅ "It does look like you've done the right thing."
+- ✅ "That's a known limitation, here's the workaround."
+- ✅ "No, that's not the issue, here's what's actually happening."
+- ❌ "Thanks for reaching out", "I appreciate the feedback", "Great question, let me help with that".
+
+Politeness rituals burn the reader's first second. Warmth comes from the answer being useful, not from a soft entrance.
+
+### 2. Affirm what they did, honestly
+If the user's path was correct but felt uncertain, say so plainly. Don't gaslight them by implying they did something unnecessary if they didn't. "You had to do it that way, and you did it right" beats "you didn't need to do that" when they actually did. The reassurance has to be true to land.
+
+### 3. Acknowledge the context that confused them
+If the platform UI or our own UX is the real source of confusion, name it. "Meta used to hide that part behind the scenes, but more recently they've made it visible." Validates the user's experience without throwing anyone under the bus.
+
+### 4. Always give a verification path
+Most support questions are really "did I do it right?". Include a way the user can verify the outcome themselves before signing off. Prefer in-plugin paths (Stored Event Logs, an admin page) over external ones. Add a platform-side cross-check as a secondary option when possible.
+
+### 5. Label failure modes by symptom
+Give them a self-diagnosis ladder. "Code 200 = good. 401/403 = token issue. 400 = payload issue, send a screenshot." Beats vague "if it doesn't work, let me know."
+
+### 6. Offer concrete help, not vague availability
+- ✅ "Send me a screenshot if you see that and I'll have a look."
+- ❌ "Please don't hesitate to reach out if you have any further questions."
+
+### 7. Casual register, contractions, UK/AU vocabulary
+"you're sorted", "have a look", "flick it on", "give it a go", "let me know what you see", "have a dig". Avoid: "kindly", "please advise", "at your earliest convenience", "as per", "per my last email", "going forward".
+
+### 8. Don't upsell
+Support replies are not marketing. Don't end with "Try our Pro tier" or "Have you considered...". If they don't ask, don't offer.
+
+### 9. Mention upcoming improvements lightly, framed as benefit-to-them
+If their feedback exposed a real gap that's going to get fixed, mention it briefly. Frame it as "for the next person who lands on it" rather than "we're working on improving the product". Don't promise dates. Don't apologise for the gap; acknowledging it is enough.
+
+### 10. Don't be defensive about real gaps
+When our UX caused the confusion, say so without bowing. "Worth a UX improvement on our end" lands better than either "by design" (false) or "I'm so sorry for the confusion" (over-apologetic). Customers can smell both.
+
+### 11. Short closing
+"Cheers, Rohan" is the closing. Not "Best regards", not "Kind regards", not "Thank you for being a valued UniPixel user".
+
+### 12. Zero em dashes (reiterated, this surface is where it matters most)
+Customer support replies are the surface where AI-detection is sharpest. A reader who suspects "this was written by ChatGPT" disengages instantly. Em dashes are the single biggest tell. Stay zero, even more strictly than blog/docs.
+
+### Structural template (rough)
+1. **Verdict line** (1 sentence): the answer.
+2. **Affirmation + context** (1-2 short paragraphs): what they did, why it felt confusing.
+3. **Verification path** (numbered or flowing prose): how they confirm it themselves.
+4. **Failure-mode ladder** (1 short paragraph or bullets): what each error means.
+5. **Optional cross-check** (1 paragraph): the secondary verification.
+6. **Our-side note** (1 sentence): improvements coming, framed as benefit-to-them.
+7. **Open-door close** (1 sentence): concrete offer to help if they get stuck.
+8. **Cheers, Rohan.**
+
+Not every reply needs all eight. A two-line answer is fine when the question's a two-line question. The order matters more than the completeness.
+
+---
+
 ## Examples — voice in action
 
 ### Hook examples (blog)
@@ -166,6 +241,17 @@ Docs URLs are referenced from the plugin code (help icons, Need-help links). **N
 ### Closing line examples (blog)
 - "Try UniPixel — server-side tracking from the server you already have."
 - "Try UniPixel — five platforms, one plugin, zero GTM."
+
+### Email opener examples (support replies)
+- "It does look like you've done the right thing."
+- "Quick answer: yes, that's a known limitation. Here's the workaround."
+- "No, that's not the issue. What's actually happening is..."
+- "You're nearly there, one piece is missing."
+
+### Email closer examples (support replies)
+- "Give the check above a go and let me know what you see. Happy to help interpret anything that looks weird."
+- "Send me a screenshot if it still looks off and I'll have a dig."
+- "Let me know how that goes."
 
 ### What to NOT write
 - ❌ "Discover how UniPixel revolutionises your tracking workflow."
@@ -182,6 +268,7 @@ Docs URLs are referenced from the plugin code (help icons, Need-help links). **N
 - [ ] No words from the anti-hype list
 - [ ] Comparative claims (not absolute)
 - [ ] Zero em dashes (—). Count them. The target is 0. Use periods, commas, colons, semicolons, or parentheses.
+- [ ] No time estimates ("~5 minutes", "in just 30 seconds", "takes about 10 minutes"). Leave durations off.
 - [ ] Comparison table if it's a "vs" / "alternatives" piece
 - [ ] CTA is "Try UniPixel — [benefit]" linked to wp.org
 - [ ] UK spelling consistent throughout

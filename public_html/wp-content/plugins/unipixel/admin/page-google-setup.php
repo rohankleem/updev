@@ -57,6 +57,57 @@ function unipixel_page_google_setup() {
         <h1 class="mb-0">Tag <?php echo esc_html__('Setup', 'unipixel'); ?></h1>
         <p><small><?php echo esc_html__('Configure your connection and core settings for', 'unipixel'); ?> <?php echo esc_html($platformName); ?>.</small></p>
 
+        <?php
+        // Connection status strip (token-acquisition-ux Phase 7).
+        $google_conn_state = unipixel_get_platform_connection_state($platformId);
+        if ($google_conn_state['state'] === 'not_started') :
+        ?>
+            <div class="alert alert-secondary d-flex align-items-center mb-3" role="status">
+                <span class="badge bg-secondary me-2">&bull;</span>
+                <div class="flex-grow-1">
+                    <strong><?php echo esc_html__('Server-side tracking not set up.', 'unipixel'); ?></strong>
+                    <small class="d-block"><?php echo esc_html__('Enable Server-Side Tracking and add an API Secret below, or use the guided walkthrough.', 'unipixel'); ?></small>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm ms-3" data-bs-toggle="modal" data-bs-target="#google-setup-wizard-modal">
+                    <?php echo esc_html__('Start server-side setup', 'unipixel'); ?>
+                </button>
+            </div>
+        <?php elseif ($google_conn_state['state'] === 'pasted_unverified') : ?>
+            <div class="alert alert-warning d-flex align-items-center mb-3" role="status">
+                <span class="badge bg-warning text-dark me-2">&bull;</span>
+                <div>
+                    <strong><?php echo esc_html__('Server-side not yet verified.', 'unipixel'); ?></strong>
+                    <small class="d-block"><?php echo esc_html__('Credentials saved. Click Test Connection below to verify, or wait for server events to confirm setup.', 'unipixel'); ?></small>
+                    <small class="d-block mt-1">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#google-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
+                    </small>
+                </div>
+            </div>
+        <?php else :
+            $g_freshness_at = ($google_conn_state['last_test_at'] && $google_conn_state['last_event_at'])
+                ? max($google_conn_state['last_test_at'], $google_conn_state['last_event_at'])
+                : ($google_conn_state['last_test_at'] ? $google_conn_state['last_test_at'] : $google_conn_state['last_event_at']);
+        ?>
+            <div class="alert alert-success d-flex align-items-center mb-3" role="status">
+                <span class="badge bg-success me-2">&bull;</span>
+                <div>
+                    <strong><?php echo esc_html__('Server-side connected.', 'unipixel'); ?></strong>
+                    <?php if ($g_freshness_at) : ?>
+                        <small class="d-block">
+                            <?php echo esc_html(sprintf(
+                                /* translators: %s is a human time diff, e.g. "5 minutes" */
+                                __('Verified %s ago.', 'unipixel'),
+                                human_time_diff($g_freshness_at, time())
+                            )); ?>
+                        </small>
+                    <?php endif; ?>
+                    <small class="d-block mt-1">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#google-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
+                    </small>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Feedback message container (used by ajax-platform-settings.js) -->
         <div id="platform-settings-feedback-message" class="alert" role="alert" style="display:none;"></div>
 
@@ -131,7 +182,27 @@ function unipixel_page_google_setup() {
 
             <div id="serverside-well" class="bg-light-blue">
                 <p class="mb-1"><i class="fa-solid fa-bolt-lightning"></i> <strong><?php echo esc_html__('Server-Side Tracking', 'unipixel'); ?></strong></p>
-                <p class="mb-2"><small><?php echo esc_html__('Supercharge your event tracking with Google\'s GA4 Measurement Protocol. In addition to traditional client-side sending, events are sent directly from your server, bypassing ad blockers and browser restrictions. Note: Google only deduplicates the Purchase event — for all other events, use the event-level toggles to choose either client-side or server-side to avoid double counting.', 'unipixel'); ?></small></p>
+                <p class="mb-2"><small><?php echo esc_html__('Supercharge your event tracking with Google\'s GA4 Measurement Protocol. In addition to traditional client-side sending, events are sent directly from your server, bypassing ad blockers and browser restrictions. Note: Google only deduplicates the Purchase event. For all other events, use the event-level toggles to choose either client-side or server-side to avoid double counting.', 'unipixel'); ?></small></p>
+
+                <?php
+                // Phase 5 of token-acquisition-ux: surface the 14-day log-response grace period for Google.
+                $google_log_grace = unipixel_get_log_response_grace_status($platformId);
+                if ($google_log_grace['active']) :
+                ?>
+                    <div class="alert alert-info py-2 mb-2 small" role="note">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <?php echo esc_html(sprintf(
+                            /* translators: %d is the number of days remaining */
+                            _n(
+                                'Server-side response logging is on for all Google events for %d more day so you can verify setup. After that it will auto-off; turn it back on per event in the Events tab if you want to keep logging.',
+                                'Server-side response logging is on for all Google events for %d more days so you can verify setup. After that it will auto-off; turn it back on per event in the Events tab if you want to keep logging.',
+                                $google_log_grace['days_remaining'],
+                                'unipixel'
+                            ),
+                            $google_log_grace['days_remaining']
+                        )); ?>
+                    </div>
+                <?php endif; ?>
 
                 <div class="mb-3 row">
                     <div class="col-12 col-sm-3">
@@ -157,6 +228,16 @@ function unipixel_page_google_setup() {
                         <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>">
                     </div>
                 </div>
+
+                <div class="mb-3 row" id="google-test-connection-row" style="display:none;">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-9">
+                        <button type="button" id="google-test-connection-btn" class="btn btn-outline-primary">
+                            <?php echo esc_html__('Test Connection', 'unipixel'); ?>
+                        </button>
+                        <div id="google-test-connection-result" class="mt-2" role="status" style="display:none;"></div>
+                    </div>
+                </div>
                 </div>
             </div>
 
@@ -171,6 +252,109 @@ function unipixel_page_google_setup() {
                 </div>
             </div>
         </form>
+
+        <?php /* Google Setup Wizard Modal (token-acquisition-ux Phase 7) */ ?>
+        <div class="modal fade" id="google-setup-wizard-modal" tabindex="-1" aria-labelledby="googleSetupWizardLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="googleSetupWizardLabel"><?php echo esc_html__('Google Server-Side Setup Walkthrough', 'unipixel'); ?></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?php echo esc_attr__('Close', 'unipixel'); ?>"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="google-wizard-step" data-step="1">
+                            <h6 class="mb-3"><?php echo esc_html__("What you'll achieve", 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("By the end of this guide, server-side events from this WordPress site will fire directly to Google Analytics 4 via the Measurement Protocol. You'll have your Measurement ID and an API Secret pasted into UniPixel, and a successful Test Connection confirming the wiring.", 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="google-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="google-wizard-step d-none" data-step="2">
+                            <h6 class="mb-3"><?php echo esc_html__('Prerequisites', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("You need a GA4 property with a Web data stream already set up. If you don't have one, create the property at analytics.google.com first, then come back.", 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="google-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="google-wizard-step d-none" data-step="3">
+                            <h6 class="mb-3"><?php echo esc_html__('What to ignore', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__('Google Analytics has a lot of options. For UniPixel server-side setup, you can safely ignore:', 'unipixel'); ?></p>
+                            <ul>
+                                <li><?php echo esc_html__('Enhanced Measurement toggles. These are client-side tracking concerns, separate from Measurement Protocol.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Audience definitions.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Conversion event marking.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Custom dimensions and metrics.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Google Tag Manager, unless you are already using it on your site.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Server-Side Google Tag Manager. That is a different paid product, not needed for UniPixel.', 'unipixel'); ?></li>
+                            </ul>
+                            <p><?php echo esc_html__('You only need: a Measurement ID, and a Measurement Protocol API Secret from your Web data stream.', 'unipixel'); ?></p>
+                            <p class="small text-muted"><strong><?php echo esc_html__('Important Google quirk (G-001):', 'unipixel'); ?></strong> <?php echo esc_html__('Google deduplicates only the Purchase event. For every other event, send EITHER client OR server, not both. UniPixel\'s Event Manager enforces this automatically.', 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="google-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="google-wizard-step d-none" data-step="4">
+                            <h6 class="mb-3"><?php echo esc_html__('Get your credentials', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__('You need two things from Google: your Measurement ID and a Measurement Protocol API Secret. Both come from your GA4 Web data stream.', 'unipixel'); ?></p>
+
+                            <div class="mb-3 p-3 border rounded">
+                                <ol class="mb-2 ps-4">
+                                    <li><?php echo esc_html__('Open Google Analytics. Click the Admin gear (bottom-left).', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Under the property column, click Data Streams.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Click your Web stream.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('The Measurement ID (G-XXXXXXXXXX) appears at the top of the stream details. Copy it.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Scroll down to "Measurement Protocol API secrets". Click Create.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Give it a nickname (e.g. "UniPixel WordPress"), click Create, and copy the secret.', 'unipixel'); ?></li>
+                                </ol>
+                                <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> <?php echo esc_html__('Open Google Analytics', 'unipixel'); ?>
+                                </a>
+                                <p class="mb-0 mt-2 small text-muted"><?php echo esc_html__('The API Secret is data-stream-specific, so it cannot be reused across streams or properties. Treat it as a secret, like a password.', 'unipixel'); ?></p>
+                            </div>
+
+                            <p class="mb-0"><?php echo esc_html__('Keep both copied somewhere safe, then continue.', 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="google-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="google-wizard-step d-none" data-step="5">
+                            <h6 class="mb-3"><?php echo esc_html__('Paste your credentials', 'unipixel'); ?></h6>
+                            <div class="mb-3">
+                                <label for="wizard-google-measurement-id" class="form-label"><?php echo esc_html__('Measurement ID', 'unipixel'); ?></label>
+                                <input type="text" class="form-control" id="wizard-google-measurement-id" autocomplete="off">
+                            </div>
+                            <div class="mb-3">
+                                <label for="wizard-google-api-secret" class="form-label"><?php echo esc_html__('API Secret', 'unipixel'); ?></label>
+                                <input type="password" class="form-control" id="wizard-google-api-secret" autocomplete="off">
+                            </div>
+                            <button type="button" class="btn btn-primary" id="wizard-google-save-btn"><?php echo esc_html__('Save and continue', 'unipixel'); ?></button>
+                            <div id="wizard-google-save-result" class="mt-3" role="status" style="display:none;"></div>
+                            <p class="mt-3 mb-0"><small><a href="#" class="google-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="google-wizard-step d-none" data-step="6">
+                            <h6 class="mb-3"><?php echo esc_html__('Test the connection', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("Now let's verify the connection works. UniPixel will format-check your credentials, validate the payload at Google's debug endpoint, and fire a debug-mode test event to Google's production endpoint so it appears in GA4 DebugView.", 'unipixel'); ?></p>
+                            <p class="small text-muted"><strong><?php echo esc_html__('How to confirm fully:', 'unipixel'); ?></strong> <?php echo esc_html__('Google does not surface API Secret errors directly. A green result here means the structural validation passed; to confirm the API Secret value is actually correct, open GA4 → Admin → DebugView and look for "unipixel_test_connection" within 60 seconds. If it appears there, your setup is fully working. If it does not, the API Secret is likely wrong.', 'unipixel'); ?></p>
+                            <button type="button" class="btn btn-primary" id="wizard-google-test-connection-btn"><?php echo esc_html__('Test Connection', 'unipixel'); ?></button>
+                            <div id="wizard-google-test-connection-result" class="mt-3" role="status" style="display:none;"></div>
+                            <p class="mt-3 mb-0"><small><a href="#" class="google-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="google-wizard-step d-none" data-step="7">
+                            <h6 class="mb-3"><?php echo esc_html__("You're set up", 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__('Server-side events will start flowing on the next user action on your site. Open GA4 Realtime to watch them land.', 'unipixel'); ?></p>
+                            <button type="button" class="btn btn-primary" id="wizard-google-done-btn"><?php echo esc_html__('Close', 'unipixel'); ?></button>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <span class="text-muted small"><?php echo esc_html__('Step', 'unipixel'); ?> <span class="google-wizard-current-step">1</span> <?php echo esc_html__('of', 'unipixel'); ?> 7</span>
+                        <div>
+                            <button type="button" class="btn btn-secondary google-wizard-back" disabled><?php echo esc_html__('Back', 'unipixel'); ?></button>
+                            <button type="button" class="btn btn-primary google-wizard-next"><?php echo esc_html__('Next', 'unipixel'); ?></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <?php
 }

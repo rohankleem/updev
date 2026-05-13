@@ -41,6 +41,374 @@ function unipixel_get_platform_settings($platform_id)
 }
 
 /**
+ * Returns the connection state for a platform, used by the setup-page status
+ * strip and the home dashboard badge.
+ *
+ * State machine (3 states, per the token-acquisition-ux project doc):
+ *   - 'not_started':       no Pixel ID or no access token saved
+ *   - 'pasted_unverified': credentials saved but no recent Test Connection pass
+ *                          and no successful server event in the last 24h
+ *   - 'connected':         credentials saved AND either a recorded successful
+ *                          Test Connection click OR a successful server event
+ *                          in the last 24h
+ *
+ * @param int $platform_id 1=Meta, 2=Pinterest, 3=TikTok, 4=Google, 5=Microsoft
+ * @return array { state: string, last_test_at: int|null, last_event_at: int|null }
+ */
+function unipixel_get_platform_connection_state($platform_id)
+{
+    $platform_id = (int) $platform_id;
+    $settings    = unipixel_get_platform_settings($platform_id);
+
+    $has_pixel = !empty($settings->pixel_id);
+    $has_token = !empty($settings->access_token);
+
+    if (!$has_pixel || !$has_token) {
+        return array(
+            'state'         => 'not_started',
+            'last_test_at'  => null,
+            'last_event_at' => null,
+        );
+    }
+
+    // Stored Test Connection timestamp (written by the Test Connection AJAX handler on success)
+    $timestamps    = get_option('unipixel_test_connection_timestamps', array());
+    $last_test_at  = (is_array($timestamps) && isset($timestamps[$platform_id]))
+        ? (int) $timestamps[$platform_id]
+        : null;
+
+    // Most recent successful server event in the last 24 hours
+    global $wpdb;
+    $log_table = $wpdb->prefix . 'unipixel_event_log';
+
+    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $row_time = $wpdb->get_var($wpdb->prepare(
+        "SELECT MAX(log_time) FROM %i
+         WHERE platform_id = %d
+           AND method = %s
+           AND log_time >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+           AND response_message LIKE %s",
+        $log_table,
+        $platform_id,
+        'server',
+        '%Successful%'
+    ));
+
+    $last_event_at = $row_time ? strtotime($row_time) : null;
+
+    if ($last_test_at || $last_event_at) {
+        return array(
+            'state'         => 'connected',
+            'last_test_at'  => $last_test_at,
+            'last_event_at' => $last_event_at,
+        );
+    }
+
+    return array(
+        'state'         => 'pasted_unverified',
+        'last_test_at'  => null,
+        'last_event_at' => null,
+    );
+}
+
+/**
+ * Classify a raw response_message string from `unipixel_event_log` into a plain-English
+ * label, a Bootstrap badge class, and the raw text for tooltip display.
+ *
+ * Used by the Stored Event Logs admin page to render readable status at the row level
+ * (Phase 4 of the token-acquisition-ux project).
+ *
+ * @param string $response_message Raw response_message column value (may be empty).
+ * @param string $method           'server' or 'client' (event log method column).
+ * @return array {
+ *   label:           string,
+ *   level:           string ('success'|'danger'|'warning'|'info'|'muted'),
+ *   bootstrap_class: string (e.g. 'bg-success'),
+ *   raw:             string (original message or contextual fallback for tooltip)
+ * }
+ */
+function unipixel_classify_event_log_response($response_message, $method = '')
+{
+    $raw    = is_string($response_message) ? $response_message : '';
+    $method = is_string($method) ? strtolower($method) : '';
+
+    // Client-side rows: no server response is captured, that is expected behaviour.
+    if ($method === 'client') {
+        return array(
+            'label'           => __('Client-side, no response', 'unipixel'),
+            'level'           => 'info',
+            'bootstrap_class' => 'bg-info',
+            'raw'             => $raw !== ''
+                ? $raw
+                : __('Client-side event. No response is captured because the pixel fires in the browser, not via UniPixel.', 'unipixel'),
+        );
+    }
+
+    // Server-side row with no response captured, or with a stored placeholder
+    // indicating that "Log Server-side Response" was off when this event fired.
+    if ($raw === ''
+        || stripos($raw, 'response logging turned off') !== false
+        || stripos($raw, 'logging is off') !== false
+        || stripos($raw, 'logging off') !== false) {
+        return array(
+            'label'           => __('Not logged', 'unipixel'),
+            'level'           => 'muted',
+            'bootstrap_class' => 'bg-secondary',
+            'raw'             => $raw !== ''
+                ? $raw
+                : __('Server-side response logging is off for this event. Toggle "Log Server-side Response" on the event row to capture future responses.', 'unipixel'),
+        );
+    }
+
+    // Try to extract an HTTP status code from common shapes.
+    $http_code = null;
+    if (preg_match('/code\s+(\d{3})/i', $raw, $m)) {
+        $http_code = (int) $m[1];
+    } elseif (preg_match('/"code"\s*:\s*(\d{3})/i', $raw, $m)) {
+        $http_code = (int) $m[1];
+    } elseif (preg_match('/\b(\d{3})\b/', $raw, $m)) {
+        $candidate = (int) $m[1];
+        if ($candidate >= 200 && $candidate < 600) {
+            $http_code = $candidate;
+        }
+    }
+
+    if ($http_code !== null) {
+        if ($http_code >= 200 && $http_code < 300) {
+            return array(
+                'label'           => __('Sent OK', 'unipixel'),
+                'level'           => 'success',
+                'bootstrap_class' => 'bg-success',
+                'raw'             => $raw,
+            );
+        }
+        if ($http_code === 400) {
+            return array(
+                'label'           => __('Data problem', 'unipixel'),
+                'level'           => 'danger',
+                'bootstrap_class' => 'bg-danger',
+                'raw'             => $raw,
+            );
+        }
+        if ($http_code === 401 || $http_code === 403) {
+            return array(
+                'label'           => __('Token problem', 'unipixel'),
+                'level'           => 'danger',
+                'bootstrap_class' => 'bg-danger',
+                'raw'             => $raw,
+            );
+        }
+        if ($http_code === 429) {
+            return array(
+                'label'           => __('Rate limited', 'unipixel'),
+                'level'           => 'warning',
+                'bootstrap_class' => 'bg-warning text-dark',
+                'raw'             => $raw,
+            );
+        }
+        if ($http_code >= 500 && $http_code < 600) {
+            return array(
+                'label'           => __('Platform server error', 'unipixel'),
+                'level'           => 'danger',
+                'bootstrap_class' => 'bg-danger',
+                'raw'             => $raw,
+            );
+        }
+        if ($http_code >= 400 && $http_code < 500) {
+            return array(
+                'label'           => __('Request problem', 'unipixel'),
+                'level'           => 'danger',
+                'bootstrap_class' => 'bg-danger',
+                'raw'             => $raw,
+            );
+        }
+    }
+
+    // No HTTP code extracted: fall back to keyword detection on the raw text.
+    if (stripos($raw, 'successful') !== false || stripos($raw, '"success"') !== false) {
+        return array(
+            'label'           => __('Sent OK', 'unipixel'),
+            'level'           => 'success',
+            'bootstrap_class' => 'bg-success',
+            'raw'             => $raw,
+        );
+    }
+
+    if (stripos($raw, 'unauthor') !== false
+        || stripos($raw, 'forbidden') !== false
+        || stripos($raw, 'invalid token') !== false
+        || stripos($raw, 'invalid_token') !== false
+        || stripos($raw, 'expired token') !== false) {
+        return array(
+            'label'           => __('Token problem', 'unipixel'),
+            'level'           => 'danger',
+            'bootstrap_class' => 'bg-danger',
+            'raw'             => $raw,
+        );
+    }
+
+    if (stripos($raw, 'curl') !== false
+        || stripos($raw, 'timeout') !== false
+        || stripos($raw, 'could not resolve') !== false
+        || stripos($raw, 'connection') !== false
+        || stripos($raw, 'wp_error') !== false) {
+        return array(
+            'label'           => __('Could not reach platform', 'unipixel'),
+            'level'           => 'danger',
+            'bootstrap_class' => 'bg-danger',
+            'raw'             => $raw,
+        );
+    }
+
+    // Unknown response shape.
+    return array(
+        'label'           => __('Other', 'unipixel'),
+        'level'           => 'warning',
+        'bootstrap_class' => 'bg-warning text-dark',
+        'raw'             => $raw,
+    );
+}
+
+/**
+ * Phase 5 of the token-acquisition-ux project: 14-day Log Server-side Response grace period.
+ *
+ * When a user first adds an access token for a platform, we want them to see the
+ * response detail in Stored Event Logs immediately (so they can verify setup is
+ * working). After 14 days, response logging auto-resets to off so the log table
+ * doesn't grow unbounded.
+ *
+ * Implementation: this helper bulk-sets `send_server_log_response = 1` on every
+ * event row for the platform, records a per-platform grace-period start timestamp,
+ * and schedules a one-shot WP-Cron event to reset back to 0 after 14 days.
+ *
+ * Idempotent per platform: only runs the first time a platform's token is added.
+ * Subsequent token changes do not re-trigger (so user customisations aren't
+ * overwritten).
+ *
+ * @param int $platform_id 1=Meta, 2=Pinterest, 3=TikTok, 4=Google, 5=Microsoft
+ */
+function unipixel_start_log_response_grace_period($platform_id)
+{
+    $platform_id = (int) $platform_id;
+    if ($platform_id <= 0) return;
+
+    $option_key = 'unipixel_log_response_grace_started_at';
+    $timestamps = get_option($option_key, array());
+    if (!is_array($timestamps)) {
+        $timestamps = array();
+    }
+
+    // Idempotent: only run if we have not started a grace period for this platform yet.
+    if (isset($timestamps[$platform_id])) {
+        return;
+    }
+
+    $timestamps[$platform_id] = time();
+    update_option($option_key, $timestamps, false);
+
+    // Bulk-enable response logging across both event tables for this platform.
+    global $wpdb;
+    $wpdb->update(
+        $wpdb->prefix . 'unipixel_woocomm_event_settings',
+        array('send_server_log_response' => 1),
+        array('platform_id' => $platform_id),
+        array('%d'),
+        array('%d')
+    );
+    $wpdb->update(
+        $wpdb->prefix . 'unipixel_events_settings',
+        array('send_server_log_response' => 1),
+        array('platform_id' => $platform_id),
+        array('%d'),
+        array('%d')
+    );
+
+    // Schedule reset 14 days out (avoid duplicates with wp_next_scheduled).
+    $reset_at = time() + (14 * DAY_IN_SECONDS);
+    if (!wp_next_scheduled('unipixel_end_log_response_grace_period', array($platform_id))) {
+        wp_schedule_single_event($reset_at, 'unipixel_end_log_response_grace_period', array($platform_id));
+    }
+}
+
+/**
+ * Cron callback: 14 days after grace period started, bulk-reset
+ * send_server_log_response back to 0 for this platform's events. User-customised
+ * settings made AFTER the grace period started will be overwritten by this reset
+ * (accepted trade-off for keeping the log table from growing unbounded).
+ *
+ * Defensive: only runs if the recorded grace timestamp is actually >= 14 days old.
+ * This guards against duplicate scheduling and against an old cron firing after
+ * the user re-added a token (which we don't re-trigger anyway, but harmless).
+ *
+ * @param int $platform_id
+ */
+function unipixel_end_log_response_grace_period_callback($platform_id)
+{
+    $platform_id = (int) $platform_id;
+    if ($platform_id <= 0) return;
+
+    $timestamps = get_option('unipixel_log_response_grace_started_at', array());
+    if (!is_array($timestamps) || !isset($timestamps[$platform_id])) {
+        return;
+    }
+
+    $started_at = (int) $timestamps[$platform_id];
+    if ((time() - $started_at) < (14 * DAY_IN_SECONDS)) {
+        // Grace period not actually expired yet (cron fired early, or was renewed).
+        return;
+    }
+
+    global $wpdb;
+    $wpdb->update(
+        $wpdb->prefix . 'unipixel_woocomm_event_settings',
+        array('send_server_log_response' => 0),
+        array('platform_id' => $platform_id),
+        array('%d'),
+        array('%d')
+    );
+    $wpdb->update(
+        $wpdb->prefix . 'unipixel_events_settings',
+        array('send_server_log_response' => 0),
+        array('platform_id' => $platform_id),
+        array('%d'),
+        array('%d')
+    );
+}
+add_action('unipixel_end_log_response_grace_period', 'unipixel_end_log_response_grace_period_callback');
+
+/**
+ * Returns true if a platform is currently inside its 14-day Log Server-side
+ * Response grace period. Used by setup-page and Stored Event Logs notes.
+ *
+ * @param int $platform_id
+ * @return array { active: bool, started_at: int|null, ends_at: int|null, days_remaining: int|null }
+ */
+function unipixel_get_log_response_grace_status($platform_id)
+{
+    $platform_id = (int) $platform_id;
+    $timestamps  = get_option('unipixel_log_response_grace_started_at', array());
+
+    if (!is_array($timestamps) || !isset($timestamps[$platform_id])) {
+        return array('active' => false, 'started_at' => null, 'ends_at' => null, 'days_remaining' => null);
+    }
+
+    $started_at = (int) $timestamps[$platform_id];
+    $ends_at    = $started_at + (14 * DAY_IN_SECONDS);
+    $remaining  = $ends_at - time();
+
+    if ($remaining <= 0) {
+        return array('active' => false, 'started_at' => $started_at, 'ends_at' => $ends_at, 'days_remaining' => 0);
+    }
+
+    return array(
+        'active'         => true,
+        'started_at'     => $started_at,
+        'ends_at'        => $ends_at,
+        'days_remaining' => (int) ceil($remaining / DAY_IN_SECONDS),
+    );
+}
+
+/**
  * Retrieves settings for a specific event by platform ID and event name.
  *
  * @param int $platform_id The ID of the platform (e.g., 1 for Meta, 4 for Google).
@@ -103,17 +471,11 @@ function unipixel_get_help_icon($key)
         ],
         "Meta_PixelId"   => [
             "title" => "Pixel ID",
-            "content" => "Your unique identifier for your Meta Pixel. Found in Meta Events Manager under your Pixel settings.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-meta/' target='_blank'>See the full Meta setup guide</a>"
+            "content" => "Your unique identifier for your Meta Pixel. Found in Meta Business Settings under Data Sources.<br/><br/><a href='#meta-setup-wizard'>Open setup guide</a>"
         ],
         "Meta_AccessToken"   => [
             "title" => "Access Token",
-            "content" => "Used for Conversions API / Server side tracking. <br/>
-                    1. Go to <b>Business Settings</b> in <b>Facebook Business Manager</b>.<br/>
-                    2. Navigate to System Users and click <b>Add System User</b>.<br/>
-                    3. Assign Admin permissions and select your <b>Business Account</b>.<br/>
-                    4. In the <b>Permissions</b> tab, ensure access to <b>Manage Ads</b>.<br/>
-                    5. Click <b>Generate Access Token</b>.<br/>
-                    6. Copy and save the token securely.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-meta/' target='_blank'>See the full Meta setup guide</a>"
+            "content" => "A long-lived token for Meta's Conversions API (server-side tracking). Created via a System User in Meta Business Settings with the <code>ads_management</code> permission.<br/><br/><a href='#meta-setup-wizard'>Open setup guide</a>"
         ],
         "Meta_PageView_ClientSideTurnOn"   => [
             "title" => "PageView Client-side event",
@@ -160,7 +522,7 @@ function unipixel_get_help_icon($key)
         ],
         "Google_MeasurementId"   => [
             "title" => "Measurement ID",
-            "content" => "This ID specifies your unique Google Analytics setup, ensuring data is sent to the correct property. It can be found in Google Analytics > Admin > Data Streams, under 'Measurement ID' (formatted as G-XXXXXXXXXX).<br/><br/><a href='https://unipixelhq.com/unipixel-docs/getting-ready-for-unipixel-what-you-need-from-google/' target='_blank'>See the full Google setup guide</a>"
+            "content" => "Your GA4 Web data stream's Measurement ID (G-XXXXXXXXXX). Found in Google Analytics Admin under Data Streams.<br/><br/><a href='#google-setup-wizard'>Open setup guide</a>"
         ],
         "Google_ContainerId"   => [
             "title" => "Tag Manager Container Id",
@@ -168,11 +530,7 @@ function unipixel_get_help_icon($key)
         ],
         "Google_ApiSecret"   => [
             "title" => "API Secret",
-            "content" => "Used for Google Server side tracking. <br/>
-                    1. Go to <b>Google Analytics Admin</b>.<br/>
-                    2. Under <b>Data Streams</b>, select your website stream.<br/>
-                    3. Scroll down to <b>Measurement Protocol API Secret</b>.<br/>
-                    4. Click <b>Create</b>, name it (e.g., 'Server-Side Tracking'), and copy the API Secret.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/getting-ready-for-unipixel-what-you-need-from-google/' target='_blank'>See the full Google setup guide</a>"
+            "content" => "A Measurement Protocol API Secret for your GA4 Web data stream (server-side tracking). Generated in Google Analytics Admin under Data Streams. The secret is data-stream-specific.<br/><br/><a href='#google-setup-wizard'>Open setup guide</a>"
         ],
 
 
@@ -228,16 +586,11 @@ function unipixel_get_help_icon($key)
         ],
         "TikTok_PixelId" => [
             "title" => "Pixel ID",
-            "content" => "Your unique TikTok Pixel ID, available in your TikTok Ads Manager under Events > Manage > Pixel Settings.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-tiktok/' target='_blank'>See the full TikTok setup guide</a>"
+            "content" => "Your TikTok Web Pixel ID (around 20 uppercase letters and digits, e.g. C8C3JPS5R0L0CKHEJ8K0). Found at the top of the pixel detail page in TikTok Events Manager.<br/><br/><a href='#tiktok-setup-wizard'>Open setup guide</a>"
         ],
         "TikTok_AccessToken" => [
             "title" => "Access Token",
-            "content" => "Used for TikTok Events API / Server side tracking.<br/>
-                    1. Go to <b>TikTok Ads Manager</b>.<br/>
-                    2. Navigate to <b>Events</b> > <b>Manage</b> and select your Pixel.<br/>
-                    3. Under <b>Settings</b>, find <b>Events API</b>.<br/>
-                    4. Click <b>Generate Access Token</b>.<br/>
-                    5. Copy and save the token securely.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-tiktok/' target='_blank'>See the full TikTok setup guide</a>"
+            "content" => "An Events API access token for your TikTok Web Pixel (server-side tracking). Generated in TikTok Events Manager → your Pixel → Settings → Events API.<br/><br/><a href='#tiktok-setup-wizard'>Open setup guide</a>"
         ],
 
         "Pinterest_Enabled" => [
@@ -254,19 +607,15 @@ function unipixel_get_help_icon($key)
         ],
         "Pinterest_TagId" => [
             "title" => "Pinterest Tag ID",
-            "content" => "Your unique Pinterest Tag ID. Found in Pinterest Ads Manager under <b>Conversions</b> > <b>Set Up the Pinterest Tag</b>, or in your Tag settings.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
+            "content" => "Your Pinterest Tag ID (numeric, ~13 digits). Found at the top of the Tag detail page in Pinterest Ads Manager → Conversions → Manage tags.<br/><br/><a href='#pinterest-setup-wizard'>Open setup guide</a>"
         ],
         "Pinterest_AdAccountId" => [
             "title" => "Ad Account ID",
-            "content" => "Your Pinterest Ad Account ID. Found in Pinterest Ads Manager -- visible in the URL or under <b>Ads</b> > <b>Overview</b> in the account dropdown. Required for server-side Conversions API calls.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
+            "content" => "Your Pinterest Ad Account ID (numeric, ~12-13 digits). Visible in the Pinterest Ads Manager URL, or under Business → Ad accounts.<br/><br/><a href='#pinterest-setup-wizard'>Open setup guide</a>"
         ],
         "Pinterest_AccessToken" => [
             "title" => "Conversion Access Token",
-            "content" => "Used for Pinterest Conversions API / Server-side tracking.<br/>
-                    1. Go to <b>Pinterest Ads Manager</b>.<br/>
-                    2. Navigate to <b>Conversions</b> and select your Tag.<br/>
-                    3. Under <b>Set Up Conversions API</b>, generate an access token.<br/>
-                    4. Copy and save the token securely.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-pinterest/' target='_blank'>See the full Pinterest setup guide</a>"
+            "content" => "A Conversion Access Token for Pinterest's Conversions API (server-side tracking). Newer tokens start with \"pina_\". Generated in Pinterest Ads Manager → Conversions → Access Tokens.<br/><br/><a href='#pinterest-setup-wizard'>Open setup guide</a>"
         ],
         "Pinterest_PageView_ClientSideTurnOn" => [
             "title" => "Pinterest PageView Client-side",
@@ -287,16 +636,11 @@ function unipixel_get_help_icon($key)
         ],
         "Microsoft_PixelId" => [
             "title" => "UET Tag ID",
-            "content" => "Your unique Microsoft UET Tag ID. Found in Microsoft Advertising under <b>Tools</b> > <b>UET tag</b>. It is the numeric ID shown next to your tag name, also visible in the UET code snippet as the value after <b>ti=</b>.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-microsoft/' target='_blank'>See the full Microsoft setup guide</a>"
+            "content" => "Your Microsoft UET Tag ID (7-9 digit number). Found in Microsoft Advertising → Tools → UET tag, or as the value after <code>ti=</code> in the UET code snippet.<br/><br/><a href='#microsoft-setup-wizard'>Open setup guide</a>"
         ],
         "Microsoft_AccessToken" => [
             "title" => "CAPI Access Token",
-            "content" => "Used for Microsoft Conversions API / Server-side tracking.<br/>
-                    1. Go to <b>Microsoft Advertising</b>.<br/>
-                    2. Navigate to <b>Tools</b> > <b>UET tag</b> and select your tag.<br/>
-                    3. Look for the <b>Conversions API</b> section.<br/>
-                    4. Generate or copy your access token.<br/>
-                    5. Save the token securely -- treat it like a password.<br/><br/>If you do not see the Conversions API option, your account may need to be opted in. Contact your Microsoft Advertising account manager.<br/><br/><a href='https://unipixelhq.com/unipixel-docs/setting-up-unipixel-with-microsoft/' target='_blank'>See the full Microsoft setup guide</a>"
+            "content" => "A Conversions API access token for Microsoft Advertising (server-side tracking). Generated in Microsoft Advertising → Tools → UET tag → Use Conversions API. If you do not see this option, CAPI is not yet enabled on your account; contact your Microsoft Ads account manager.<br/><br/><a href='#microsoft-setup-wizard'>Open setup guide</a>"
         ],
 
 

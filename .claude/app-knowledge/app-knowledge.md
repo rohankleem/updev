@@ -211,3 +211,52 @@ Covers: pixel initialisation, client-first event pattern, custom event config, D
 - **Argument ordering in send-server-event functions** — see § TT-002.
 - **`wp_add_inline_script` in AJAX context** — does nothing. Use fragments. See § ATC-001.
 - **Guest transient collisions** — `md5(IP+UA)` keys can collide behind NAT. Use `unipixel_get_user_identifier_for_transient()` and prefer WC session where possible. See § ATC-002.
+- **Trusting AI-summarised API URLs** — verify endpoints with direct `curl` before coding against them. The Google `/_debug_/mp/collect` vs `/debug/mp/collect` case (Phase 7 token-acquisition-ux work) cost us an extra round of debugging because a WebFetch summary inserted underscores that aren't in the real URL.
+- **Bootstrap popover sanitizer strips data attributes from inner links** — `data-bs-toggle="modal"` inside popover HTML content is silently stripped by default. Use an href-anchor pattern (e.g. `href="#some-modal"`) and document-level click delegation in the consuming JS instead. See Phase 6 of the token-acquisition-ux project doc for the worked example.
+
+---
+
+## Test Connection pattern (per-platform)
+
+Each platform's setup page has a Test Connection button (in `admin/handlers/handler-{platform}-test-connection.php`) that validates the credentials live against the platform's API. Pattern shipped during the token-acquisition-ux project:
+
+- **Format checks first.** Cheap regex on Pixel ID + Access Token shape catches paste errors / wrong-platform IDs before any API call. Each platform's format is different (Meta Pixel IDs are 14-17 digits, Google Measurement IDs start with `G-`, TikTok Pixel IDs are 20 uppercase alphanumeric, Pinterest Tag IDs and Ad Account IDs are numeric, Microsoft UET Tag IDs are 7-9 digits).
+- **API call to a validation endpoint where one exists.** Meta has `debug_token` (real token validation). Pinterest has `/v5/user_account` and `/v5/ad_accounts/{id}` for token + account check. TikTok and Microsoft don't have credential-validation endpoints, so we fire a real test event to their production endpoint (TikTok with `test_event_code` to land in Test Events tab; Microsoft to CAPI endpoint and parse the structured error response). Google's debug endpoint doesn't validate the API Secret value at all, so we send a `debug_mode:1` event to production so it lands in GA4 DebugView for user self-verification.
+- **Parse platform-specific diagnostic feedback** into actionable user messages. Meta has the richest signal (codes 190 + subcodes 460/463/464 for token issues, 100 for parameter problems, 200/220 for permission, plus scopes/expires_at in `data`). TikTok soft errors are message-keyword-matched. Pinterest and Microsoft use HTTP status + JSON `error.code/message`.
+- **Record successful Test Connection timestamp** to `unipixel_test_connection_timestamps` (WP option, `platform_id => unix_time`). The persistent status indicator strip and home dashboard badge read this to flip Connected immediately (rather than waiting for real events to flow). Helper: `unipixel_get_platform_connection_state($platform_id)`.
+
+## Connection state machine (3 states, platform-agnostic helper)
+
+`unipixel_get_platform_connection_state($platform_id)` in `functions/unipixel-functions.php` returns `{state, last_test_at, last_event_at}`. States:
+
+- **not_started** — credentials (Pixel ID + Access Token) not both present.
+- **pasted_unverified** — credentials present, but no recent successful Test Connection AND no successful server event in `unipixel_event_log` with `method='server'` AND `response_message LIKE '%Successful%'` in the last 24h.
+- **connected** — credentials present, AND (recent successful Test Connection OR ≥1 successful event in 24h).
+
+Reused by setup-page status strip, home dashboard badges. Hybrid definition deliberate: pure data-driven definition would leave the strip amber after a Test Connection pass until events actually fired. See `projects/token-acquisition-ux.md` for design rationale.
+
+## Wizard component structure
+
+Each platform setup page has a Bootstrap modal-lg wizard (`#{platform}-setup-wizard-modal`) with 7 steps: What you'll achieve / Prerequisites / What to ignore / Get your credentials / Paste and save / Test connection / Done. Step navigation in `admin/js/{platform}-setup-wizard.js`. Common patterns:
+
+- **Modal trigger** via `data-bs-toggle="modal"` on Start Setup button (visible when state is `not_started`) and Re-walk Setup link (visible in `pasted_unverified` + `connected`).
+- **Help-icon popover links** open the wizard too via document-level delegation on `a[href="#{platform}-setup-wizard"]`. Survives Bootstrap's popover sanitizer (see pitfalls above).
+- **Input sync** between wizard inputs and underlying page form inputs on modal open + on save.
+- **Step 5 Save** uses the existing `unipixel_update_platform` AJAX (platform-agnostic). Step 6 Test Connection uses the platform-specific `unipixel_{platform}_test_connection` action. Step 7 Done reloads the page so the strip flips green.
+- **"Looks different in your dashboard?" link** in every step closes the wizard and opens the existing `#unipixelFeedbackModal` (rendered globally by `inc/feedback.php`) with the description pre-filled as `{Platform} server-side wizard, step N (step title):` so the user just adds their description and submits.
+
+## 14-day Log Server-side Response grace period
+
+When `access_token` transitions from empty → non-empty for a platform (first-time setup), three things happen via `unipixel_start_log_response_grace_period($platform_id)`:
+
+1. `wp_unipixel_woocomm_event_settings` and `wp_unipixel_events_settings` rows for this platform get `send_server_log_response = 1` bulk-updated, so all events log their server response while the user verifies setup.
+2. A timestamp goes into the `unipixel_log_response_grace_started_at` WP option.
+3. A `wp_schedule_single_event` is scheduled 14 days out to fire `unipixel_end_log_response_grace_period_callback` which bulk-resets to 0.
+
+Idempotent per platform: only triggers on the first empty→non-empty transition. Subsequent token changes don't re-trigger (so user customisations aren't overwritten).
+
+Database-level approach was chosen deliberately over modifying the gate in the 11+ caller files in the event-firing pipeline. Lower regression risk.
+
+## Plain-English event log labels
+
+`unipixel_classify_event_log_response($response_message, $method)` in `functions/unipixel-functions.php` maps raw `response_message` strings to `{label, level, bootstrap_class, raw}`. Used by the Stored Event Logs page to render badges instead of raw HTTP codes. HTTP code extraction (Code XXX / JSON code field / standalone 3-digit) plus keyword fallback. `method='client'` rows get a special "Client-side, no response" badge so users don't think those are failures. Empty or "logging turned off" rows get muted "Not logged".

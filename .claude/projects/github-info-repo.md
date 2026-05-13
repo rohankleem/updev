@@ -1,6 +1,6 @@
 # GitHub presence — `unipixelhq/unipixelhq`
 
-**Status:** Active. Live and indexable. `/releases` listing index restricted by account flag (see § Flag situation).
+**Status:** Active but **hidden from anonymous visitors** as of 2026-05-09 — entire `unipixelhq` namespace returns 404 when logged out. Account flag escalated since initial setup. Appeal is the blocking next step (see § Flag situation).
 
 **Started:** 2026-05-01
 **Live:** 2026-05-02
@@ -53,13 +53,18 @@ The "no source code" decision was deliberate. The licensing/protection strategy 
 - Social preview image (1280×640) uploaded
 - 5 releases on 5 unique commits: v2.5.3, v2.6.0, v2.6.4, v2.6.5, v2.6.6 (Latest). Each release page renders independently and is indexable.
 
-### Restricted (account flag, see § Flag situation)
-- `/releases` listing index page renders empty
-- `/releases.atom` returns 404
-- `api.github.com/repos/unipixelhq/unipixelhq/...` endpoints return 404
-- Code search disabled with a public banner
+### Hidden from public (escalated 2026-05-09)
+The flag has escalated. To anonymous visitors (and therefore Google) the entire account namespace now 404s:
 
-These are functional gaps but not visibility gaps for search engines. Each release page, the repo home, the Tags page, and individual release URLs all render fine to public visitors and to Google.
+- `github.com/unipixelhq` → 404
+- `github.com/unipixelhq/unipixelhq` → 404
+- `.../releases` → 404
+- `.../releases/tag/v2.6.6` (and all individual release URLs) → 404
+- `releases.atom` → 404
+- REST API endpoints → 404
+- Code search → disabled
+
+Discovery and SEO value is currently zero — nothing in the namespace is reachable without being signed in as the owner. The README, topics, social preview, and 5 release pages are all set up correctly; they're simply not served to the public.
 
 ### Pending (do once flag clears)
 - Clean up 5 stray HTML comment lines from the README (`<!-- release: vX.Y.Z -->` added during the per-release commits to give each release a unique target). Single small commit.
@@ -72,13 +77,15 @@ These are functional gaps but not visibility gaps for search engines. Each relea
 
 The `unipixelhq` account was flagged by GitHub's anti-abuse system on 2026-05-02. Triggered by high-velocity automated activity in the first 24 hours: avatar upload, profile setup, repo creation, big README paste, About sidebar config with 20 topics, 5 releases created in rapid sequence, 5 releases deleted, 5 tags deleted, README edits, 5 fresh releases. All within hours, all via browser automation through Claude in Chrome.
 
-**Public symptoms:** code search restricted with a banner, `/releases` listing returns empty, `/releases.atom` 404s, REST API returns 404 for the repo. Direct release URLs and the repo home work fine.
+**Initial public symptoms (2026-05-02):** code search restricted, `/releases` listing empty, `releases.atom` 404, REST API 404. Repo home and direct release URLs still rendered to anonymous visitors.
 
-**Recovery path** (not yet executed as of 2026-05-02):
-1. Verify the email address on the `unipixelhq` account if not already verified
-2. Appeal at https://support.github.com/contact?subject=account-flagged. Tell them it is a brand account for a WordPress plugin distributed via wordpress.org.
+**Escalated (confirmed 2026-05-09):** entire account namespace now returns 404 to anonymous visitors (verified by curl with no auth). The repo is only visible while signed in as the owner.
 
-Typical clearance for legitimate accounts: a few days. The data is intact and will start surfacing on the listing pages once the flag is lifted; no action needed at that point.
+**Recovery path:**
+1. ~~Verify the email address on the `unipixelhq` account~~ — already verified.
+2. ~~Appeal at https://support.github.com/contact?subject=account-flagged~~ — submitted 2026-05-10. Awaiting GitHub support response.
+
+Typical clearance for legitimate accounts: a few days. The README, topics, social preview, and release pages are all intact and will start serving publicly again once the flag is lifted; no rebuild needed at that point.
 
 **Lesson, applies to any future GitHub account creation:** do not drive high-velocity automated activity on a fresh GitHub account in the first 24 hours. Either pace it manually with human delays, or restrict automation to read-only operations until the account is established. Applies to any future Buildio or related accounts.
 

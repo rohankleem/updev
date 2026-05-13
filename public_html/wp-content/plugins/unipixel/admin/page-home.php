@@ -78,9 +78,23 @@ function unipixel_home_page()
 
             <!-- META -->
             <div class="col-md-6 col-lg-3 mb-4">
-                <?php if ($is_meta_setup) : ?>
+                <?php if ($is_meta_setup) :
+                    $meta_state = unipixel_get_platform_connection_state(1);
+                ?>
                     <div class="card bg-light-green borderless w-100 h-100">
                         <div class="card-body pb-0">
+                            <?php if ($meta_state['state'] === 'connected') :
+                                $meta_when = ($meta_state['last_test_at'] && $meta_state['last_event_at'])
+                                    ? max($meta_state['last_test_at'], $meta_state['last_event_at'])
+                                    : ($meta_state['last_test_at'] ? $meta_state['last_test_at'] : $meta_state['last_event_at']);
+                                $meta_title = $meta_when
+                                    ? sprintf(__('Last verified %s ago', 'unipixel'), human_time_diff($meta_when, time()))
+                                    : '';
+                            ?>
+                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($meta_title); ?>"><?php echo esc_html__('Server-side connected', 'unipixel'); ?></span>
+                            <?php elseif ($meta_state['state'] === 'pasted_unverified') : ?>
+                                <span class="badge bg-warning text-dark mb-2"><?php echo esc_html__('Server-side unverified', 'unipixel'); ?></span>
+                            <?php endif; ?>
                             <h1>Pixel for Meta (Facebook)</h1>
                             <p>Manage Meta pixel with Conversions API, including site events.</p>
                             <a href="<?php echo esc_url(menu_page_url('unipixel_meta', false)); ?>" class="btn btn-primary">View Pixel Setup</a>
@@ -99,9 +113,23 @@ function unipixel_home_page()
 
             <!-- TIKTOK -->
             <div class="col-md-6 col-lg-3 mb-4">
-                <?php if ($is_tiktok_setup) : ?>
+                <?php if ($is_tiktok_setup) :
+                    $tiktok_state = unipixel_get_platform_connection_state(3);
+                ?>
                     <div class="card bg-light-purple borderless w-100 h-100">
                         <div class="card-body pb-0">
+                            <?php if ($tiktok_state['state'] === 'connected') :
+                                $tiktok_when = ($tiktok_state['last_test_at'] && $tiktok_state['last_event_at'])
+                                    ? max($tiktok_state['last_test_at'], $tiktok_state['last_event_at'])
+                                    : ($tiktok_state['last_test_at'] ? $tiktok_state['last_test_at'] : $tiktok_state['last_event_at']);
+                                $tiktok_title = $tiktok_when
+                                    ? sprintf(__('Last verified %s ago', 'unipixel'), human_time_diff($tiktok_when, time()))
+                                    : '';
+                            ?>
+                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($tiktok_title); ?>"><?php echo esc_html__('Server-side connected', 'unipixel'); ?></span>
+                            <?php elseif ($tiktok_state['state'] === 'pasted_unverified') : ?>
+                                <span class="badge bg-warning text-dark mb-2"><?php echo esc_html__('Server-side unverified', 'unipixel'); ?></span>
+                            <?php endif; ?>
                             <h1>TikTok Pixel</h1>
                             <p>Manage TikTok tracking with server-side and client-side events.</p>
                             <a href="<?php echo esc_url(menu_page_url('unipixel_tiktok', false)); ?>" class="btn btn-primary">View Pixel Setup</a>
@@ -120,9 +148,23 @@ function unipixel_home_page()
 
             <!-- GOOGLE -->
             <div class="col-md-6 col-lg-3 mb-4">
-                <?php if ($is_google_setup) : ?>
+                <?php if ($is_google_setup) :
+                    $google_state = unipixel_get_platform_connection_state(4);
+                ?>
                     <div class="card bg-light-blue borderless w-100 h-100">
                         <div class="card-body pb-0">
+                            <?php if ($google_state['state'] === 'connected') :
+                                $google_when = ($google_state['last_test_at'] && $google_state['last_event_at'])
+                                    ? max($google_state['last_test_at'], $google_state['last_event_at'])
+                                    : ($google_state['last_test_at'] ? $google_state['last_test_at'] : $google_state['last_event_at']);
+                                $google_title = $google_when
+                                    ? sprintf(__('Last verified %s ago', 'unipixel'), human_time_diff($google_when, time()))
+                                    : '';
+                            ?>
+                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($google_title); ?>"><?php echo esc_html__('Server-side connected', 'unipixel'); ?></span>
+                            <?php elseif ($google_state['state'] === 'pasted_unverified') : ?>
+                                <span class="badge bg-warning text-dark mb-2"><?php echo esc_html__('Server-side unverified', 'unipixel'); ?></span>
+                            <?php endif; ?>
                             <h1>Google Analytics</h1>
                             <p>Manage Google Analytics with Measurement Protocol.</p>
                             <a href="<?php echo esc_url(menu_page_url('unipixel_google', false)); ?>" class="btn btn-primary">View Tag Setup</a>
@@ -141,9 +183,23 @@ function unipixel_home_page()
 
             <!-- PINTEREST -->
             <div class="col-md-6 col-lg-3 mb-4">
-                <?php if ($is_pinterest_setup) : ?>
+                <?php if ($is_pinterest_setup) :
+                    $pinterest_state = unipixel_get_platform_connection_state(2);
+                ?>
                     <div class="card bg-pinterest-pink borderless w-100 h-100">
                         <div class="card-body pb-0">
+                            <?php if ($pinterest_state['state'] === 'connected') :
+                                $pinterest_when = ($pinterest_state['last_test_at'] && $pinterest_state['last_event_at'])
+                                    ? max($pinterest_state['last_test_at'], $pinterest_state['last_event_at'])
+                                    : ($pinterest_state['last_test_at'] ? $pinterest_state['last_test_at'] : $pinterest_state['last_event_at']);
+                                $pinterest_title = $pinterest_when
+                                    ? sprintf(__('Last verified %s ago', 'unipixel'), human_time_diff($pinterest_when, time()))
+                                    : '';
+                            ?>
+                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($pinterest_title); ?>"><?php echo esc_html__('Server-side connected', 'unipixel'); ?></span>
+                            <?php elseif ($pinterest_state['state'] === 'pasted_unverified') : ?>
+                                <span class="badge bg-warning text-dark mb-2"><?php echo esc_html__('Server-side unverified', 'unipixel'); ?></span>
+                            <?php endif; ?>
                             <h1>Pinterest Tag</h1>
                             <p>Manage Pinterest tracking with Conversions API, including site events.</p>
                             <a href="<?php echo esc_url(menu_page_url('unipixel_pinterest', false)); ?>" class="btn btn-primary">View Tag Setup</a>

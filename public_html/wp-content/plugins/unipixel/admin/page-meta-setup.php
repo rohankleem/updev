@@ -55,6 +55,57 @@ function unipixel_page_meta_setup() {
         <h1 class="mb-0">Tag <?php echo esc_html__('Setup', 'unipixel'); ?></h1>
         <p><small><?php echo esc_html__('Configure your connection and core settings for', 'unipixel'); ?> <?php echo esc_html($platformName); ?>.</small></p>
 
+        <?php
+        // Connection status strip (token-acquisition-ux Phase 2). Phase 3 adds wizard triggers.
+        $meta_conn_state = unipixel_get_platform_connection_state($platformId);
+        if ($meta_conn_state['state'] === 'not_started') :
+        ?>
+            <div class="alert alert-secondary d-flex align-items-center mb-3" role="status">
+                <span class="badge bg-secondary me-2">&bull;</span>
+                <div class="flex-grow-1">
+                    <strong><?php echo esc_html__('Server-side tracking not set up.', 'unipixel'); ?></strong>
+                    <small class="d-block"><?php echo esc_html__('Enable Server-Side Tracking and add an Access Token below, or use the guided walkthrough.', 'unipixel'); ?></small>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm ms-3" data-bs-toggle="modal" data-bs-target="#meta-setup-wizard-modal">
+                    <?php echo esc_html__('Start server-side setup', 'unipixel'); ?>
+                </button>
+            </div>
+        <?php elseif ($meta_conn_state['state'] === 'pasted_unverified') : ?>
+            <div class="alert alert-warning d-flex align-items-center mb-3" role="status">
+                <span class="badge bg-warning text-dark me-2">&bull;</span>
+                <div>
+                    <strong><?php echo esc_html__('Server-side not yet verified.', 'unipixel'); ?></strong>
+                    <small class="d-block"><?php echo esc_html__('Credentials saved. Click Test Connection below to verify, or wait for server events to confirm setup.', 'unipixel'); ?></small>
+                    <small class="d-block mt-1">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#meta-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
+                    </small>
+                </div>
+            </div>
+        <?php else :
+            $freshness_at = ($meta_conn_state['last_test_at'] && $meta_conn_state['last_event_at'])
+                ? max($meta_conn_state['last_test_at'], $meta_conn_state['last_event_at'])
+                : ($meta_conn_state['last_test_at'] ? $meta_conn_state['last_test_at'] : $meta_conn_state['last_event_at']);
+        ?>
+            <div class="alert alert-success d-flex align-items-center mb-3" role="status">
+                <span class="badge bg-success me-2">&bull;</span>
+                <div>
+                    <strong><?php echo esc_html__('Server-side connected.', 'unipixel'); ?></strong>
+                    <?php if ($freshness_at) : ?>
+                        <small class="d-block">
+                            <?php echo esc_html(sprintf(
+                                /* translators: %s is a human time diff, e.g. "5 minutes" */
+                                __('Verified %s ago.', 'unipixel'),
+                                human_time_diff($freshness_at, time())
+                            )); ?>
+                        </small>
+                    <?php endif; ?>
+                    <small class="d-block mt-1">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#meta-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
+                    </small>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Feedback message container (used by ajax-platform-settings.js) -->
         <div id="platform-settings-feedback-message" class="alert" role="alert" style="display:none;"></div>
 
@@ -116,6 +167,26 @@ function unipixel_page_meta_setup() {
                 <p class="mb-1"><i class="fa-solid fa-bolt-lightning"></i> <strong><?php echo esc_html__('Server-Side Tracking', 'unipixel'); ?></strong></p>
                 <p class="mb-2"><small><?php echo esc_html__('Supercharge your event tracking with Meta\'s Conversions API. In addition to traditional client-side sending, events are sent directly from your server, bypassing ad blockers and browser restrictions. Events are matched-up at Meta avoiding double counting and improving your measurement and reporting.', 'unipixel'); ?></small></p>
 
+                <?php
+                // Phase 5 of token-acquisition-ux: surface the 14-day log-response grace period.
+                $meta_log_grace = unipixel_get_log_response_grace_status($platformId);
+                if ($meta_log_grace['active']) :
+                ?>
+                    <div class="alert alert-info py-2 mb-2 small" role="note">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <?php echo esc_html(sprintf(
+                            /* translators: %d is the number of days remaining */
+                            _n(
+                                'Server-side response logging is on for all Meta events for %d more day so you can verify setup. After that it will auto-off; turn it back on per event in the Events tab if you want to keep logging.',
+                                'Server-side response logging is on for all Meta events for %d more days so you can verify setup. After that it will auto-off; turn it back on per event in the Events tab if you want to keep logging.',
+                                $meta_log_grace['days_remaining'],
+                                'unipixel'
+                            ),
+                            $meta_log_grace['days_remaining']
+                        )); ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="mb-3 row">
                     <div class="col-12 col-sm-3">
                         <label class="form-check-label" for="serverside_global_enabled">
@@ -140,6 +211,16 @@ function unipixel_page_meta_setup() {
                         <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>">
                     </div>
                 </div>
+
+                <div class="mb-3 row" id="meta-test-connection-row" style="display:none;">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-9">
+                        <button type="button" id="meta-test-connection-btn" class="btn btn-outline-primary">
+                            <?php echo esc_html__('Test Connection', 'unipixel'); ?>
+                        </button>
+                        <div id="meta-test-connection-result" class="mt-2" role="status" style="display:none;"></div>
+                    </div>
+                </div>
                 </div>
             </div>
 
@@ -153,6 +234,121 @@ function unipixel_page_meta_setup() {
                 </div>
             </div>
         </form>
+
+        <?php /* Meta Setup Wizard Modal (token-acquisition-ux Phase 3) */ ?>
+        <div class="modal fade" id="meta-setup-wizard-modal" tabindex="-1" aria-labelledby="metaSetupWizardLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="metaSetupWizardLabel"><?php echo esc_html__('Meta Server-Side Setup Walkthrough', 'unipixel'); ?></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?php echo esc_attr__('Close', 'unipixel'); ?>"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="meta-wizard-step" data-step="1">
+                            <h6 class="mb-3"><?php echo esc_html__("What you'll achieve", 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("By the end of this guide, server-side events from this WordPress site will fire directly to Meta. You'll have your Pixel ID and an Access Token pasted into UniPixel, and a successful Test Connection confirming the wiring.", 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="meta-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="meta-wizard-step d-none" data-step="2">
+                            <h6 class="mb-3"><?php echo esc_html__('Prerequisites', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("You need admin access to your Meta Business Manager. If you don't have one yet, set one up at business.facebook.com first, then come back.", 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="meta-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="meta-wizard-step d-none" data-step="3">
+                            <h6 class="mb-3"><?php echo esc_html__('What to ignore', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("Meta's Business Manager pushes a lot of options at you. For UniPixel setup, you can safely ignore:", 'unipixel'); ?></p>
+                            <ul>
+                                <li><?php echo esc_html__('Advantage+ campaign suggestions. These are ad-spend features, unrelated to tracking setup.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Conversions API Gateway prompts. UniPixel IS the integration, you do not need a separate Gateway.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Audience template wizards. UniPixel handles your event setup.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Lookalike Audience prompts.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Anything in Datasets beyond confirming your Pixel exists.', 'unipixel'); ?></li>
+                            </ul>
+                            <p><?php echo esc_html__('You only need: a Pixel ID, and an Access Token tied to that Pixel.', 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="meta-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="meta-wizard-step d-none" data-step="4">
+                            <h6 class="mb-3"><?php echo esc_html__('Get your credentials', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__('You need two things from Meta: your Pixel ID and an Access Token. Both come from Meta Events Manager.', 'unipixel'); ?></p>
+
+                            <div class="mb-3 p-3 border rounded">
+                                <p class="mb-2"><strong><?php echo esc_html__('The easy path (recommended)', 'unipixel'); ?></strong></p>
+                                <ol class="mb-2 ps-4">
+                                    <li><?php echo esc_html__('Open Meta Events Manager and select your Pixel.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Your Pixel ID is shown at the top of the Pixel page. Copy it.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Open the Settings tab on the same Pixel.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Scroll to the Conversions API section and click "Generate Access Token". Meta will create an app and a system user behind the scenes for you. The token appears immediately. Copy it now, you will not be able to view it again later.', 'unipixel'); ?></li>
+                                </ol>
+                                <a href="https://business.facebook.com/events_manager2/" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> <?php echo esc_html__('Open Meta Events Manager', 'unipixel'); ?>
+                                </a>
+                                <p class="mb-0 mt-2 small text-muted"><?php echo esc_html__('If you do not see the "Generate Access Token" link, you may need Developer access in your Business Manager. Ask your Business Manager admin to grant it.', 'unipixel'); ?></p>
+                            </div>
+
+                            <details class="mb-3">
+                                <summary class="small text-muted" style="cursor:pointer;"><?php echo esc_html__('Already have your own app and system user? (e.g. agency setup)', 'unipixel'); ?></summary>
+                                <div class="p-3 mt-2 border rounded">
+                                    <p class="mb-2"><?php echo esc_html__('If your team manages its own Meta apps and system users, you can generate the token manually instead:', 'unipixel'); ?></p>
+                                    <ol class="mb-2 ps-4">
+                                        <li><?php echo esc_html__('Open Business Settings, go to System Users.', 'unipixel'); ?></li>
+                                        <li><?php echo esc_html__('Pick or add a system user.', 'unipixel'); ?></li>
+                                        <li><?php echo esc_html__('Assign your Pixel as an asset for that system user.', 'unipixel'); ?></li>
+                                        <li><?php echo esc_html__('Click Generate Token with the ads_management permission. Copy it immediately.', 'unipixel'); ?></li>
+                                    </ol>
+                                    <a href="https://business.facebook.com/settings/system-users/" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fa-solid fa-arrow-up-right-from-square"></i> <?php echo esc_html__('Open System Users', 'unipixel'); ?>
+                                    </a>
+                                </div>
+                            </details>
+
+                            <p class="mb-0"><?php echo esc_html__('Keep your Pixel ID and Access Token copied somewhere safe, then continue.', 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="meta-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="meta-wizard-step d-none" data-step="5">
+                            <h6 class="mb-3"><?php echo esc_html__('Paste your credentials', 'unipixel'); ?></h6>
+                            <div class="mb-3">
+                                <label for="wizard-pixel-id" class="form-label"><?php echo esc_html__('Pixel ID', 'unipixel'); ?></label>
+                                <input type="text" class="form-control" id="wizard-pixel-id" name="wizard-pixel-id" autocomplete="off">
+                            </div>
+                            <div class="mb-3">
+                                <label for="wizard-access-token" class="form-label"><?php echo esc_html__('Access Token', 'unipixel'); ?></label>
+                                <input type="password" class="form-control" id="wizard-access-token" name="wizard-access-token" autocomplete="off">
+                            </div>
+                            <button type="button" class="btn btn-primary" id="wizard-save-btn"><?php echo esc_html__('Save and continue', 'unipixel'); ?></button>
+                            <div id="wizard-save-result" class="mt-3" role="status" style="display:none;"></div>
+                            <p class="mt-3 mb-0"><small><a href="#" class="meta-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="meta-wizard-step d-none" data-step="6">
+                            <h6 class="mb-3"><?php echo esc_html__('Test the connection', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("Now let's verify the connection works. UniPixel will check your token against Meta's API and confirm it has access to your Pixel.", 'unipixel'); ?></p>
+                            <button type="button" class="btn btn-primary" id="wizard-test-connection-btn"><?php echo esc_html__('Test Connection', 'unipixel'); ?></button>
+                            <div id="wizard-test-connection-result" class="mt-3" role="status" style="display:none;"></div>
+                            <p class="mt-3 mb-0"><small><a href="#" class="meta-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="meta-wizard-step d-none" data-step="7">
+                            <h6 class="mb-3"><?php echo esc_html__("You're set up", 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__('Server-side events will start flowing on the next user action on your site. Close this and visit Stored Event Logs to watch them land.', 'unipixel'); ?></p>
+                            <button type="button" class="btn btn-primary" id="wizard-done-btn"><?php echo esc_html__('Close', 'unipixel'); ?></button>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <span class="text-muted small"><?php echo esc_html__('Step', 'unipixel'); ?> <span class="meta-wizard-current-step">1</span> <?php echo esc_html__('of', 'unipixel'); ?> 7</span>
+                        <div>
+                            <button type="button" class="btn btn-secondary meta-wizard-back" disabled><?php echo esc_html__('Back', 'unipixel'); ?></button>
+                            <button type="button" class="btn btn-primary meta-wizard-next"><?php echo esc_html__('Next', 'unipixel'); ?></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <?php
 }

@@ -31,6 +31,13 @@ Medium-cadence file. What's done, what's blocking adoption, what that means for 
   - Fire-once-per-session guard for URL events (no double-counting on reload)
   - Google client/server mutex (G-001) enforced inline — one less foot-gun for users who don't know Google permits one or the other for non-Purchase events
   - Conversion grouping persists across edits: change a shared field (trigger, URL pattern) once and it propagates to every linked platform; per-platform overrides (event name, send-mode) stay independent
+- **Token-acquisition UX (staged for next release, 2026-05-13):**
+  - **Test Connection button on every platform setup page** (Meta / Google / TikTok / Pinterest / Microsoft). Each validates against the platform's real API with platform-specific format checks + diagnostic feedback. No more silent "did it work?" — green = working, red = the specific thing wrong (token expired, password changed, wrong scope, no pixel access, ad-account access denied, rate-limited, etc.)
+  - **Three-state connection status indicator** on each setup page (Not set up / Pasted unverified / Connected with verified-X-ago timestamp), and matching badges on the UniPixel home dashboard for each platform card
+  - **Guided setup wizard per platform** (7-step modal) with platform-specific "what to ignore" copy listing the upsells, audience builders, catalog setup etc. that users can skip without affecting tracking
+  - **14-day Log Server-side Response grace period** — when a token is first added, response logging auto-enables for all events for that platform for 14 days so the user can verify; then auto-off so the log table doesn't grow unbounded
+  - **Plain-English response badges in Stored Event Logs** replacing raw HTTP codes (Sent OK / Token problem / Data problem / Rate limited / Not logged / Client-side, no response)
+  - **Help-icon copy refreshed** across all credential fields, replacing stale wall-of-text legacy instructions with one-liner + Open Setup Guide link
 
 ---
 
@@ -40,11 +47,15 @@ Medium-cadence file. What's done, what's blocking adoption, what that means for 
 
 ~100 installs. Invisible on WordPress.org. No SEO presence. No community footprint. No brand. The product can compete with $359/yr PixelYourSite — but nobody is making the comparison because they haven't found UniPixel. **This is the primary blocker.** See `campaigns.md` § Growth Channels.
 
-### 2. Onboarding — platform credential gathering is painful
+### 2. Onboarding — substantially reduced 2026-05-13
 
-The plugin setup itself is simple. But before a user can configure UniPixel, they need to navigate each platform's own interface — Meta Business Suite, Pinterest Ads Manager, TikTok Business Center, Google Analytics — to find pixel IDs, generate access tokens, locate API secrets. Each platform has different terminology, different UI, different steps. Some platforms actively recommend competitors during this process (Pinterest recommends PixelYourSite in their ads manager setup docs).
+**Substantially reduced by the token-acquisition UX initiative shipped 2026-05-13** (see release-log § Staged for next release, projects/token-acquisition-ux.md for full record). The platform-credential-gathering problem hasn't gone away — Meta, Google, TikTok, Pinterest, and Microsoft each still have their own dashboards with different terminology and competing upsells — but UniPixel now has:
 
-UniPixel can't control those platform interfaces but can mitigate with clear documentation on buildio.dev walking users through each platform step by step. Several of these docs already exist.
+- A guided setup wizard for each platform with a curated "what to ignore" skip list naming the specific upsells / audience builders / catalog setup prompts users can safely skip.
+- A Test Connection button that validates credentials live and tells users in plain English what's wrong if it fails. No more "did I do this right?" uncertainty.
+- A visible connection-status indicator on each setup page and on the home dashboard.
+
+**Residual onboarding friction:** docs at unipixelhq.com/unipixel-docs/ are still useful for users who want to read before clicking, and several per-platform docs already exist. The wizards now subsume most of what those docs needed to do for first-time setup. Doc focus can shift to deeper / edge-case content.
 
 ### 3. Custom events UI — element-clicked / element-shown still need CSS selectors
 

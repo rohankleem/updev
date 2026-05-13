@@ -143,7 +143,8 @@ CLAUDE.md                                    ← You are here. Operating manual.
 │   ├── multi-tier-clickid-persistence.md    ← Feature spec (not started).
 │   ├── consent-popup-i18n.md                ← Feature spec (not started) — multi-language + editable consent popup.
 │   ├── centralised-event-builder.md         ← 3-phase feature: URL trigger → event name dropdowns → conversion builder + grouping.
-│   └── github-info-repo.md                  ← Public GitHub presence at `github.com/unipixelhq` — info-only repo, decisions, current state, flag situation, per-release maintenance.
+│   ├── github-info-repo.md                  ← Public GitHub presence at `github.com/unipixelhq` — info-only repo, decisions, current state, flag situation, per-release maintenance.
+│   └── token-acquisition-ux.md              ← Cross-platform token-acquisition initiative. Wizard, Test Connection button, per-platform status indicators. Origin: Moisés support 2026-05-12. Bundles #8, #30. Subsumes #1.
 └── testing/                                 ← Verification flows. Browser-agent-executable test specs.
     ├── testing.md                           ← Methodology, verification surfaces, index of all flows.
     └── flows/                               ← One file per flow (consent-grant, click-id-capture, woocommerce-purchase, etc).

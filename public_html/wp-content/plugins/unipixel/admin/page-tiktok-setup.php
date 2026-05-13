@@ -55,6 +55,57 @@ function unipixel_page_tiktok_setup() {
         <h1 class="mb-0">Tag <?php echo esc_html__('Setup', 'unipixel'); ?></h1>
         <p><small><?php echo esc_html__('Configure your connection and core settings for', 'unipixel'); ?> <?php echo esc_html($platformName); ?>.</small></p>
 
+        <?php
+        // Connection status strip (token-acquisition-ux Phase 8 — TikTok).
+        $tiktok_conn_state = unipixel_get_platform_connection_state($platformId);
+        if ($tiktok_conn_state['state'] === 'not_started') :
+        ?>
+            <div class="alert alert-secondary d-flex align-items-center mb-3" role="status">
+                <span class="badge bg-secondary me-2">&bull;</span>
+                <div class="flex-grow-1">
+                    <strong><?php echo esc_html__('Server-side tracking not set up.', 'unipixel'); ?></strong>
+                    <small class="d-block"><?php echo esc_html__('Enable Server-Side Tracking and add an Access Token below, or use the guided walkthrough.', 'unipixel'); ?></small>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm ms-3" data-bs-toggle="modal" data-bs-target="#tiktok-setup-wizard-modal">
+                    <?php echo esc_html__('Start server-side setup', 'unipixel'); ?>
+                </button>
+            </div>
+        <?php elseif ($tiktok_conn_state['state'] === 'pasted_unverified') : ?>
+            <div class="alert alert-warning d-flex align-items-center mb-3" role="status">
+                <span class="badge bg-warning text-dark me-2">&bull;</span>
+                <div>
+                    <strong><?php echo esc_html__('Server-side not yet verified.', 'unipixel'); ?></strong>
+                    <small class="d-block"><?php echo esc_html__('Credentials saved. Click Test Connection below to verify, or wait for server events to confirm setup.', 'unipixel'); ?></small>
+                    <small class="d-block mt-1">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#tiktok-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
+                    </small>
+                </div>
+            </div>
+        <?php else :
+            $tt_freshness_at = ($tiktok_conn_state['last_test_at'] && $tiktok_conn_state['last_event_at'])
+                ? max($tiktok_conn_state['last_test_at'], $tiktok_conn_state['last_event_at'])
+                : ($tiktok_conn_state['last_test_at'] ? $tiktok_conn_state['last_test_at'] : $tiktok_conn_state['last_event_at']);
+        ?>
+            <div class="alert alert-success d-flex align-items-center mb-3" role="status">
+                <span class="badge bg-success me-2">&bull;</span>
+                <div>
+                    <strong><?php echo esc_html__('Server-side connected.', 'unipixel'); ?></strong>
+                    <?php if ($tt_freshness_at) : ?>
+                        <small class="d-block">
+                            <?php echo esc_html(sprintf(
+                                /* translators: %s is a human time diff, e.g. "5 minutes" */
+                                __('Verified %s ago.', 'unipixel'),
+                                human_time_diff($tt_freshness_at, time())
+                            )); ?>
+                        </small>
+                    <?php endif; ?>
+                    <small class="d-block mt-1">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#tiktok-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
+                    </small>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!-- Feedback message container (used by ajax-platform-settings.js) -->
         <div id="platform-settings-feedback-message" class="alert" role="alert" style="display:none;"></div>
 
@@ -116,6 +167,26 @@ function unipixel_page_tiktok_setup() {
                 <p class="mb-1"><i class="fa-solid fa-bolt-lightning"></i> <strong><?php echo esc_html__('Server-Side Tracking', 'unipixel'); ?></strong></p>
                 <p class="mb-2"><small><?php echo esc_html__('Supercharge your event tracking with TikTok\'s Events API. In addition to traditional client-side sending, events are sent directly from your server, bypassing ad blockers and browser restrictions. Events are matched-up at TikTok avoiding double counting and improving your measurement and reporting.', 'unipixel'); ?></small></p>
 
+                <?php
+                // Phase 5 of token-acquisition-ux: surface the 14-day log-response grace period for TikTok.
+                $tiktok_log_grace = unipixel_get_log_response_grace_status($platformId);
+                if ($tiktok_log_grace['active']) :
+                ?>
+                    <div class="alert alert-info py-2 mb-2 small" role="note">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <?php echo esc_html(sprintf(
+                            /* translators: %d is the number of days remaining */
+                            _n(
+                                'Server-side response logging is on for all TikTok events for %d more day so you can verify setup. After that it will auto-off; turn it back on per event in the Events tab if you want to keep logging.',
+                                'Server-side response logging is on for all TikTok events for %d more days so you can verify setup. After that it will auto-off; turn it back on per event in the Events tab if you want to keep logging.',
+                                $tiktok_log_grace['days_remaining'],
+                                'unipixel'
+                            ),
+                            $tiktok_log_grace['days_remaining']
+                        )); ?>
+                    </div>
+                <?php endif; ?>
+
                 <div class="mb-3 row">
                     <div class="col-12 col-sm-3">
                         <label class="form-check-label" for="serverside_global_enabled">
@@ -140,6 +211,16 @@ function unipixel_page_tiktok_setup() {
                         <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>">
                     </div>
                 </div>
+
+                <div class="mb-3 row" id="tiktok-test-connection-row" style="display:none;">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-9">
+                        <button type="button" id="tiktok-test-connection-btn" class="btn btn-outline-primary">
+                            <?php echo esc_html__('Test Connection', 'unipixel'); ?>
+                        </button>
+                        <div id="tiktok-test-connection-result" class="mt-2" role="status" style="display:none;"></div>
+                    </div>
+                </div>
                 </div>
             </div>
 
@@ -153,6 +234,106 @@ function unipixel_page_tiktok_setup() {
                 </div>
             </div>
         </form>
+
+        <?php /* TikTok Setup Wizard Modal (token-acquisition-ux Phase 8) */ ?>
+        <div class="modal fade" id="tiktok-setup-wizard-modal" tabindex="-1" aria-labelledby="tiktokSetupWizardLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="tiktokSetupWizardLabel"><?php echo esc_html__('TikTok Server-Side Setup Walkthrough', 'unipixel'); ?></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?php echo esc_attr__('Close', 'unipixel'); ?>"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="tiktok-wizard-step" data-step="1">
+                            <h6 class="mb-3"><?php echo esc_html__("What you'll achieve", 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("By the end of this guide, server-side events from this WordPress site will fire directly to TikTok via the Events API. You'll have your Pixel ID and an Access Token pasted into UniPixel, and a successful Test Connection confirming the wiring.", 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="tiktok-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="tiktok-wizard-step d-none" data-step="2">
+                            <h6 class="mb-3"><?php echo esc_html__('Prerequisites', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__('You need a TikTok Ads Manager account with a Web Pixel set up. If you don\'t have one, create it in TikTok Ads Manager → Tools → Events Manager → Web Events first, then come back.', 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="tiktok-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="tiktok-wizard-step d-none" data-step="3">
+                            <h6 class="mb-3"><?php echo esc_html__('What to ignore', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__('TikTok Ads Manager pushes a lot of options at you. For UniPixel server-side setup, you can safely ignore:', 'unipixel'); ?></p>
+                            <ul>
+                                <li><?php echo esc_html__('Smart Performance Campaign suggestions. Those are ad-spend features, unrelated to tracking setup.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Audience Insights and custom audience builders.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Catalog setup. That is a separate product for Dynamic Showcase Ads.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('Spark Ads prompts.', 'unipixel'); ?></li>
+                                <li><?php echo esc_html__('The TikTok partner integrations marketplace. UniPixel IS your integration.', 'unipixel'); ?></li>
+                            </ul>
+                            <p><?php echo esc_html__('You only need: your Web Pixel\'s Pixel ID, and an Events API Access Token for that Pixel.', 'unipixel'); ?></p>
+                            <p class="small text-muted"><strong><?php echo esc_html__('TikTok quirk worth knowing:', 'unipixel'); ?></strong> <?php echo esc_html__('TikTok auto-maps certain "Reserved Event Names" to its Standard Events. If you create custom events with those reserved names, TikTok rolls them into the Standard event silently. Stick to clearly-custom event names if you want them tracked as custom.', 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="tiktok-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="tiktok-wizard-step d-none" data-step="4">
+                            <h6 class="mb-3"><?php echo esc_html__('Get your credentials', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__('You need two things from TikTok: your Pixel ID and an Events API Access Token. Both come from TikTok Events Manager.', 'unipixel'); ?></p>
+
+                            <div class="mb-3 p-3 border rounded">
+                                <ol class="mb-2 ps-4">
+                                    <li><?php echo esc_html__('Open TikTok Ads Manager and go to Tools → Events Manager.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Click your Web Pixel (or click "Connect data source" → "Web" to create one).', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Your Pixel ID appears at the top of the pixel detail page (a string like C8C3JPS5R0L0CKHEJ8K0). Copy it.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Open the Settings tab on the same pixel.', 'unipixel'); ?></li>
+                                    <li><?php echo esc_html__('Scroll to the Events API section. Click "Generate access token" and copy it immediately (TikTok will only show it once).', 'unipixel'); ?></li>
+                                </ol>
+                                <a href="https://ads.tiktok.com/i18n/events_manager/" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> <?php echo esc_html__('Open TikTok Events Manager', 'unipixel'); ?>
+                                </a>
+                            </div>
+
+                            <p class="mb-0"><?php echo esc_html__('Keep both copied somewhere safe, then continue.', 'unipixel'); ?></p>
+                            <p class="mt-3 mb-0"><small><a href="#" class="tiktok-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="tiktok-wizard-step d-none" data-step="5">
+                            <h6 class="mb-3"><?php echo esc_html__('Paste your credentials', 'unipixel'); ?></h6>
+                            <div class="mb-3">
+                                <label for="wizard-tiktok-pixel-id" class="form-label"><?php echo esc_html__('Pixel ID', 'unipixel'); ?></label>
+                                <input type="text" class="form-control" id="wizard-tiktok-pixel-id" autocomplete="off">
+                            </div>
+                            <div class="mb-3">
+                                <label for="wizard-tiktok-access-token" class="form-label"><?php echo esc_html__('Access Token', 'unipixel'); ?></label>
+                                <input type="password" class="form-control" id="wizard-tiktok-access-token" autocomplete="off">
+                            </div>
+                            <button type="button" class="btn btn-primary" id="wizard-tiktok-save-btn"><?php echo esc_html__('Save and continue', 'unipixel'); ?></button>
+                            <div id="wizard-tiktok-save-result" class="mt-3" role="status" style="display:none;"></div>
+                            <p class="mt-3 mb-0"><small><a href="#" class="tiktok-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="tiktok-wizard-step d-none" data-step="6">
+                            <h6 class="mb-3"><?php echo esc_html__('Test the connection', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("Now let's verify the connection works. UniPixel will format-check your credentials and send a test event to TikTok's Events API with an auto-generated test_event_code, so it lands in TikTok Events Manager → Test Events tab (not in production reports).", 'unipixel'); ?></p>
+                            <p class="small text-muted"><strong><?php echo esc_html__('How to confirm fully:', 'unipixel'); ?></strong> <?php echo esc_html__('A green result here means TikTok accepted the event with code 0 (OK). To see the test event in TikTok\'s own UI, open Events Manager → your Pixel → Test Events tab. The event name will be "unipixel_test_connection" and the test_event_code will be shown in the success message.', 'unipixel'); ?></p>
+                            <button type="button" class="btn btn-primary" id="wizard-tiktok-test-connection-btn"><?php echo esc_html__('Test Connection', 'unipixel'); ?></button>
+                            <div id="wizard-tiktok-test-connection-result" class="mt-3" role="status" style="display:none;"></div>
+                            <p class="mt-3 mb-0"><small><a href="#" class="tiktok-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
+                        </div>
+
+                        <div class="tiktok-wizard-step d-none" data-step="7">
+                            <h6 class="mb-3"><?php echo esc_html__("You're set up", 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__('Server-side events will start flowing on the next user action on your site. Open TikTok Events Manager → your Pixel → Events to watch them land in production reports.', 'unipixel'); ?></p>
+                            <button type="button" class="btn btn-primary" id="wizard-tiktok-done-btn"><?php echo esc_html__('Close', 'unipixel'); ?></button>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer d-flex justify-content-between">
+                        <span class="text-muted small"><?php echo esc_html__('Step', 'unipixel'); ?> <span class="tiktok-wizard-current-step">1</span> <?php echo esc_html__('of', 'unipixel'); ?> 7</span>
+                        <div>
+                            <button type="button" class="btn btn-secondary tiktok-wizard-back" disabled><?php echo esc_html__('Back', 'unipixel'); ?></button>
+                            <button type="button" class="btn btn-primary tiktok-wizard-next"><?php echo esc_html__('Next', 'unipixel'); ?></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <?php
 }

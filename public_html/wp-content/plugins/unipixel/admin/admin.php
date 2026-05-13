@@ -5,6 +5,11 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 require_once 'handlers/handler-general-settings.php';
 require_once 'handlers/handler-platform-settings.php';
+require_once 'handlers/handler-meta-test-connection.php';
+require_once 'handlers/handler-google-test-connection.php';
+require_once 'handlers/handler-tiktok-test-connection.php';
+require_once 'handlers/handler-pinterest-test-connection.php';
+require_once 'handlers/handler-microsoft-test-connection.php';
 require_once 'handlers/handler-event-settings.php'; 
 require_once 'handlers/handler-event-woocomm-settings.php'; 
 require_once 'handlers/handler-consent-settings.php';
@@ -72,6 +77,16 @@ function unipixel_admin_enqueue($hook) {
         wp_enqueue_script('unipixel-ajax-consent-settings', plugins_url('admin/js/ajax-consent-settings.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
         wp_enqueue_script('unipixel-ajax-consent-i18n', plugins_url('admin/js/ajax-consent-i18n.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
         wp_enqueue_script('unipixel-ajax-platform-settings', plugins_url('admin/js/ajax-platform-settings.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-meta-test-connection', plugins_url('admin/js/meta-test-connection.js', __DIR__), array('jquery', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-meta-setup-wizard', plugins_url('admin/js/meta-setup-wizard.js', __DIR__), array('jquery', 'bootstrap_bundle_js', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-google-test-connection', plugins_url('admin/js/google-test-connection.js', __DIR__), array('jquery', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-google-setup-wizard', plugins_url('admin/js/google-setup-wizard.js', __DIR__), array('jquery', 'bootstrap_bundle_js', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-tiktok-test-connection', plugins_url('admin/js/tiktok-test-connection.js', __DIR__), array('jquery', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-tiktok-setup-wizard', plugins_url('admin/js/tiktok-setup-wizard.js', __DIR__), array('jquery', 'bootstrap_bundle_js', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-pinterest-test-connection', plugins_url('admin/js/pinterest-test-connection.js', __DIR__), array('jquery', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-pinterest-setup-wizard', plugins_url('admin/js/pinterest-setup-wizard.js', __DIR__), array('jquery', 'bootstrap_bundle_js', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-microsoft-test-connection', plugins_url('admin/js/microsoft-test-connection.js', __DIR__), array('jquery', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
+        wp_enqueue_script('unipixel-microsoft-setup-wizard', plugins_url('admin/js/microsoft-setup-wizard.js', __DIR__), array('jquery', 'bootstrap_bundle_js', 'unipixel-ajax-platform-settings'), UNIPIXEL_VERSION, true);
         wp_enqueue_script('unipixel-ajax-event-settings', plugins_url('admin/js/ajax-event-settings.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
         wp_enqueue_script('unipixel-ajax-conversion-groups', plugins_url('admin/js/ajax-conversion-groups.js', __DIR__), array('jquery'), UNIPIXEL_VERSION, true);
 

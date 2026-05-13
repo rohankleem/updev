@@ -127,6 +127,11 @@ function unipixel_page_event_logs()
             Events are stored when database storage is enabled in your
             <a href="<?php echo esc_url(menu_page_url('unipixel_general_settings', false)); ?>">General Settings</a>.
         </p>
+        <div class="alert alert-info py-2 mb-4 small" role="note">
+            <i class="fa-solid fa-circle-info"></i>
+            <strong><?php echo esc_html__('About response detail in these logs.', 'unipixel'); ?></strong>
+            <?php echo esc_html__('For 14 days after you add a new access token, server-side responses are logged automatically so you can verify setup is working. After 14 days they stop logging unless you turn "Log Server-side Response" back on for the events you want to keep tracking. Rows with the muted "Not logged" badge mean logging is currently off for that event.', 'unipixel'); ?>
+        </div>
 
         <!-- Filters (server-side) -->
         <form method="get" action="<?php echo esc_url($action_url); ?>" class="mb-3">
@@ -220,7 +225,23 @@ function unipixel_page_event_logs()
                                 <td><?php echo esc_html($log['method']); ?></td>
                                 <td><?php echo esc_html($log['party']); ?></td>
                                 <td><?php echo esc_html($log['event_trigger']); ?></td>
-                                <td><?php echo esc_html($log['response_message']); ?></td>
+                                <td>
+                                    <?php
+                                    $resp = unipixel_classify_event_log_response(
+                                        isset($log['response_message']) ? $log['response_message'] : '',
+                                        isset($log['method']) ? $log['method'] : ''
+                                    );
+                                    ?>
+                                    <span class="badge <?php echo esc_attr($resp['bootstrap_class']); ?>"
+                                          role="button"
+                                          data-bs-toggle="popover"
+                                          data-bs-trigger="hover focus"
+                                          data-bs-title="<?php echo esc_attr__('Response detail', 'unipixel'); ?>"
+                                          data-bs-html="true"
+                                          data-bs-content="<?php echo esc_attr('<pre style=\'white-space: pre-wrap; word-break: break-all; margin: 0; font-size: 0.85em;\'>' . htmlspecialchars($resp['raw'], ENT_QUOTES, 'UTF-8') . '</pre>'); ?>">
+                                        <?php echo esc_html($resp['label']); ?>
+                                    </span>
+                                </td>
                                 <td>
                                     <i class="fas fa-info-circle text-secondary" role="button"
                                        data-bs-toggle="popover"
