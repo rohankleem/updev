@@ -91,7 +91,6 @@ function unipixel_page_pinterest_setup() {
                      ================================================================== -->
                 <div class="unipixel-tracking-section bg-light p-3 mb-3 rounded border">
                     <div class="d-flex align-items-center mb-2">
-                        <i class="fa-solid fa-bolt me-2 text-primary"></i>
                         <strong><?php echo esc_html__('Client-side tracking', 'unipixel'); ?></strong>
                         <span class="badge unipixel-client-side-pill <?php echo $client_side_active ? 'bg-success' : 'bg-secondary'; ?> ms-2"
                               data-label-active="<?php echo esc_attr__('Active', 'unipixel'); ?>"
@@ -144,7 +143,7 @@ function unipixel_page_pinterest_setup() {
                 <!-- ==================================================================
                      Server-side tracking section
                      ================================================================== -->
-                <div id="serverside-well" class="unipixel-tracking-section bg-light-blue p-3 mb-3 rounded border">
+                <div id="serverside-well" class="unipixel-tracking-section bg-light p-3 mb-3 rounded border">
                     <div class="d-flex align-items-center mb-2">
                         <i class="fa-solid fa-bolt-lightning me-2"></i>
                         <strong><?php echo esc_html__('Server-side tracking', 'unipixel'); ?></strong>
