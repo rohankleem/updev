@@ -127,12 +127,6 @@ function unipixel_page_event_logs()
             Events are stored when database storage is enabled in your
             <a href="<?php echo esc_url(menu_page_url('unipixel_general_settings', false)); ?>">General Settings</a>.
         </p>
-        <div class="alert alert-info py-2 mb-4 small" role="note">
-            <i class="fa-solid fa-circle-info"></i>
-            <strong><?php echo esc_html__('About response detail in these logs.', 'unipixel'); ?></strong>
-            <?php echo esc_html__('For 14 days after you add a new access token, server-side responses are logged automatically so you can verify setup is working. After 14 days they stop logging unless you turn "Log Server-side Response" back on for the events you want to keep tracking. Rows with the muted "Not logged" badge mean logging is currently off for that event.', 'unipixel'); ?>
-        </div>
-
         <!-- Filters (server-side) -->
         <form method="get" action="<?php echo esc_url($action_url); ?>" class="mb-3">
             <!-- Preserve the admin page slug -->

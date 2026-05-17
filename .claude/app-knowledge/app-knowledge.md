@@ -245,18 +245,6 @@ Each platform setup page has a Bootstrap modal-lg wizard (`#{platform}-setup-wiz
 - **Step 5 Save** uses the existing `unipixel_update_platform` AJAX (platform-agnostic). Step 6 Test Connection uses the platform-specific `unipixel_{platform}_test_connection` action. Step 7 Done reloads the page so the strip flips green.
 - **"Looks different in your dashboard?" link** in every step closes the wizard and opens the existing `#unipixelFeedbackModal` (rendered globally by `inc/feedback.php`) with the description pre-filled as `{Platform} server-side wizard, step N (step title):` so the user just adds their description and submits.
 
-## 14-day Log Server-side Response grace period
-
-When `access_token` transitions from empty → non-empty for a platform (first-time setup), three things happen via `unipixel_start_log_response_grace_period($platform_id)`:
-
-1. `wp_unipixel_woocomm_event_settings` and `wp_unipixel_events_settings` rows for this platform get `send_server_log_response = 1` bulk-updated, so all events log their server response while the user verifies setup.
-2. A timestamp goes into the `unipixel_log_response_grace_started_at` WP option.
-3. A `wp_schedule_single_event` is scheduled 14 days out to fire `unipixel_end_log_response_grace_period_callback` which bulk-resets to 0.
-
-Idempotent per platform: only triggers on the first empty→non-empty transition. Subsequent token changes don't re-trigger (so user customisations aren't overwritten).
-
-Database-level approach was chosen deliberately over modifying the gate in the 11+ caller files in the event-firing pipeline. Lower regression risk.
-
 ## Plain-English event log labels
 
 `unipixel_classify_event_log_response($response_message, $method)` in `functions/unipixel-functions.php` maps raw `response_message` strings to `{label, level, bootstrap_class, raw}`. Used by the Stored Event Logs page to render badges instead of raw HTTP codes. HTTP code extraction (Code XXX / JSON code field / standalone 3-digit) plus keyword fallback. `method='client'` rows get a special "Client-side, no response" badge so users don't think those are failures. Empty or "logging turned off" rows get muted "Not logged".

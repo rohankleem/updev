@@ -167,26 +167,6 @@ function unipixel_page_tiktok_setup() {
                 <p class="mb-1"><i class="fa-solid fa-bolt-lightning"></i> <strong><?php echo esc_html__('Server-Side Tracking', 'unipixel'); ?></strong></p>
                 <p class="mb-2"><small><?php echo esc_html__('Supercharge your event tracking with TikTok\'s Events API. In addition to traditional client-side sending, events are sent directly from your server, bypassing ad blockers and browser restrictions. Events are matched-up at TikTok avoiding double counting and improving your measurement and reporting.', 'unipixel'); ?></small></p>
 
-                <?php
-                // Phase 5 of token-acquisition-ux: surface the 14-day log-response grace period for TikTok.
-                $tiktok_log_grace = unipixel_get_log_response_grace_status($platformId);
-                if ($tiktok_log_grace['active']) :
-                ?>
-                    <div class="alert alert-info py-2 mb-2 small" role="note">
-                        <i class="fa-solid fa-circle-info"></i>
-                        <?php echo esc_html(sprintf(
-                            /* translators: %d is the number of days remaining */
-                            _n(
-                                'Server-side response logging is on for all TikTok events for %d more day so you can verify setup. After that it will auto-off; turn it back on per event in the Events tab if you want to keep logging.',
-                                'Server-side response logging is on for all TikTok events for %d more days so you can verify setup. After that it will auto-off; turn it back on per event in the Events tab if you want to keep logging.',
-                                $tiktok_log_grace['days_remaining'],
-                                'unipixel'
-                            ),
-                            $tiktok_log_grace['days_remaining']
-                        )); ?>
-                    </div>
-                <?php endif; ?>
-
                 <div class="mb-3 row">
                     <div class="col-12 col-sm-3">
                         <label class="form-check-label" for="serverside_global_enabled">

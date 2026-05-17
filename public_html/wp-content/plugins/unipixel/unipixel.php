@@ -85,9 +85,20 @@ function unipixel_activate() {
 
     update_option('unipixel_version', UNIPIXEL_VERSION);
 
+    // Cleanup: clear any scheduled events + leftover option from the removed
+    // 14-day log-response grace period (an earlier in-flight design that was
+    // dropped before release).
+    foreach (array(1, 2, 3, 4, 5) as $unipixel_legacy_platform_id) {
+        $unipixel_legacy_cron_ts = wp_next_scheduled('unipixel_end_log_response_grace_period', array($unipixel_legacy_platform_id));
+        if ($unipixel_legacy_cron_ts) {
+            wp_unschedule_event($unipixel_legacy_cron_ts, 'unipixel_end_log_response_grace_period', array($unipixel_legacy_platform_id));
+        }
+    }
+    delete_option('unipixel_log_response_grace_started_at');
+
     unipixel_metric_log(
-        'Activate Plugin', 
-        'N/A',           
+        'Activate Plugin',
+        'N/A',
         array(
             'info' => 'Plugin activated',
             'version' => UNIPIXEL_VERSION,

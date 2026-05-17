@@ -92,16 +92,6 @@ function unipixel_handle_platform_update() {
         array('%d')
     );
 
-    // Phase 5 of token-acquisition-ux: when the access_token transitions from
-    // empty to non-empty for the first time on a platform, kick off the 14-day
-    // "Log Server-side Response" grace period so the user can see actual events
-    // landing without having to toggle anything per-event. Idempotent.
-    $previous_token = isset($current_data['access_token']) ? $current_data['access_token'] : '';
-    if ($access_token !== '' && $previous_token === '' && function_exists('unipixel_start_log_response_grace_period')) {
-        unipixel_start_log_response_grace_period($platform_id);
-    }
-
-
     $action = "Platform Settings";
     $platformName = $current_data['platform_name'];
     $platformEnabledStr = "Disabled";

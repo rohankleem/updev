@@ -35,7 +35,6 @@ Medium-cadence file. What's done, what's blocking adoption, what that means for 
   - **Test Connection button on every platform setup page** (Meta / Google / TikTok / Pinterest / Microsoft). Each validates against the platform's real API with platform-specific format checks + diagnostic feedback. No more silent "did it work?" — green = working, red = the specific thing wrong (token expired, password changed, wrong scope, no pixel access, ad-account access denied, rate-limited, etc.)
   - **Three-state connection status indicator** on each setup page (Not set up / Pasted unverified / Connected with verified-X-ago timestamp), and matching badges on the UniPixel home dashboard for each platform card
   - **Guided setup wizard per platform** (7-step modal) with platform-specific "what to ignore" copy listing the upsells, audience builders, catalog setup etc. that users can skip without affecting tracking
-  - **14-day Log Server-side Response grace period** — when a token is first added, response logging auto-enables for all events for that platform for 14 days so the user can verify; then auto-off so the log table doesn't grow unbounded
   - **Plain-English response badges in Stored Event Logs** replacing raw HTTP codes (Sent OK / Token problem / Data problem / Rate limited / Not logged / Client-side, no response)
   - **Help-icon copy refreshed** across all credential fields, replacing stale wall-of-text legacy instructions with one-liner + Open Setup Guide link
 

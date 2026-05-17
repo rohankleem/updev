@@ -1,6 +1,6 @@
 # Token-acquisition UX
 
-**Status:** Complete (shipped 2026-05-12 to 2026-05-13). All 8 phases delivered.
+**Status:** Complete (shipped 2026-05-12 to 2026-05-13). 14-day log-response grace period **removed 2026-05-17** before v2.7.0 release; see Phase 5 entry below.
 **Backlog refs:** #34 in `release-log.md` (parent, now Done). Subsumes #1, #8, #30 (all Done-by-subsumption).
 **Origin:** Moisés (nuespacios.com) support feedback, 2026-05-12.
 
@@ -118,7 +118,25 @@ The five concrete moves from the design conversation (Test Connection button, st
 
 **Verified in browser:** Stored Event Logs page now renders three distinct visual states across the rows (green Sent OK for the two Lead server events that returned 200, grey Not logged for ViewContent server rows where logging was off, blue Client-side no response for every client row). Hover on a badge surfaces the original response detail.
 
-### Phase 5: "Log Server-side Response" 14-day default + visibility — SHIPPED 2026-05-12
+### Phase 5: "Log Server-side Response" 14-day default + visibility — REMOVED 2026-05-17 (was shipped 2026-05-12, removed before v2.7.0 release)
+
+**Reason for removal.** The whole approach was a judgment error. WP-Cron is unreliable across hosts (low-traffic sites only fire cron on page loads, some hosts disable WP-Cron, system-cron isn't always configured), so the 14-day auto-off was going to silently fail on a meaningful subset of installs. More importantly, the underlying problem (new users not seeing server-side response data) is already solved by the Test Connection button + plain-English error badges shipped in the same release. Adding scheduled automation on top was redundant complexity, and it changed user-configured settings without the user knowing.
+
+Per Rohan: *"It should be solved by UX, not through a cron job and without a user knowing."*
+
+**Files reverted (2026-05-17):**
+- `functions/unipixel-functions.php` — deleted `unipixel_start_log_response_grace_period()`, `unipixel_end_log_response_grace_period_callback()`, `unipixel_get_log_response_grace_status()`, and the `add_action('unipixel_end_log_response_grace_period', ...)` registration.
+- `admin/handlers/handler-platform-settings.php` — removed the trigger block on empty→non-empty token transition.
+- `admin/page-event-logs.php` — removed the intro info alert.
+- `admin/page-meta-setup.php`, `admin/page-google-setup.php`, `admin/page-tiktok-setup.php`, `admin/page-pinterest-setup.php`, `admin/page-microsoft-setup.php` — removed conditional "X days remaining" alerts inside each `#serverside-well`.
+- `unipixel.php` `unipixel_activate()` — added cleanup that clears any orphan scheduled `unipixel_end_log_response_grace_period` events for platform IDs 1-5 and deletes the `unipixel_log_response_grace_started_at` option. So any install that ever triggered the grace flow (Rohan's local dev included, if/when WP-Cron processed the trigger) gets cleaned on next plugin activation.
+- All 9 touched files lint clean.
+
+**Lesson saved as feedback memory** (`feedback_no_cron_dependent_ux_automation.md`): don't introduce WP-Cron-dependent automation for UX problems; flag cron dependency as a design objection before writing code; propose non-scheduled alternatives first.
+
+**Original implementation notes preserved below for context:**
+
+### Phase 5 (original spec, now removed)
 - [x] Implement default ON for the first 14 days after a platform token is added, then auto-OFF
 - [x] Add user-facing note explaining this behaviour so users aren't confused when logs stop appearing (Stored Event Logs page intro + Meta setup page near the logging context)
 - [x] Confirm the wizard's Test Connection step relies on logging being available, so first-time users immediately see results (confirmed: the Test Connection AJAX endpoint validates against Meta's Graph API directly and doesn't depend on `send_server_log_response` being on for any event)
