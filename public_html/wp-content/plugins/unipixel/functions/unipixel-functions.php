@@ -397,7 +397,7 @@ function unipixel_get_help_icon($key)
         ],
         "Meta_PixelId"   => [
             "title" => "Pixel ID",
-            "content" => "Your unique identifier for your Meta Pixel. Found in Meta Business Settings under Data Sources.<br/><br/><a href='#meta-setup-wizard'>Open setup guide</a>"
+            "content" => "Your unique identifier for your Meta Pixel. Found in Meta Events Manager at the top of the Pixel detail page.<br/><br/><a href='https://business.facebook.com/events_manager2/' target='_blank' rel='noopener noreferrer'>Open Meta Events Manager</a>"
         ],
         "Meta_AccessToken"   => [
             "title" => "Access Token",
@@ -448,7 +448,7 @@ function unipixel_get_help_icon($key)
         ],
         "Google_MeasurementId"   => [
             "title" => "Measurement ID",
-            "content" => "Your GA4 Web data stream's Measurement ID (G-XXXXXXXXXX). Found in Google Analytics Admin under Data Streams.<br/><br/><a href='#google-setup-wizard'>Open setup guide</a>"
+            "content" => "Your GA4 Web data stream's Measurement ID (G-XXXXXXXXXX). Found in Google Analytics Admin under Data Streams.<br/><br/><a href='https://analytics.google.com/' target='_blank' rel='noopener noreferrer'>Open Google Analytics</a>"
         ],
         "Google_ContainerId"   => [
             "title" => "Tag Manager Container Id",
@@ -512,7 +512,7 @@ function unipixel_get_help_icon($key)
         ],
         "TikTok_PixelId" => [
             "title" => "Pixel ID",
-            "content" => "Your TikTok Web Pixel ID (around 20 uppercase letters and digits, e.g. C8C3JPS5R0L0CKHEJ8K0). Found at the top of the pixel detail page in TikTok Events Manager.<br/><br/><a href='#tiktok-setup-wizard'>Open setup guide</a>"
+            "content" => "Your TikTok Web Pixel ID (around 20 uppercase letters and digits, e.g. C8C3JPS5R0L0CKHEJ8K0). Found at the top of the pixel detail page in TikTok Events Manager.<br/><br/><a href='https://ads.tiktok.com/i18n/events_manager/' target='_blank' rel='noopener noreferrer'>Open TikTok Events Manager</a>"
         ],
         "TikTok_AccessToken" => [
             "title" => "Access Token",
@@ -533,7 +533,7 @@ function unipixel_get_help_icon($key)
         ],
         "Pinterest_TagId" => [
             "title" => "Pinterest Tag ID",
-            "content" => "Your Pinterest Tag ID (numeric, ~13 digits). Found at the top of the Tag detail page in Pinterest Ads Manager → Conversions → Manage tags.<br/><br/><a href='#pinterest-setup-wizard'>Open setup guide</a>"
+            "content" => "Your Pinterest Tag ID (numeric, ~13 digits). Found at the top of the Tag detail page in Pinterest Ads Manager under Conversions → Manage tags.<br/><br/><a href='https://ads.pinterest.com/' target='_blank' rel='noopener noreferrer'>Open Pinterest Ads Manager</a>"
         ],
         "Pinterest_AdAccountId" => [
             "title" => "Ad Account ID",
@@ -562,7 +562,7 @@ function unipixel_get_help_icon($key)
         ],
         "Microsoft_PixelId" => [
             "title" => "UET Tag ID",
-            "content" => "Your Microsoft UET Tag ID (7-9 digit number). Found in Microsoft Advertising → Tools → UET tag, or as the value after <code>ti=</code> in the UET code snippet.<br/><br/><a href='#microsoft-setup-wizard'>Open setup guide</a>"
+            "content" => "Your Microsoft UET Tag ID (7-9 digit number). Found in Microsoft Advertising under Tools → UET tag, or as the value after <code>ti=</code> in the UET code snippet.<br/><br/><a href='https://ui.ads.microsoft.com/' target='_blank' rel='noopener noreferrer'>Open Microsoft Advertising</a>"
         ],
         "Microsoft_AccessToken" => [
             "title" => "CAPI Access Token",

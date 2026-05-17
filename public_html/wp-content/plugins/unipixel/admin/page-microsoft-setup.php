@@ -40,6 +40,11 @@ function unipixel_page_microsoft_setup()
 
     // Allowlist for inline help icons HTML
     $icon_allow = unipixel_get_popover_allowlist();
+
+    // Two-section layout. Note: Microsoft setup has no Pixel Setting radio (no
+    // client-side script-delivery choice). Just the UET Tag ID for client-side.
+    $client_side_active   = (!empty($pixel_id) && $platform_enabled === 1);
+    $microsoft_conn_state = unipixel_get_platform_connection_state($platformId);
 ?>
     <div class="UniPixelShell position-relative" data-platform="microsoft">
 
@@ -59,57 +64,6 @@ function unipixel_page_microsoft_setup()
             </small>
         </p>
 
-        <?php
-        // Connection status strip (token-acquisition-ux Phase 8 — Microsoft).
-        $microsoft_conn_state = unipixel_get_platform_connection_state($platformId);
-        if ($microsoft_conn_state['state'] === 'not_started') :
-        ?>
-            <div class="alert alert-secondary d-flex align-items-center mb-3" role="status">
-                <span class="badge bg-secondary me-2">&bull;</span>
-                <div class="flex-grow-1">
-                    <strong><?php echo esc_html__('Server-side tracking not set up.', 'unipixel'); ?></strong>
-                    <small class="d-block"><?php echo esc_html__('Enable Server-Side Tracking and add a CAPI Access Token below, or use the guided walkthrough. Note: Microsoft CAPI tokens are gated. You may need to contact your Microsoft Ads account manager to get one.', 'unipixel'); ?></small>
-                </div>
-                <button type="button" class="btn btn-primary btn-sm ms-3" data-bs-toggle="modal" data-bs-target="#microsoft-setup-wizard-modal">
-                    <?php echo esc_html__('Start server-side setup', 'unipixel'); ?>
-                </button>
-            </div>
-        <?php elseif ($microsoft_conn_state['state'] === 'pasted_unverified') : ?>
-            <div class="alert alert-warning d-flex align-items-center mb-3" role="status">
-                <span class="badge bg-warning text-dark me-2">&bull;</span>
-                <div>
-                    <strong><?php echo esc_html__('Server-side not yet verified.', 'unipixel'); ?></strong>
-                    <small class="d-block"><?php echo esc_html__('Credentials saved. Click Test Connection below to verify, or wait for server events to confirm setup.', 'unipixel'); ?></small>
-                    <small class="d-block mt-1">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#microsoft-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
-                    </small>
-                </div>
-            </div>
-        <?php else :
-            $ms_freshness_at = ($microsoft_conn_state['last_test_at'] && $microsoft_conn_state['last_event_at'])
-                ? max($microsoft_conn_state['last_test_at'], $microsoft_conn_state['last_event_at'])
-                : ($microsoft_conn_state['last_test_at'] ? $microsoft_conn_state['last_test_at'] : $microsoft_conn_state['last_event_at']);
-        ?>
-            <div class="alert alert-success d-flex align-items-center mb-3" role="status">
-                <span class="badge bg-success me-2">&bull;</span>
-                <div>
-                    <strong><?php echo esc_html__('Server-side ready.', 'unipixel'); ?></strong>
-                    <?php if ($ms_freshness_at) : ?>
-                        <small class="d-block">
-                            <?php echo esc_html(sprintf(
-                                /* translators: %s is a human time diff, e.g. "5 minutes" */
-                                __('Verified %s ago.', 'unipixel'),
-                                human_time_diff($ms_freshness_at, time())
-                            )); ?>
-                        </small>
-                    <?php endif; ?>
-                    <small class="d-block mt-1">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#microsoft-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
-                    </small>
-                </div>
-            </div>
-        <?php endif; ?>
-
         <!-- Feedback message container -->
         <div id="platform-settings-feedback-message" class="alert" role="alert" style="display:none;"></div>
 
@@ -121,7 +75,7 @@ function unipixel_page_microsoft_setup()
             <div class="mb-3 row">
                 <div class="col-12 col-sm-3">
                     <label class="form-check-label" for="platform_enabled">
-                        <?php echo esc_html__('Turn On/Enabled?', 'unipixel'); ?>
+                        <?php echo esc_html__('Send tracking to Microsoft?', 'unipixel'); ?>
                         <?php echo wp_kses(unipixel_get_help_icon('Microsoft_Enabled'), $icon_allow); ?>
                     </label>
                 </div>
@@ -136,22 +90,102 @@ function unipixel_page_microsoft_setup()
 
             <div id="platform-fields">
 
-                <!-- UET Tag ID -->
-                <div class="mb-3 row">
-                    <label for="pixel_id" class="col-sm-3 col-form-label">
-                        <?php echo esc_html__('UET Tag ID:', 'unipixel'); ?>
-                        <?php echo wp_kses(unipixel_get_help_icon('Microsoft_PixelId'), $icon_allow); ?>
-                    </label>
-                    <div class="col-sm-9">
-                        <input type="text" id="pixel_id" name="pixel_id" class="form-control"
-                            value="<?php echo esc_attr($pixel_id); ?>" autocomplete="off" required>
+                <!-- ==================================================================
+                     Client-side tracking section
+                     ================================================================== -->
+                <div class="unipixel-tracking-section bg-light p-3 mb-3 rounded border">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fa-solid fa-bolt me-2 text-primary"></i>
+                        <strong><?php echo esc_html__('Client-side tracking', 'unipixel'); ?></strong>
+                        <?php if ($client_side_active) : ?>
+                            <span class="badge bg-success ms-2"><?php echo esc_html__('Active', 'unipixel'); ?></span>
+                        <?php else : ?>
+                            <span class="badge bg-secondary ms-2"><?php echo esc_html__('Off', 'unipixel'); ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <p class="small text-muted mb-3"><?php echo esc_html__('The fastest way to start tracking. Add your UET Tag ID and events fire via the UET tag in the browser.', 'unipixel'); ?></p>
+
+                    <?php if (empty($pixel_id)) : ?>
+                        <div class="alert alert-info py-2 small mb-3" role="status">
+                            <strong><?php echo esc_html__('Start simple.', 'unipixel'); ?></strong>
+                            <?php echo esc_html__('Add your UET Tag ID below to start tracking. Find it in Microsoft Advertising under Tools → UET tag.', 'unipixel'); ?>
+                            <a href="https://ui.ads.microsoft.com/" target="_blank" rel="noopener noreferrer" class="ms-1">
+                                <?php echo esc_html__('Open Microsoft Advertising', 'unipixel'); ?> <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                            <div class="mt-1 small text-muted"><?php echo esc_html__('No UET tag yet? The Tools → UET tag page has a Create button.', 'unipixel'); ?></div>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="mb-0 row">
+                        <label for="pixel_id" class="col-sm-3 col-form-label">
+                            <?php echo esc_html__('UET Tag ID:', 'unipixel'); ?>
+                            <?php echo wp_kses(unipixel_get_help_icon('Microsoft_PixelId'), $icon_allow); ?>
+                        </label>
+                        <div class="col-sm-9">
+                            <input type="text" id="pixel_id" name="pixel_id" class="form-control"
+                                value="<?php echo esc_attr($pixel_id); ?>" autocomplete="off" required>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Server-Side Tracking -->
-                <div id="serverside-well" class="bg-light-blue">
-                    <p class="mb-1"><i class="fa-solid fa-bolt-lightning"></i> <strong><?php echo esc_html__('Server-Side Tracking', 'unipixel'); ?></strong></p>
-                    <p class="mb-2"><small><?php echo esc_html__('Supercharge your event tracking with Microsoft\'s Conversions API (CAPI). In addition to traditional client-side sending via the UET tag, events are sent directly from your server, bypassing ad blockers and browser restrictions. Events are deduplicated using event IDs to avoid double counting.', 'unipixel'); ?></small></p>
+                <!-- ==================================================================
+                     Server-side tracking section
+                     ================================================================== -->
+                <div id="serverside-well" class="unipixel-tracking-section bg-light-blue p-3 mb-3 rounded border">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fa-solid fa-bolt-lightning me-2"></i>
+                        <strong><?php echo esc_html__('Server-side tracking', 'unipixel'); ?></strong>
+                        <span class="text-muted small ms-2"><?php echo esc_html__('(recommended, if available)', 'unipixel'); ?></span>
+                    </div>
+
+                    <?php if ($microsoft_conn_state['state'] === 'not_started') : ?>
+                        <div class="alert alert-secondary d-flex align-items-center mb-3" role="status">
+                            <span class="badge bg-secondary me-2">&bull;</span>
+                            <div class="flex-grow-1">
+                                <strong><?php echo esc_html__('Server-side tracking not set up.', 'unipixel'); ?></strong>
+                                <small class="d-block"><?php echo esc_html__('Enable Server-Side Tracking and add a CAPI Access Token below, or use the guided walkthrough. Note: Microsoft CAPI tokens are gated. You may need to contact your Microsoft Ads account manager to get one.', 'unipixel'); ?></small>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm ms-3" data-bs-toggle="modal" data-bs-target="#microsoft-setup-wizard-modal">
+                                <?php echo esc_html__('Start server-side setup', 'unipixel'); ?>
+                            </button>
+                        </div>
+                    <?php elseif ($microsoft_conn_state['state'] === 'pasted_unverified') : ?>
+                        <div class="alert alert-warning d-flex align-items-center mb-3" role="status">
+                            <span class="badge bg-warning text-dark me-2">&bull;</span>
+                            <div>
+                                <strong><?php echo esc_html__('Server-side not yet verified.', 'unipixel'); ?></strong>
+                                <small class="d-block"><?php echo esc_html__('Credentials saved. Click Test Connection below to verify, or wait for server events to confirm setup.', 'unipixel'); ?></small>
+                                <small class="d-block mt-1">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#microsoft-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
+                                </small>
+                            </div>
+                        </div>
+                    <?php else :
+                        $ms_freshness_at = ($microsoft_conn_state['last_test_at'] && $microsoft_conn_state['last_event_at'])
+                            ? max($microsoft_conn_state['last_test_at'], $microsoft_conn_state['last_event_at'])
+                            : ($microsoft_conn_state['last_test_at'] ? $microsoft_conn_state['last_test_at'] : $microsoft_conn_state['last_event_at']);
+                    ?>
+                        <div class="alert alert-success d-flex align-items-center mb-3" role="status">
+                            <span class="badge bg-success me-2">&bull;</span>
+                            <div>
+                                <strong><?php echo esc_html__('Server-side ready.', 'unipixel'); ?></strong>
+                                <?php if ($ms_freshness_at) : ?>
+                                    <small class="d-block">
+                                        <?php echo esc_html(sprintf(
+                                            /* translators: %s is a human time diff, e.g. "5 minutes" */
+                                            __('Verified %s ago.', 'unipixel'),
+                                            human_time_diff($ms_freshness_at, time())
+                                        )); ?>
+                                    </small>
+                                <?php endif; ?>
+                                <small class="d-block mt-1">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#microsoft-setup-wizard-modal"><?php echo esc_html__('Re-walk server-side setup', 'unipixel'); ?></a>
+                                </small>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <p class="small text-muted mb-3"><?php echo esc_html__('More accurate, bypasses ad blockers, dedupes with client-side via event IDs. Requires a CAPI Access Token on top of your UET Tag ID. Microsoft CAPI is gated by Microsoft, so you may need to request access from your account manager.', 'unipixel'); ?></p>
 
                     <div class="mb-3 row">
                         <div class="col-12 col-sm-3">
@@ -168,26 +202,26 @@ function unipixel_page_microsoft_setup()
                     </div>
 
                     <div id="serverside-fields">
-                    <div class="mb-3 row">
-                        <label for="access_token" class="col-sm-3 col-form-label">
-                            <?php echo esc_html__('CAPI Access Token:', 'unipixel'); ?>
-                            <?php echo wp_kses(unipixel_get_help_icon('Microsoft_AccessToken'), $icon_allow); ?>
-                        </label>
-                        <div class="col-sm-9">
-                            <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>" autocomplete="new-password">
-                            <small class="form-text text-muted"><?php echo esc_html__('Obtain your token from the Microsoft Advertising UI under "Use Conversions API", or contact your account manager.', 'unipixel'); ?></small>
+                        <div class="mb-3 row">
+                            <label for="access_token" class="col-sm-3 col-form-label">
+                                <?php echo esc_html__('CAPI Access Token:', 'unipixel'); ?>
+                                <?php echo wp_kses(unipixel_get_help_icon('Microsoft_AccessToken'), $icon_allow); ?>
+                            </label>
+                            <div class="col-sm-9">
+                                <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>" autocomplete="new-password">
+                                <small class="form-text text-muted"><?php echo esc_html__('Obtain your token from the Microsoft Advertising UI under "Use Conversions API", or contact your account manager.', 'unipixel'); ?></small>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-3 row" id="microsoft-test-connection-row" style="display:none;">
-                        <div class="col-sm-3"></div>
-                        <div class="col-sm-9">
-                            <button type="button" id="microsoft-test-connection-btn" class="btn btn-outline-primary">
-                                <?php echo esc_html__('Test Connection', 'unipixel'); ?>
-                            </button>
-                            <div id="microsoft-test-connection-result" class="mt-2" role="status" style="display:none;"></div>
+                        <div class="mb-3 row" id="microsoft-test-connection-row" style="display:none;">
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-9">
+                                <button type="button" id="microsoft-test-connection-btn" class="btn btn-outline-primary">
+                                    <?php echo esc_html__('Test Connection', 'unipixel'); ?>
+                                </button>
+                                <div id="microsoft-test-connection-result" class="mt-2" role="status" style="display:none;"></div>
+                            </div>
                         </div>
-                    </div>
                     </div>
                 </div>
 
@@ -195,7 +229,6 @@ function unipixel_page_microsoft_setup()
 
             <!-- Submit -->
             <div class="mb-3 row">
-
                 <div class="col-sm-9 offset-sm-3">
                     <input type="submit"
                         value="<?php echo esc_attr__('Update Settings', 'unipixel'); ?>"
@@ -211,13 +244,13 @@ function unipixel_page_microsoft_setup()
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="microsoftSetupWizardLabel"><?php echo esc_html__('Microsoft Server-Side Setup Walkthrough', 'unipixel'); ?></h5>
+                        <h5 class="modal-title" id="microsoftSetupWizardLabel"><?php echo esc_html__('Set up server-side tracking for Microsoft', 'unipixel'); ?></h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<?php echo esc_attr__('Close', 'unipixel'); ?>"></button>
                     </div>
                     <div class="modal-body">
                         <div class="microsoft-wizard-step" data-step="1">
                             <h6 class="mb-3"><?php echo esc_html__("What you'll achieve", 'unipixel'); ?></h6>
-                            <p><?php echo esc_html__("By the end of this guide, server-side events from this WordPress site will fire directly to Microsoft Advertising via the Conversions API (CAPI). You'll have your UET Tag ID and a CAPI Access Token pasted into UniPixel, and a successful Test Connection confirming the wiring.", 'unipixel'); ?></p>
+                            <p><?php echo esc_html__("By the end of this guide, server-side events will fire to Microsoft Advertising via the Conversions API (CAPI) on top of any client-side tracking. You'll have your UET Tag ID and a CAPI Access Token pasted into UniPixel, and a successful Test Connection confirming the wiring.", 'unipixel'); ?></p>
                             <p class="mt-3 mb-0"><small><a href="#" class="microsoft-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
                         </div>
 
@@ -242,6 +275,7 @@ function unipixel_page_microsoft_setup()
 
                         <div class="microsoft-wizard-step d-none" data-step="4">
                             <h6 class="mb-3"><?php echo esc_html__('Get your credentials', 'unipixel'); ?></h6>
+                            <p><?php echo esc_html__("You'll need a UET tag in Microsoft Advertising. If you don't have one, the Open Microsoft Advertising link below has a Create button under Tools → UET tag.", 'unipixel'); ?></p>
                             <p><?php echo esc_html__('You need two things from Microsoft: your UET Tag ID and a CAPI Access Token.', 'unipixel'); ?></p>
 
                             <div class="mb-3 p-3 border rounded">
