@@ -2,10 +2,33 @@
     var UniPixelPlatformSettings = {
         init: function () {
             this.bindEvents();
+            // Make sure the pill reflects current form state on initial load
+            // (in case the server-rendered value drifts from form defaults).
+            this.updateClientSidePill();
         },
         bindEvents: function () {
             // Bind form submission for updating platform settings
             $('#platform-settings-form').on('submit', this.handlePlatformSettingsSubmit.bind(this));
+
+            // Live-update the Client-side tracking pill (Active / Off) whenever
+            // the master toggle flips or the Pixel ID input changes. Reflects
+            // intent immediately so users don't have to reload after Update.
+            $('#platform_enabled').on('change', this.updateClientSidePill.bind(this));
+            $('#pixel_id').on('input change', this.updateClientSidePill.bind(this));
+        },
+        updateClientSidePill: function () {
+            var $pill = $('.unipixel-client-side-pill');
+            if (!$pill.length) return;
+            var pixelId = $.trim($('#pixel_id').val() || '');
+            var platformEnabled = $('#platform_enabled').is(':checked');
+            var active = (pixelId !== '' && platformEnabled);
+            var labelActive = $pill.data('label-active') || 'Active';
+            var labelOff = $pill.data('label-off') || 'Off';
+            if (active) {
+                $pill.removeClass('bg-secondary').addClass('bg-success').text(labelActive);
+            } else {
+                $pill.removeClass('bg-success').addClass('bg-secondary').text(labelOff);
+            }
         },
         handlePlatformSettingsSubmit: function (e) {
             e.preventDefault();
@@ -36,6 +59,8 @@
                     console.log('Success:', response);
                     if (response.success) {
                         this.showFeedbackMessage(response.data.message, 'success');
+                        // Canonical pill update from persisted state, after save success.
+                        this.updateClientSidePill();
                     } else {
                         this.showFeedbackMessage(response.data.message, 'danger');
                     }

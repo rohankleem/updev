@@ -97,11 +97,9 @@ function unipixel_page_microsoft_setup()
                     <div class="d-flex align-items-center mb-2">
                         <i class="fa-solid fa-bolt me-2 text-primary"></i>
                         <strong><?php echo esc_html__('Client-side tracking', 'unipixel'); ?></strong>
-                        <?php if ($client_side_active) : ?>
-                            <span class="badge bg-success ms-2"><?php echo esc_html__('Active', 'unipixel'); ?></span>
-                        <?php else : ?>
-                            <span class="badge bg-secondary ms-2"><?php echo esc_html__('Off', 'unipixel'); ?></span>
-                        <?php endif; ?>
+                        <span class="badge unipixel-client-side-pill <?php echo $client_side_active ? 'bg-success' : 'bg-secondary'; ?> ms-2"
+                              data-label-active="<?php echo esc_attr__('Active', 'unipixel'); ?>"
+                              data-label-off="<?php echo esc_attr__('Off', 'unipixel'); ?>"><?php echo $client_side_active ? esc_html__('Active', 'unipixel') : esc_html__('Off', 'unipixel'); ?></span>
                     </div>
                     <p class="small text-muted mb-3"><?php echo esc_html__('The fastest way to start tracking. Add your UET Tag ID and events fire via the UET tag in the browser.', 'unipixel'); ?></p>
 
