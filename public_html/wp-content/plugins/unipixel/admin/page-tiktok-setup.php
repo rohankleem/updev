@@ -89,7 +89,7 @@ function unipixel_page_tiktok_setup() {
             <div class="alert alert-success d-flex align-items-center mb-3" role="status">
                 <span class="badge bg-success me-2">&bull;</span>
                 <div>
-                    <strong><?php echo esc_html__('Server-side connected.', 'unipixel'); ?></strong>
+                    <strong><?php echo esc_html__('Server-side ready.', 'unipixel'); ?></strong>
                     <?php if ($tt_freshness_at) : ?>
                         <small class="d-block">
                             <?php echo esc_html(sprintf(
@@ -159,7 +159,7 @@ function unipixel_page_tiktok_setup() {
                     <?php echo wp_kses(unipixel_get_help_icon('TikTok_PixelId'), $icon_allow); ?>
                 </label>
                 <div class="col-sm-9">
-                    <input type="text" id="pixel_id" name="pixel_id" class="form-control" value="<?php echo esc_attr($pixel_id); ?>" required>
+                    <input type="text" id="pixel_id" name="pixel_id" class="form-control" value="<?php echo esc_attr($pixel_id); ?>" autocomplete="off" required>
                 </div>
             </div>
 
@@ -188,7 +188,7 @@ function unipixel_page_tiktok_setup() {
                         <?php echo wp_kses(unipixel_get_help_icon('TikTok_AccessToken'), $icon_allow); ?>
                     </label>
                     <div class="col-sm-9">
-                        <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>">
+                        <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>" autocomplete="new-password">
                     </div>
                 </div>
 

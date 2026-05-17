@@ -68,7 +68,7 @@ function unipixel_page_microsoft_setup()
                 <span class="badge bg-secondary me-2">&bull;</span>
                 <div class="flex-grow-1">
                     <strong><?php echo esc_html__('Server-side tracking not set up.', 'unipixel'); ?></strong>
-                    <small class="d-block"><?php echo esc_html__('Enable Server-Side Tracking and add a CAPI Access Token below, or use the guided walkthrough. Note: Microsoft CAPI tokens are gated — you may need to contact your Microsoft Ads account manager to get one.', 'unipixel'); ?></small>
+                    <small class="d-block"><?php echo esc_html__('Enable Server-Side Tracking and add a CAPI Access Token below, or use the guided walkthrough. Note: Microsoft CAPI tokens are gated. You may need to contact your Microsoft Ads account manager to get one.', 'unipixel'); ?></small>
                 </div>
                 <button type="button" class="btn btn-primary btn-sm ms-3" data-bs-toggle="modal" data-bs-target="#microsoft-setup-wizard-modal">
                     <?php echo esc_html__('Start server-side setup', 'unipixel'); ?>
@@ -93,7 +93,7 @@ function unipixel_page_microsoft_setup()
             <div class="alert alert-success d-flex align-items-center mb-3" role="status">
                 <span class="badge bg-success me-2">&bull;</span>
                 <div>
-                    <strong><?php echo esc_html__('Server-side connected.', 'unipixel'); ?></strong>
+                    <strong><?php echo esc_html__('Server-side ready.', 'unipixel'); ?></strong>
                     <?php if ($ms_freshness_at) : ?>
                         <small class="d-block">
                             <?php echo esc_html(sprintf(
@@ -144,7 +144,7 @@ function unipixel_page_microsoft_setup()
                     </label>
                     <div class="col-sm-9">
                         <input type="text" id="pixel_id" name="pixel_id" class="form-control"
-                            value="<?php echo esc_attr($pixel_id); ?>" required>
+                            value="<?php echo esc_attr($pixel_id); ?>" autocomplete="off" required>
                     </div>
                 </div>
 
@@ -174,7 +174,7 @@ function unipixel_page_microsoft_setup()
                             <?php echo wp_kses(unipixel_get_help_icon('Microsoft_AccessToken'), $icon_allow); ?>
                         </label>
                         <div class="col-sm-9">
-                            <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>">
+                            <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>" autocomplete="new-password">
                             <small class="form-text text-muted"><?php echo esc_html__('Obtain your token from the Microsoft Advertising UI under "Use Conversions API", or contact your account manager.', 'unipixel'); ?></small>
                         </div>
                     </div>
@@ -223,7 +223,7 @@ function unipixel_page_microsoft_setup()
 
                         <div class="microsoft-wizard-step d-none" data-step="2">
                             <h6 class="mb-3"><?php echo esc_html__('Prerequisites', 'unipixel'); ?></h6>
-                            <p><?php echo esc_html__('You need: a Microsoft Advertising account with an active UET Tag, AND a CAPI Access Token. Microsoft CAPI is gated — most accounts don\'t get a CAPI token automatically. You may need to request access from your Microsoft Advertising account manager. If you only have a UET Tag (no CAPI token), you can still do client-side tracking with UniPixel; just skip this wizard and add only the UET Tag ID in the main form.', 'unipixel'); ?></p>
+                            <p><?php echo esc_html__('You need: a Microsoft Advertising account with an active UET Tag, AND a CAPI Access Token. Microsoft CAPI is gated. Most accounts don\'t get a CAPI token automatically. You may need to request access from your Microsoft Advertising account manager. If you only have a UET Tag (no CAPI token), you can still do client-side tracking with UniPixel; just skip this wizard and add only the UET Tag ID in the main form.', 'unipixel'); ?></p>
                             <p class="mt-3 mb-0"><small><a href="#" class="microsoft-wizard-looks-different"><?php echo esc_html__('Looks different in your dashboard? Tell us.', 'unipixel'); ?></a></small></p>
                         </div>
 

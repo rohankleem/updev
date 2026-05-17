@@ -21,6 +21,14 @@ function unipixel_handle_google_test_connection()
 {
     check_ajax_referer('unipixel_ajax_nonce', 'nonce');
 
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(array(
+            'state'   => 'forbidden',
+            'message' => __('You do not have permission to run this action.', 'unipixel'),
+        ), 403);
+        return;
+    }
+
     $measurement_id = isset($_POST['pixel_id']) ? sanitize_text_field(wp_unslash($_POST['pixel_id'])) : '';
     $api_secret     = isset($_POST['access_token']) ? sanitize_text_field(wp_unslash($_POST['access_token'])) : '';
 

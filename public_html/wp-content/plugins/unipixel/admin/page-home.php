@@ -91,7 +91,7 @@ function unipixel_home_page()
                                     ? sprintf(__('Last verified %s ago', 'unipixel'), human_time_diff($meta_when, time()))
                                     : '';
                             ?>
-                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($meta_title); ?>"><?php echo esc_html__('Server-side connected', 'unipixel'); ?></span>
+                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($meta_title); ?>"><?php echo esc_html__('Server-side ready', 'unipixel'); ?></span>
                             <?php elseif ($meta_state['state'] === 'pasted_unverified') : ?>
                                 <span class="badge bg-warning text-dark mb-2"><?php echo esc_html__('Server-side unverified', 'unipixel'); ?></span>
                             <?php endif; ?>
@@ -126,7 +126,7 @@ function unipixel_home_page()
                                     ? sprintf(__('Last verified %s ago', 'unipixel'), human_time_diff($tiktok_when, time()))
                                     : '';
                             ?>
-                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($tiktok_title); ?>"><?php echo esc_html__('Server-side connected', 'unipixel'); ?></span>
+                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($tiktok_title); ?>"><?php echo esc_html__('Server-side ready', 'unipixel'); ?></span>
                             <?php elseif ($tiktok_state['state'] === 'pasted_unverified') : ?>
                                 <span class="badge bg-warning text-dark mb-2"><?php echo esc_html__('Server-side unverified', 'unipixel'); ?></span>
                             <?php endif; ?>
@@ -161,7 +161,7 @@ function unipixel_home_page()
                                     ? sprintf(__('Last verified %s ago', 'unipixel'), human_time_diff($google_when, time()))
                                     : '';
                             ?>
-                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($google_title); ?>"><?php echo esc_html__('Server-side connected', 'unipixel'); ?></span>
+                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($google_title); ?>"><?php echo esc_html__('Server-side ready', 'unipixel'); ?></span>
                             <?php elseif ($google_state['state'] === 'pasted_unverified') : ?>
                                 <span class="badge bg-warning text-dark mb-2"><?php echo esc_html__('Server-side unverified', 'unipixel'); ?></span>
                             <?php endif; ?>
@@ -196,7 +196,7 @@ function unipixel_home_page()
                                     ? sprintf(__('Last verified %s ago', 'unipixel'), human_time_diff($pinterest_when, time()))
                                     : '';
                             ?>
-                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($pinterest_title); ?>"><?php echo esc_html__('Server-side connected', 'unipixel'); ?></span>
+                                <span class="badge bg-success mb-2" title="<?php echo esc_attr($pinterest_title); ?>"><?php echo esc_html__('Server-side ready', 'unipixel'); ?></span>
                             <?php elseif ($pinterest_state['state'] === 'pasted_unverified') : ?>
                                 <span class="badge bg-warning text-dark mb-2"><?php echo esc_html__('Server-side unverified', 'unipixel'); ?></span>
                             <?php endif; ?>

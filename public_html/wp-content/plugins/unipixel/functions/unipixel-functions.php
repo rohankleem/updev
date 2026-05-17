@@ -41,16 +41,75 @@ function unipixel_get_platform_settings($platform_id)
 }
 
 /**
+ * Lightweight format check on the saved credentials for a platform. Mirrors the
+ * format-only checks the Test Connection handlers run before they call the
+ * platform API. Used by the connection-state helper to invalidate a stale Test
+ * Connection timestamp if the saved credentials would no longer pass today's
+ * format rules (e.g. user swapped to invalid creds without re-testing, or the
+ * validation tightened in a later release).
+ *
+ * Returns true if credentials look format-valid (or if we have no opinion on
+ * this platform). Never makes an API call.
+ *
+ * @param int           $platform_id 1=Meta, 2=Pinterest, 3=TikTok, 4=Google, 5=Microsoft
+ * @param object|null   $settings    Row from unipixel_get_platform_settings(), or null
+ * @return bool
+ */
+function unipixel_credentials_pass_format_check($platform_id, $settings)
+{
+    if (!is_object($settings)) return true;
+
+    $pixel_id     = isset($settings->pixel_id) ? (string) $settings->pixel_id : '';
+    $access_token = isset($settings->access_token) ? (string) $settings->access_token : '';
+    $extra_id     = isset($settings->additional_id) ? (string) $settings->additional_id : '';
+
+    switch ((int) $platform_id) {
+        case 1: // Meta
+            if (!preg_match('/^\d{14,17}$/', $pixel_id)) return false;
+            if (strpos($access_token, 'EAA') !== 0)      return false;
+            if (strlen($access_token) < 100)              return false;
+            return true;
+
+        case 4: // Google
+            if (!preg_match('/^G-[A-Z0-9]+$/', $pixel_id))               return false;
+            if (!preg_match('/^[A-Za-z0-9_\-]{15,40}$/', $access_token)) return false;
+            return true;
+
+        case 3: // TikTok
+            if (!preg_match('/^[A-Z0-9]{18,30}$/', $pixel_id))         return false;
+            if (!preg_match('/^[A-Za-z0-9]{30,80}$/', $access_token))  return false;
+            return true;
+
+        case 2: // Pinterest (needs three: Tag ID + Ad Account ID + Token)
+            if (!preg_match('/^\d{10,20}$/', $pixel_id))                                return false;
+            if (!preg_match('/^\d{8,20}$/', $extra_id))                                 return false;
+            if (!preg_match('/^(pina_)?[A-Za-z0-9_\-]{30,200}$/', $access_token))       return false;
+            return true;
+
+        case 5: // Microsoft
+            if (!preg_match('/^\d{6,12}$/', $pixel_id))                       return false;
+            if (!preg_match('/^[A-Za-z0-9_\-\.]{30,500}$/', $access_token))   return false;
+            return true;
+
+        default:
+            return true; // unknown platform: no opinion, trust the timestamp
+    }
+}
+
+/**
  * Returns the connection state for a platform, used by the setup-page status
  * strip and the home dashboard badge.
  *
  * State machine (3 states, per the token-acquisition-ux project doc):
  *   - 'not_started':       no Pixel ID or no access token saved
  *   - 'pasted_unverified': credentials saved but no recent Test Connection pass
- *                          and no successful server event in the last 24h
- *   - 'connected':         credentials saved AND either a recorded successful
- *                          Test Connection click OR a successful server event
- *                          in the last 24h
+ *                          and no successful server event in the last 24h, OR
+ *                          the saved credentials would fail today's format check
+ *                          (in which case any stored Test Connection timestamp
+ *                          is treated as stale and ignored)
+ *   - 'connected':         credentials saved AND format-valid AND either a recorded
+ *                          successful Test Connection click OR a successful server
+ *                          event in the last 24h
  *
  * @param int $platform_id 1=Meta, 2=Pinterest, 3=TikTok, 4=Google, 5=Microsoft
  * @return array { state: string, last_test_at: int|null, last_event_at: int|null }
@@ -71,10 +130,16 @@ function unipixel_get_platform_connection_state($platform_id)
         );
     }
 
-    // Stored Test Connection timestamp (written by the Test Connection AJAX handler on success)
-    $timestamps    = get_option('unipixel_test_connection_timestamps', array());
-    $last_test_at  = (is_array($timestamps) && isset($timestamps[$platform_id]))
+    // Stored Test Connection timestamp (written by the Test Connection AJAX handler on success).
+    // Ignore the timestamp if the saved credentials would fail today's format check: it's stale,
+    // either because the user swapped to invalid creds or because validation tightened since the
+    // pass was recorded. Real server events in the last 24h are stronger evidence and still count.
+    $timestamps   = get_option('unipixel_test_connection_timestamps', array());
+    $raw_test_at  = (is_array($timestamps) && isset($timestamps[$platform_id]))
         ? (int) $timestamps[$platform_id]
+        : null;
+    $last_test_at = ($raw_test_at && unipixel_credentials_pass_format_check($platform_id, $settings))
+        ? $raw_test_at
         : null;
 
     // Most recent successful server event in the last 24 hours
