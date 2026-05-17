@@ -68,8 +68,14 @@ function unipixel_page_microsoft_setup()
         <div id="platform-settings-feedback-message" class="alert" role="alert" style="display:none;"></div>
 
         <!-- Platform (Tag/Connection) form -->
-        <form id="platform-settings-form" class="form-horizontal">
+        <form id="platform-settings-form" class="form-horizontal" autocomplete="off">
             <input type="hidden" id="platform_id" name="platform_id" value="<?php echo esc_attr((string)$platform_id); ?>">
+
+            <?php /* Anti-autofill honeypot: see page-meta-setup.php for rationale. */ ?>
+            <div class="unipixel-autofill-honeypot" aria-hidden="true" style="position:absolute;height:0;width:0;overflow:hidden;opacity:0;">
+                <input type="text" name="__autofill_decoy_user" autocomplete="username" tabindex="-1">
+                <input type="password" name="__autofill_decoy_pass" autocomplete="new-password" tabindex="-1">
+            </div>
 
             <!-- Enabled toggle -->
             <div class="mb-3 row">

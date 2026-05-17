@@ -64,8 +64,14 @@ function unipixel_page_meta_setup() {
 
 
         <!-- Platform (Tag/Connection) form -->
-        <form id="platform-settings-form" class="form-horizontal">
+        <form id="platform-settings-form" class="form-horizontal" autocomplete="off">
             <input type="hidden" id="platform_id" name="platform_id" value="<?php echo esc_attr((string) $platform_id); ?>">
+
+            <?php /* Anti-autofill honeypot: browsers ignore autocomplete="off" on text inputs that look username-shaped (e.g. when a password field appears later in the form). These hidden decoys catch the browser's autofill before it reaches the real credential inputs below. */ ?>
+            <div class="unipixel-autofill-honeypot" aria-hidden="true" style="position:absolute;height:0;width:0;overflow:hidden;opacity:0;">
+                <input type="text" name="__autofill_decoy_user" autocomplete="username" tabindex="-1">
+                <input type="password" name="__autofill_decoy_pass" autocomplete="new-password" tabindex="-1">
+            </div>
 
             <div class="mb-3 row">
                 <div class="col-12 col-sm-3">
