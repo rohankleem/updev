@@ -226,7 +226,7 @@ function unipixel_page_meta_setup() {
                                 <?php echo wp_kses(unipixel_get_help_icon('Meta_AccessToken'), $icon_allow); ?>
                             </label>
                             <div class="col-sm-9">
-                                <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>" autocomplete="new-password">
+                                <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>" autocomplete="new-password" readonly>
                             </div>
                         </div>
 

@@ -15,6 +15,20 @@
             // intent immediately so users don't have to reload after Update.
             $('#platform_enabled').on('change', this.updateClientSidePill.bind(this));
             $('#pixel_id').on('input change', this.updateClientSidePill.bind(this));
+
+            // Disarm the readonly attribute on credential password inputs the
+            // moment the user actually interacts with them. The readonly is
+            // applied server-side to stop Chrome's browser autofill from
+            // injecting the user's saved WP login password (or any other
+            // saved password) into Access Token / API Secret / Conversion
+            // Access Token fields. autocomplete="new-password" and hidden
+            // honeypot fields aren't enough on Chrome for password-typed
+            // inputs; the readonly attribute is the only reliable signal
+            // that the field should be left alone at autofill scan time.
+            $(document).on('focus mousedown touchstart',
+                'input[type="password"][readonly]',
+                function () { this.removeAttribute('readonly'); }
+            );
         },
         updateClientSidePill: function () {
             var $pill = $('.unipixel-client-side-pill');

@@ -211,7 +211,7 @@ function unipixel_page_microsoft_setup()
                                 <?php echo wp_kses(unipixel_get_help_icon('Microsoft_AccessToken'), $icon_allow); ?>
                             </label>
                             <div class="col-sm-9">
-                                <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>" autocomplete="new-password">
+                                <input type="password" id="access_token" name="access_token" class="form-control" value="<?php echo esc_attr($access_token); ?>" autocomplete="new-password" readonly>
                                 <small class="form-text text-muted"><?php echo esc_html__('Obtain your token from the Microsoft Advertising UI under "Use Conversions API", or contact your account manager.', 'unipixel'); ?></small>
                             </div>
                         </div>
