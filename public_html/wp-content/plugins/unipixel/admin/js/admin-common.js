@@ -90,6 +90,9 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     const triggers = document.querySelectorAll('[data-bs-toggle="popover"]');
+    // Long enough for the cursor to travel from the icon, across the arrow gap,
+    // into the popover body so its links can be clicked and text selected.
+    const HIDE_DELAY = 250;
 
     triggers.forEach(el => {
       const pop = new bootstrap.Popover(el, {
@@ -100,23 +103,24 @@
       });
 
       let hideTimeout;
-
-      el.addEventListener('mouseenter', () => {
+      const cancelHide = () => clearTimeout(hideTimeout);
+      const scheduleHide = () => {
         clearTimeout(hideTimeout);
-        pop.show();
+        hideTimeout = setTimeout(() => pop.hide(), HIDE_DELAY);
+      };
 
-        const popEl = bootstrap.Popover.getInstance(el)._popover || document.querySelector('.popover');
-        if (popEl) {
-          popEl.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
-          popEl.addEventListener('mouseleave', () => {
-            hideTimeout = setTimeout(() => pop.hide(), 50);
-          });
-        }
+      // Once the tip is actually in the DOM, keep it open while the cursor is
+      // over it. cancelHide/scheduleHide are stable refs, so re-binding on each
+      // show is a no-op (the browser dedupes identical listeners).
+      el.addEventListener('shown.bs.popover', () => {
+        const tip = pop.tip || pop._popover || document.querySelector('.popover.UniPixelPopover');
+        if (!tip) return;
+        tip.addEventListener('mouseenter', cancelHide);
+        tip.addEventListener('mouseleave', scheduleHide);
       });
 
-      el.addEventListener('mouseleave', () => {
-        hideTimeout = setTimeout(() => pop.hide(), 50);
-      });
+      el.addEventListener('mouseenter', () => { cancelHide(); pop.show(); });
+      el.addEventListener('mouseleave', scheduleHide);
     });
   });
 

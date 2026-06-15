@@ -58,7 +58,8 @@ function unipixel_update_schema()
             party VARCHAR(10),
             event_order VARCHAR(20),
             log_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            PRIMARY KEY (id)
+            PRIMARY KEY (id),
+            KEY log_time (log_time)
         );",
 
         // Log count (gauge)
@@ -762,6 +763,13 @@ function unipixel_patch_event_log_columns()
         if (!$exists) {
             $wpdb->query($wpdb->prepare($ddl, $log_table));
         }
+    }
+
+    // log_time index — the prune query orders by log_time (oldest first); without it a large
+    // log full-sorts on every prune, slowing front-end requests. Add once on existing installs.
+    $log_time_index = $wpdb->get_var($wpdb->prepare("SHOW INDEX FROM %i WHERE Key_name = %s", $log_table, 'log_time'));
+    if (!$log_time_index) {
+        $wpdb->query($wpdb->prepare("ALTER TABLE %i ADD INDEX log_time (log_time)", $log_table));
     }
 
     if ($wpdb->last_error) {

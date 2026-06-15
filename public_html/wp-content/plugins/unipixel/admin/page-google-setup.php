@@ -201,12 +201,13 @@ function unipixel_page_google_setup() {
                         <div class="alert alert-success d-flex align-items-center mb-3" role="status">
                             <span class="badge bg-success me-2">&bull;</span>
                             <div>
-                                <strong><?php echo esc_html__('Server-side ready.', 'unipixel'); ?></strong>
+                                <strong><?php echo esc_html__('Format checks passed.', 'unipixel'); ?></strong>
+                                <small class="d-block"><?php echo esc_html__('Confirm delivery in GA4 DebugView. Google does not let us verify the API Secret value directly.', 'unipixel'); ?></small>
                                 <?php if ($g_freshness_at) : ?>
                                     <small class="d-block">
                                         <?php echo esc_html(sprintf(
                                             /* translators: %s is a human time diff, e.g. "5 minutes" */
-                                            __('Verified %s ago.', 'unipixel'),
+                                            __('Last tested %s ago.', 'unipixel'),
                                             human_time_diff($g_freshness_at, time())
                                         )); ?>
                                     </small>

@@ -111,9 +111,9 @@ class UniPixelLog
         );
         $wpdb->query($query);
 
-        // Auto-prune logs if needed
-        $logTriggerDeleteQty = 50000;
-        $logMinKeepQty = 40000;
+        // Auto-prune logs if needed. Trigger at 20k, delete the oldest 10k,
+        // leaving a ~10k floor (floor = trigger - delete quantity).
+        $logTriggerDeleteQty = 20000;
         $logToDeleteQty = 10000;
 
         $query = $wpdb->prepare(
@@ -124,12 +124,12 @@ class UniPixelLog
         $current_count = $wpdb->get_var($query);
 
         if ($current_count >= $logTriggerDeleteQty) {
-            $this->cleanup_logs($logMinKeepQty, $logToDeleteQty);
+            $this->cleanup_logs($logToDeleteQty);
         }
     }
 
 
-    private function cleanup_logs($logMinKeepQty, $logToDeleteQty)
+    private function cleanup_logs($logToDeleteQty)
     {
         global $wpdb;
 
@@ -150,7 +150,7 @@ class UniPixelLog
             $query = $wpdb->prepare(
                 "DELETE FROM %i WHERE id IN ($placeholders)",
                 $this->log_table,
-                $logs_to_delete
+                ...$logs_to_delete
             );
             // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
             $wpdb->query($query);
@@ -162,9 +162,9 @@ class UniPixelLog
                 $this->log_table
             );
             // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-            $remaining_logs = $wpdb->get_var($query);
-            $new_count = $remaining_logs > $logMinKeepQty ? $remaining_logs - $logMinKeepQty : 0;
-
+            $remaining_logs = (int) $wpdb->get_var($query);
+            // Gauge must mirror the true row count so the next prune triggers correctly.
+            $new_count = $remaining_logs;
 
             $query = $wpdb->prepare(
                 // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared

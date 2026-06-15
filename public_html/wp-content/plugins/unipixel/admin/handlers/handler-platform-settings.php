@@ -30,7 +30,11 @@ function unipixel_handle_platform_update() {
     $pixel_id = sanitize_text_field(wp_unslash($_POST['pixel_id']));
     $access_token = sanitize_text_field(wp_unslash($_POST['access_token']));
     $platform_enabled = intval($_POST['platform_enabled']);
-    $pageview_send_serverside = intval($_POST['pageview_send_serverside']);
+    // This setup form does not manage the server-side PageView toggle (it lives on
+    // the events page). Default to null so a missing key neither throws an
+    // "Undefined array key" warning (which corrupted the AJAX JSON response) nor
+    // clobbers the events-page setting to 0 on every save.
+    $pageview_send_serverside = isset($_POST['pageview_send_serverside']) ? intval($_POST['pageview_send_serverside']) : null;
     $pageview_send_clientside = isset($_POST['pageview_send_clientside']) ? intval($_POST['pageview_send_clientside']) : 1;
     $serverside_global_enabled = isset($_POST['serverside_global_enabled']) ? intval($_POST['serverside_global_enabled']) : 0;
 
@@ -66,12 +70,17 @@ function unipixel_handle_platform_update() {
         'pixel_id' => $pixel_id,
         'access_token' => $access_token,
         'platform_enabled' => $platform_enabled,
-        'pageview_send_serverside' => $pageview_send_serverside,
         'pageview_send_clientside' => $pageview_send_clientside,
         'serverside_global_enabled' => $serverside_global_enabled,
     );
 
-    $format = array('%s','%s','%d','%d','%d','%d');
+    $format = array('%s','%s','%d','%d','%d');
+
+    // Only persist pageview_send_serverside when this form actually submitted it.
+    if ($pageview_send_serverside !== null) {
+        $update_data['pageview_send_serverside'] = $pageview_send_serverside;
+        $format[] = '%d';
+    }
 
     if ($additional_id !== null) {
         $update_data['additional_id'] = $additional_id;
@@ -99,10 +108,9 @@ function unipixel_handle_platform_update() {
         $platformEnabledStr = "Enabled";
     }
 
-    $platformPageViewServerSide = "false";
-    if ($pageview_send_serverside){
-        $platformPageViewServerSide = "true";
-    }
+    $platformPageViewServerSide = ($pageview_send_serverside === null)
+        ? "unchanged"
+        : ($pageview_send_serverside ? "true" : "false");
     unipixel_metric_log(
         $action,
         $platformName,

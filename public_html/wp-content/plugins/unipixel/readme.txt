@@ -4,7 +4,7 @@ Tags: meta conversion api, pinterest conversions api, server-side tracking, tikt
 Requires at least: 5.0
 Tested up to: 6.9.4
 Requires PHP: 7.0
-Stable tag: 2.6.7
+Stable tag: 2.6.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -156,6 +156,13 @@ For more details on privacy policies and terms of use, please visit the followin
 
 == Changelog ==
 
+= 2.6.9 =
+* New: Guided setup wizards for every platform (Meta, Google, TikTok, Pinterest, Microsoft), each with a "Test Connection" button that checks your credentials and tells you in plain English whether you are connected.
+* Improvement: Setup pages now separate client-side and server-side tracking into clear sections. Client-side gets you tracking with just a Pixel ID; server-side is presented as the recommended next step rather than a requirement.
+* Fix: Improved performance on sites where the Stored Event Logs had grown very large.
+* Fix: Resolved an "Ajax request failed" error that could appear when saving platform settings on hosting that displays PHP warnings.
+* Fix: Saving a platform's setup page no longer switches off that platform's server-side PageView setting.
+
 = 2.6.7 =
 * Renamed "Custom events" to "Site events" across the admin for clearer wording.
 * Added help icons in the Event Manager.
@@ -248,112 +255,6 @@ For more details on privacy policies and terms of use, please visit the followin
 * New: Better options and control over storing/logging of all the vents that are fired, with more information too.
 * New: Google PageView events now supports client-side and new server-side sending options.
 
-= 1.15.1 =
-* Fix: some events were not sending due to bug in Consent settings
-
-= 1.15.0 =
-* New feature: Honouring of Cookie Consent choices from supported systems: OneTrust, Cookiebot, or Osano. Turning this On means that UniPixel event tracking only takes place if the user has given consent in the relevant categories (e.g. Marketing or Performance). Optional setting.
-* Improvement: ViewContent / view_item now filters out bots and crawlers to provide more accurate visitor data (server-side events were greater in qty than client side events)
-* Fix: View Content for Google fixed to be correct event terminology, "view_item".
-
-= 1.14.1 =
-* Fix for "Enable Platform" setting not being honoured properly on some occasions when sending events.
-
-= 1.14.0 =
-* New feature to send 'ViewContent' / 'view_content' events for WooCommerce when products are viewed, providing additional information to Meta and Google. This helps populate reports in Google Analytics and Meta for better insights to things like "Purchase Journey", and adds to Sales Funnel insights.
-* New feature to Turn-on or Turn-off platform Response Logging for WooCommerce server-side events (the response from Google or Meta). Provides option to improve performance if desired vs documenting the response from Google and Meta. Server-side Response Logging is turned-off by default for ViewContent events (to assist with performance for common occuring content views).
-* Performance improvement: If Response Logging is turned off for Server-side events, this is now coupled with another update that allows remote post to the platform to be non-blocking, meaning that it doesn't hold up other WordPress processes and maintains seamless performance.
-
-= 1.13.1 =
-* Improved Meta Commerce tracking: Events like Purchase and AddToCart are now matched to your product catalog in Meta's Commerce Manager, enabling more accurate attribution and shop insights.
-
-= 1.13.0 =
-* Meta/Facebook tracking: Now with New Option to send PageView as Server-side
-* Meta/Facebook tracking: Added "event_source_url" (Page URL) now sent for better event info
-* Meta/Facebook tracking: Fix - removed currency info for non-applicable events
-
-= 1.12.2 =
-* Code improvements to handle Meta Disabled, Google Disabled, prevent unnecessary processes going on if Disabled.
-
-= 1.12.1 =
-* Google tracking quality update
-
-= 1.12.0 =
-* New improvements to Google tracking, now with better gclid handling for Google Ads conversion tracking (campaign conversion tracking). Fixed a problem with Google's tracking script (gtag) not loading properly in some scenarios. Improved debugging and testing features including new separate options for client-side and server-side debugging for Google DebugView.
-
-= 1.11.1 =
-* Added product name to Add To Cart and Checkout triggers for Google Analytics
-
-= 1.11.0 =
-* Bug fixes and event quality improvements for Google Analytics data sending. Some google events not being recognised because of missing "event_id". Introduction of "Enable Google DebugView" option in General Settings to support event feedback and testing in Google Analytics.
-
-= 1.10.7 =
-* Event quality updates and deduplication improvements, including more data sent for purchases.
-
-= 1.10.6 =
-* Initiate Checkout regularity updated
-
-= 1.10.4 =
-* Meta fbc matching improvement
-
-= 1.10.3 =
-* Update to timestamp being sent to Meta in fbc, using milliseconds now, to reduce Meta notification saying that timestamp in the future in some cases. This improves event matching quality in Meta.
-
-= 1.10.1 =
-* Fix for client_id not being sent in some cases for Google server-side sending, meaning that some woocommerce events were not being registered on Google.
-
-= 1.10.0 =
-* Improvements to Meta data-sending to address Meta's 'fbc' feedback warning, caused by differences in event_time being reported.
-* Fixed currency value not being sent, fixed Cart Totals for Add To Cart events
-* Changes to 'Session' handling (moved to using 'Transients', safer for WordPress).
-* New feature in Admin to provide feedback, request features or report issues.
-* New feature for Admin settings to turn on/off Logging tracking events in the Browser Console, to assist with debugging and setup.
-
-= 1.9.3 =
-* Fix for incorrect format of "fbc" value being sent in some instances to Meta.
-
-= 1.9.2 =
-* Fix for better consistency when sending 'fbc' to Meta, which helps with deduplication and increases conversion reporting
-
-= 1.9.1 =
-* Fix for Add to Cart event tracking for category "Add to Cart" buttons that use ajax
-
-= 1.9.0 =
-* IMPORTANT FIXES: Several fixes to address introduced bugs in 1.8.*, including re-factoring of WooCommerce server-side and client-side event sending. Addresses several issues identified in different WooCommerce versions where Add To Cart, Initiate Checkout and Purchases were not sending properly in some circumstances.
-
-= 1.8.5 =
-* Bug fix for Meta client side sending to improve event data consistency
-
-= 1.8.4 =
-* Bug fix causing error on non-woocommerce websites
-
-= 1.8.2 =
-* Updates to help text
-
-= 1.8.1 =
-* Bug fix for admin event updates creating duplicates in some scenarios
-
-= 1.8.0 =
-* New UX and easier setup for WooCommerce server side events, including improved event sending reliability.
-
-= 1.7.1 =
-* New diagnostics for better plugin performance and debugging.
-
-= 1.7.0 =
-* Admin UI improvements and additions, improved help text support and performance updates.
-
-= 1.6.0 =
-* Security and compatibility improvements. Upgrade for enhanced data handling and overall stability.
-
-= 1.5.0 =
-* Compatibility improvements. Upgrade for enhanced data handling and overall stability.
-
-= 1.2.0 =
-* Added Google Server side API integration.
-
-= 1.1.1 =
-* Initial release with Meta (Facebook) Conversion API integration.
-
 == Upgrade Notice ==
 
 = 2.6.0 =
@@ -376,18 +277,6 @@ Recommended update — three new consent managers supported (Complianz, CookieYe
 
 = 2.4.0 =
 Recommended update — richer product data for better ad reporting, TikTok deduplication fix, and corrected AddToCart values.
-
-= 1.7.0 =
-* Includes admin UI improvements, improved help text support and performance updates.
-
-= 1.6.0 =
-* Security and compatibility improvements.
-
-= 1.5.0 =
-* Significant security and compatibility improvements. Upgrade for enhanced data handling and overall stability.
-
-= 1.1.1 =
-* Initial release.
 
 == Screenshots ==
 
