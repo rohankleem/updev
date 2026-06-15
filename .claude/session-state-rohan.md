@@ -6,61 +6,31 @@
 
 ## Where We Came From
 
-- Token-Acquisition UX initiative (Phases 1–8) shipped 2026-05-12 to 2026-05-13. Project doc marked Complete. All Test Connection / status strip / wizard / 14-day grace / plain-English label / help-icon work done across Meta, Google, TikTok, Pinterest, Microsoft. Committed as `739c49d`.
-- Verified end-to-end in browser on updev.local.site this session: all 7 surfaces (Home dashboard, Meta/Google/TikTok/Pinterest/Microsoft setup pages, Stored Event Logs) render correctly, Meta Test Connection live-passed against real token.
-- Release for v2.7.0 still staged but not cut.
-
----
+- **Microsoft event-name mismatch** investigation parked. Preferred fix is Option C (make `event_platform_ref` editable per row in the WooCommerce events table). Full writeup: `projects/microsoft-event-name-mismatch.md`. Did **not** ride in 2.6.9.
+- The token-acquisition UX initiative (wizards / Test Connection / status strips / home badges / plain-English log labels / client-server split / autofill hardening) was staged on `main` since 2.6.7, plus the 2.6.8 `log_time` index hotfix forward-port.
 
 ## What We Worked On
 
-### Microsoft event-name mismatch — diagnostic + parked
+### 2.6.9 release-readiness pass, fixes, build + stage (2026-06-15)
 
-The Token-Acquisition browser verification turned into a real-world investigation of Rohan's own live site (steelchief.com.au), where Microsoft Ads is recording two custom Site Event goals (`ClickOpenConfigurator`, `ConfiguratorShownPrice`) but failing to record three others (`Purchase 2`, `Lead`, `ConfiguratorSubmittedYes`) despite the underlying events firing in UniPixel's Stored Event Logs.
+Ran a full browser + DB test pass on updev (and a real-upgrade smoke test on uphq) over the staged batch, fixed three bugs, then bumped + obfuscated + staged 2.6.9. **Source committed & pushed: `origin/main` `3e4c838 "2.6.9 release"`.**
 
-**Diagnosis (high confidence):** Microsoft Ads conversion goal matching is case-sensitive on the rule's `EventAction` string. The `Purchase 2` goal's rule is literally `EventAction = "Purchase" (EqualsTo)` — confirmed via Microsoft's own Copilot. UniPixel sends `purchase` lowercase. Case mismatch = zero matches. Same pattern applies to the Lead goal. The two Configurator goals work because their values are user-typed Bespoke fields matching the goal name's capitalisation.
+**Fixes shipped in 2.6.9 (all in 3e4c838):**
+- **Log prune was completely inert** — `cleanup_logs()` (`classes/class-unipixel-log.php`) passed the ID array as one `wpdb::prepare()` arg, so the DELETE collapsed to an empty query and the event log grew unbounded. Fixed with `...$ids` spread; gauge now set to true `COUNT(*)`; thresholds retuned to 20k trigger / 10k delete.
+- **`unipixel_meta` "Ajax request failed" / JSON.parse** (user-reported) — `handler-platform-settings.php` read `$_POST['pageview_send_serverside']` unguarded (the JS never sends it); on hosts with display_errors on, the warning corrupted the AJAX JSON. Guarded.
+- **Silent PageView clobber** — same missing field meant every setup-page save rewrote `pageview_send_serverside` to 0, undoing the events-page toggle. Now only written when posted.
+- **Google badge honesty** — `page-google-setup.php`: "Server-side ready" → "Format checks passed" + GA4 DebugView note (MP can't verify the API secret).
+- **Help-icon popover hover-bridge** — `admin/js/admin-common.js`: popovers hid before the cursor reached their links. 50ms → 250ms hide delay + keep-open handlers bound via `shown.bs.popover`.
 
-**Underlying root cause:** Microsoft has no canonical UET event-name standard. Their docs are inconsistent — `purchase` lowercase in some examples, `PRODUCT_PURCHASE` uppercase in others, `AutoEvent_purchase` mixed, plus a broken 404 on their own "How to track custom events" help link. Microsoft's own support specialist refused to publicly answer the "what name should I send?" question on their Q&A site. The "convention" depends on which Microsoft tool created the goal — most users go through the Goal Category dropdown which auto-fills PascalCase rules.
+**Verified:** upgrade auto-runs on `plugins_loaded` version change, idempotent + lossless (forced 2.6.0→ test, and real 2.6.0→2.6.9 on uphq); prune deletes + gauge mirrors (seeded 20k+); Meta Test Connection live-passed; client-only path fires token-free with non-alarming UI; `platform_enabled` gates client + server firing; all 5 wizards accurate with current deep links. Full obfuscation sweep passed (php -l filename+stdin, node --check on all JS, coverage/parity/zero-byte). Obfuscated 2.6.9 installed + clicked through on uphq — all admin surfaces render clean.
 
-**Tried and reverted:** Option A — hardcode PascalCase Microsoft event names in UniPixel (10 files edited, DB migration written, PHP lint clean). Reverted because Option C (make `event_platform_ref` user-editable per row in the WooCommerce events table, matching how Site Events already works) is a much better fit. Microsoft having no standard means no hardcoded value can be universally correct.
-
-Full writeup with all evidence, three solution options, sibling issues, and Option A implementation notes if we change our minds: `.claude/projects/microsoft-event-name-mismatch.md`.
-
-### Two sibling issues parked alongside
-
-Both surfaced during the same investigation, both unresolved, both documented in the project doc above:
-
-1. **Server-side Microsoft rows missing from Stored Event Logs** — likely cause is `serverside_global_enabled = 0` at the platform level on live (separate from per-event Send Server-side toggles). Code gates server firing on the platform flag.
-2. **Three misconfigured Site Event triggers** — `ConfiguratorSubmittedYes` URL pattern probably doesn't match the real post-submit URL; `lead/#thankyousuccess` element may not exist in DOM on lead success; `lead/#bookCallFormSubmitted` has a CSS-selector value in a URL-Match trigger.
-
----
+**Logged findings (none blocking):** the 2.6.8 `log_time` index is largely cosmetic for the prune (MySQL ignores it at `LIMIT 10000`; the working prune is the real fix — see app-knowledge); Meta Graph pinned v18.0; consent popup defaults to Spanish on the dev boxes; dev Pinterest token dead (401); per-event WC CAPI matrix untested (no store catalogue).
 
 ## Where We Need To Go
 
-### Pick the solution for the Microsoft event-name issue (next session)
+- **Ship 2.6.9:** (1) TortoiseSVN commit `tags/2.6.9/` (new) + `trunk/readme.txt` (modified); (2) **gate file #5** — bump `UPHQ_PLUGIN_VERSION` on uphq (`unipixelhq-seo` plugin) + deploy. Then verify on wordpress.org and watch reviews/forum for the JSON.parse reporter.
+- **Deferred:** pick the Microsoft event-name solution (Option C); test the per-event WC CAPI matrix once a product/order flow exists on a test store.
+- uphq local marketing dev site left on obfuscated 2.6.9 (2.6.0 backup at `%TEMP%\uphq_unipixel_backup_pre269` if revert wanted).
 
-Read `.claude/projects/microsoft-event-name-mismatch.md`. Decision needed:
-
-- **Option C** (preferred direction): make `event_platform_ref` editable per row in the WooCommerce events admin table. Mirrors Site Events. Requires adding a stable internal-key column to `wp_unipixel_woocomm_event_settings` (so DB lookups stay anchored while the wire-format value becomes user-controlled), updating hook handlers, updating `admin/page-microsoft-events.php`, plus migration to set sensible PascalCase defaults.
-- **Option B** (translation layer): keep DB lowercase, translate at send-time via a map. Simpler but still wrong for non-default Microsoft setups.
-- **Option A** (hardcode PascalCase): fastest, gets Rohan recording revenue on live faster but is one-size-fits-all in a domain without a fits-all answer. Implementation notes preserved in the project doc.
-
-### Followups regardless of which option
-
-- Fix the live site's two Microsoft Site Events rows: `lead` → `Lead` (manually, in UniPixel admin)
-- Verify and toggle `serverside_global_enabled = 1` for Microsoft on the live site to start getting server-side rows in logs
-- Fix the three broken Site Event triggers — needs live-site browser inspection of the configurator submission flow
-
-### Release backlog (unchanged)
-
-The Token-Acquisition UX initiative (Phases 1–8) is still staged for v2.7.0 release. The Microsoft event-name fix should ride along once a solution is picked. Standard release-gate process per CLAUDE.md § Release Gate + `app-knowledge/deploy-and-release.md`.
-
-### Marketing follow-ups (unchanged)
-
-- v2.7.0 announcement blog post when release ships (Token-Acquisition UX as headline, possibly plus a "we now record Microsoft Ads conversions correctly" note depending on what we ship for Microsoft).
-- Refresh Meta and Pinterest docs at unipixelhq.com/unipixel-docs/ — stale.
-- "How UniPixel tells you what's wrong" competitive piece on diagnostic feedback.
-
-### Memories saved this session
-
-None new. Existing memories continued to apply (no em dashes, no time estimates, ground strategy in user moments, drafts-are-done, don't project in design conversations).
+### Memories
+None new this session. Existing memories continued to apply (no em dashes, no time estimates, don't project in design conversations, ground strategy in user moments, drafts-are-done).

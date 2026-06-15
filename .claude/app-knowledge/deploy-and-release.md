@@ -163,6 +163,14 @@ Default behaviour:
    ```
    No FAIL output = good.
 2. **Exclusion check** — confirm `.claude/` and `CLAUDE.md` are NOT present in the export folder.
+3. **JS syntax on minified output** — `php -l` doesn't cover JS, and JShrink minification is a separate breakage vector. `node --check` every exported `.js` (skip 0-byte files):
+   ```bash
+   while IFS= read -r f; do [ -s "$f" ] || continue; node --check "$f" 2>&1 | grep -qi error && echo "JS FAIL: $f"; done < <(find "$EXPORT" -name '*.js')
+   ```
+4. **Obfuscation coverage + parity** — catch files left raw or silently dropped:
+   - File-count parity: source PHP/JS count == export PHP/JS count.
+   - Every non-excluded PHP carries `\xNN` encoded strings, and comment markers (`//File:`, `/**`) appear in **only** `unipixel.php` (the one raw file). Any other raw marker = a file the obfuscator skipped.
+   - No unexpected zero-byte files. (A fully-commented source file legitimately minifies to 0 bytes — e.g. `admin/js/popover-init.js` is all `//` comments — so confirm the source before dismissing.)
 
 ### Paste into SVN, then commit via TortoiseSVN
 
