@@ -162,6 +162,14 @@ function unipixel_page_general_settings()
 
 
 
+            <!-- Delete stored event logs -->
+            <div class="mt-3">
+                <button type="button" class="btn btn-sm btn-primary js-unipixel-clear-logs">
+                    <i class="fa-solid fa-trash-can"></i> <?php echo esc_html__('Delete Stored Event Logs', 'unipixel'); ?>
+                </button>
+                <div class="text-muted mt-1" style="font-size: 11px;"><?php echo esc_html__('If your stored logs have grown large, deleting them can help performance.', 'unipixel'); ?></div>
+            </div>
+
             <div class="browserConsoleSettings obsolete d-none">
 
 

@@ -125,6 +125,69 @@
   });
 
 
+  // ---- Clear Stored Event Logs ------------------------------------------
+  // Shared by the button on the Event Logs page (top-right) and the General
+  // Settings "Store Records" section. Both use the .js-unipixel-clear-logs class
+  // and the single confirm modal rendered in the footer (inc/clear-event-logs.php).
+  (function () {
+    var dismissLabel = null;
+    function msgBox() { return document.getElementById('unipixelClearLogsMsg'); }
+    function showMsg(text, kind) {
+      var box = msgBox();
+      if (!box) return;
+      box.className = 'alert mt-3 mb-0 alert-' + (kind === 'error' ? 'danger' : 'success');
+      box.textContent = text;
+    }
+    function resetModal() {
+      var box = msgBox();
+      if (box) { box.className = 'alert mt-3 mb-0 d-none'; box.textContent = ''; }
+      $('#unipixelClearLogsConfirm').removeClass('d-none').prop('disabled', false);
+      var $dismiss = $('#unipixelClearLogsDismiss');
+      if (dismissLabel === null) { dismissLabel = $dismiss.text(); }
+      $dismiss.text(dismissLabel);
+    }
+
+    $(document).on('click', '.js-unipixel-clear-logs', function (e) {
+      e.preventDefault();
+      resetModal();
+      var el = document.getElementById('unipixelClearLogsModal');
+      if (el && typeof bootstrap !== 'undefined') {
+        bootstrap.Modal.getOrCreateInstance(el).show();
+      }
+    });
+
+    $(document).on('click', '#unipixelClearLogsConfirm', function () {
+      var $btn = $(this);
+      $btn.prop('disabled', true);
+      $.ajax({
+        url: unipixel_ajax_obj.ajaxurl,
+        type: 'POST',
+        data: { action: 'unipixel_clear_event_logs', nonce: unipixel_ajax_obj.nonce },
+        success: function (resp) {
+          if (resp && resp.success) {
+            // Event Logs page: reload so the emptied table is the confirmation.
+            if (location.search.indexOf('page=unipixel_event_logs') !== -1) {
+              location.reload();
+              return;
+            }
+            // General Settings: confirm inline, no reload (keeps unsaved toggles).
+            showMsg((resp.data && resp.data.message) || 'Stored event logs deleted.', 'success');
+            $btn.addClass('d-none');
+            $('#unipixelClearLogsDismiss').text('Close');
+          } else {
+            showMsg((resp && resp.data && resp.data.message) || 'Could not delete the logs.', 'error');
+            $btn.prop('disabled', false);
+          }
+        },
+        error: function () {
+          showMsg('Could not delete the logs. Please try again.', 'error');
+          $btn.prop('disabled', false);
+        }
+      });
+    });
+  })();
+
+
 })(jQuery);
 
 

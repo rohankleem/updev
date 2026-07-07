@@ -125,7 +125,7 @@ function unipixel_page_event_logs()
         <p class="text-muted mb-4">
             These logs show all events that UniPixel has stored in your database after being sent to connected platforms like Meta and Google.
             Events are stored when database storage is enabled in your
-            <a href="<?php echo esc_url(menu_page_url('unipixel_general_settings', false)); ?>">General Settings</a>.
+            <a href="<?php echo esc_url(menu_page_url('unipixel_general_settings', false)); ?>">General Settings</a>, where you can also delete the stored logs.
         </p>
         <!-- Filters (server-side) -->
         <form method="get" action="<?php echo esc_url($action_url); ?>" class="mb-3">

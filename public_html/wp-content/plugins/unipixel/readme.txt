@@ -2,9 +2,9 @@
 Contributors: buildiodev
 Tags: meta conversion api, pinterest conversions api, server-side tracking, tiktok events api, woocommerce pixel
 Requires at least: 5.0
-Tested up to: 6.9.4
+Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 2.6.9
+Stable tag: 2.6.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -155,6 +155,9 @@ For more details on privacy policies and terms of use, please visit the followin
 
 
 == Changelog ==
+
+= 2.6.10 =
+* New: Delete all stored event logs from General Settings, to empty the log if it has grown large.
 
 = 2.6.9 =
 * New: Guided setup wizards for every platform (Meta, Google, TikTok, Pinterest, Microsoft), each with a "Test Connection" button that checks your credentials and tells you in plain English whether you are connected.
