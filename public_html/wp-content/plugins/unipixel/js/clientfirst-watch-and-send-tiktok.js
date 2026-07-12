@@ -1,7 +1,7 @@
 //File: public_html\wp-content\plugins\unipixel\js\clientfirst-watch-and-send-tiktok.js
 
-(function ($) {
-    $(document).ready(function () {
+(function () {
+    unipixelOnReady(function () {
 
         // --- Retrieve logging settings ---
         var enableLogging_SendEvents = false;
@@ -92,9 +92,8 @@
                     nonce: UniPixelEventDataTikTok.nonce
                 };
 
-                $.post(UniPixelEventDataTikTok.ajaxurl, ajaxPayload)
-                    .done(function (resp) {
-                        var jsn = (typeof resp === "string") ? JSON.parse(resp) : resp;
+                unipixelAjaxPost(UniPixelEventDataTikTok.ajaxurl, ajaxPayload)
+                    .then(function (jsn) {
 
                         if (!jsn.dataSent) {
                             log_Send('UniPixel | TikTok | Server-side event not sent:', jsn);
@@ -109,8 +108,8 @@
                             log_Send('UniPixel | TikTok | Server-side platform response disabled, not waiting for response');
                         }
                     })
-                    .fail(function (_, status, err) {
-                        log_Send('UniPixel | TikTok | Server-side event error:', status, err);
+                    .catch(function (err) {
+                        log_Send('UniPixel | TikTok | Server-side event error:', err);
                     });
                 }
             } else {
@@ -168,4 +167,4 @@
             });
         });
     });
-})(jQuery);
+})();

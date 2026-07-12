@@ -125,6 +125,20 @@ Meta applies its e-commerce data checklist to all standard event names (like "Le
 
 **IPv6 — LOW PRIORITY.** Depends on `unipixel_get_ip_address()` implementation. Minor.
 
+---
+
+### META-003: Events Manager CAPI tokens are dataset-scoped — can send events, nothing else (found 2026-07-12, fixed in 2.6.11)
+
+**Source:** Live false alarm on steelchief.com.au — Test Connection rejected a freshly generated, fully working token.
+
+**The token shape:** The token Events Manager generates today ("Generate access token" under Settings, Conversions API) is a SYSTEM_USER token from Meta's internal "Conversions API Application". `debug_token` reports `scopes: ["read_ads_dataset_quality"]` and a `granular_scopes` grant limited to that one dataset. It carries **no `ads_management`**, and it **cannot read the Pixel node** (`GET /{pixel_id}` returns `(#100) Missing Permission`). The only thing it can do is POST to `/{dataset_id}/events` — which it does perfectly (verified live: `events_received: 1`).
+
+**What this broke:** Test Connection (2.6.7–2.6.10) gated on the `ads_management` scope and then on a Pixel-node read. Both checks fail for this token shape, so the most common token Meta hands users was reported as broken, with advice ("regenerate in Events Manager") that produces another token of the same shape. Old-style Business Settings system-user tokens (full `ads_management` scope) passed — which is why our own dev-box tokens never tripped it.
+
+**The rule:** Never gate Meta credential validation on classic scope strings or Graph node reads. The only authoritative capability check is delivering a `test_event_code`-tagged event to `/{pixel_id}/events` and confirming `events_received`. Bonus diagnostic: `granular_scopes[].target_ids` names the dataset the token belongs to — if it doesn't contain the entered Pixel ID, the user pasted a token from a different Pixel (2.6.11 surfaces exactly that message).
+
+**Related:** test events with `test_event_code` appear only in Events Manager's Test events tab and never land in real data — safe to send from a diagnostic.
+
 ## Cross-Platform — AddToCart Event
 
 ### ATC-001: AJAX add-to-cart client pixel never fires — FIXED
@@ -273,3 +287,23 @@ _(No reports processed yet)_
 **Implication:** Our canonical bespoke example `MyBespokeEvent` is technically valid (starts with letter, only letters). It violates GA4's snake_case style convention but is accepted. No validation needed — but worth a soft inline note where space allows.
 
 **Cross-reference:** `event-terminology.md` § Platform-specific quirks.
+
+---
+
+## WordPress (host environment)
+
+### WP-001: Themes that deregister `jquery` silently kill the entire watcher chain — FIELD INCIDENT (steelchief.com.au, found 2026-07-12)
+
+**Source:** Live incident on steelchief.com.au — Meta Lead events at zero for ~a month while all other events kept flowing.
+
+**The failure mode:** `unipixel-common` declares `jquery` (the WP core handle) as a dependency (added as the "immediate fix" for backlog #26, on the assumption "WooCommerce sites always have jQuery"). WordPress **silently drops any enqueued script whose dependency handle is unregistered** — no PHP error, no console error, no admin notice. All five `clientfirst-watch-and-send-*` watchers and `unipixel-consent` depend on `unipixel-common`, so one missing `jquery` handle removes the entire element/URL event chain (client-side fbq AND the server-side AJAX relay) from the page. Base pixel (`pixel-meta.js`, dep-free) and PHP-side WooCommerce CAPI hooks are unaffected — so PageView/Purchase/etc keep arriving and the outage looks event-specific rather than systemic.
+
+**The steelchief specifics:** The theme runs `wp_deregister_script('jquery')` on every non-WooCommerce page (it ships its own jQuery under the handle `jquery-front`, loaded in the header — so plugin JS still *works at runtime*; only the dependency declaration breaks). Result: watchers alive on shop/product/cart/checkout pages, dead on the getprice/contact/landing pages — which are exactly and only where the two Lead rows (`#thankyousuccess`, `#bookCallFormSubmitted`) live. Lead died on both channels; ClickOpenConfigurator/ConfiguratorShownPrice survived via product-page configurator opens; AddPaymentInfo survived on checkout. Pre-2.6.6 plugin versions had no `jquery` dep (verified against the 2.6.1 snapshot in the website-sheds repo), which is why Lead historically worked on the same theme. Business leads were never lost (Zoho inserts continued ~15–30/day, verified in server logs) — only the ad-platform signal.
+
+**Why our testing missed it:** updev and uphq themes keep the WP `jquery` handle registered, so the drop never reproduces there.
+
+**Fix direction:** Backlog #26 proper fix (remove jQuery usage from front-end JS — it's only `$(document).ready()` and `$.post()` — then drop the dep). Interim options: depend on `jquery` only when `wp_script_is('jquery', 'registered')`, or a runtime `window.jQuery` check with no declared dep. Site-side workaround for affected themes: re-register the `jquery` handle as an alias of the theme's own copy instead of deregistering it.
+
+**Resolution:** Fixed in 2.6.11 (staged 2026-07-12) — front-end JS fully de-jQueryed (`unipixelOnReady` / `unipixelAjaxPost` helpers), `jquery` removed from `unipixel-common`'s dependency array. Verified on updev with WP jQuery deregistered to reproduce the steelchief condition: full chain enqueues and fires cleanly. steelchief.com.au heals when it updates to 2.6.11 — no site-side change needed.
+
+**Product hardening idea:** a diagnostics/Site Health check — "UniPixel front-end tracker did not load on this page (theme deregisters `jquery`)" — this failure is otherwise invisible on every surface (no console error, empty event log, config UI looks perfect).

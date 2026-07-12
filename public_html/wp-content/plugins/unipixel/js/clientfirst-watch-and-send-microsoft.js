@@ -1,6 +1,6 @@
 //File: public_html\wp-content\plugins\unipixel\js\clientfirst-watch-and-send-microsoft.js
 
-document.addEventListener('DOMContentLoaded', function () {
+unipixelOnReady(function () {
 
     // ===========================
     // Logging state initialization
@@ -108,12 +108,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     nonce: UniPixelEventDataMicrosoft.nonce
                 };
 
-                jQuery.post(UniPixelEventDataMicrosoft.ajaxurl, ajaxPayload)
-                    .done(function (resp) {
+                unipixelAjaxPost(UniPixelEventDataMicrosoft.ajaxurl, ajaxPayload)
+                    .then(function (resp) {
                         log_Send('UniPixel | Microsoft | Server-side response:', resp);
                     })
-                    .fail(function (_, status, err) {
-                        log_Send('UniPixel | Microsoft | Server-side AJAX error:', { status: status, error: err });
+                    .catch(function (err) {
+                        log_Send('UniPixel | Microsoft | Server-side AJAX error:', err);
                     });
             }
         } else {

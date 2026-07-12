@@ -7,6 +7,52 @@ if (typeof UniPixelOrderData === 'undefined') {
 }
 
 
+/**
+ * Run a callback once the DOM is ready. Unlike a bare DOMContentLoaded
+ * listener, this still fires when the script executes after the event
+ * (e.g. under defer/delay JS optimisers), matching jQuery.ready semantics.
+ */
+window.unipixelOnReady = function (fn) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', fn);
+    } else {
+        fn();
+    }
+};
+
+/**
+ * POST form-encoded data and resolve with the parsed JSON response.
+ * Encodes nested objects/arrays in PHP bracket notation exactly as
+ * jQuery.param() did, so admin-ajax handlers see an identical $_POST.
+ * Rejects on network failure or a non-JSON response body.
+ */
+window.unipixelAjaxPost = function (url, data) {
+    var body = new URLSearchParams();
+    (function build(prefix, value) {
+        if (value === null || value === undefined) {
+            body.append(prefix, '');
+        } else if (Array.isArray(value)) {
+            value.forEach(function (item, i) {
+                if (item !== null && typeof item === 'object') {
+                    build(prefix + '[' + i + ']', item);
+                } else {
+                    build(prefix + '[]', item);
+                }
+            });
+        } else if (typeof value === 'object') {
+            Object.keys(value).forEach(function (key) {
+                build(prefix === '' ? key : prefix + '[' + key + ']', value[key]);
+            });
+        } else {
+            body.append(prefix, value);
+        }
+    })('', data);
+
+    return fetch(url, { method: 'POST', credentials: 'same-origin', body: body })
+        .then(function (response) { return response.text(); })
+        .then(function (text) { return JSON.parse(text); });
+};
+
 window.UniPixelGetCookieValue = function (cookieName) {
     const name = cookieName + "=";
     const decodedCookie = decodeURIComponent(document.cookie);
@@ -44,17 +90,9 @@ function unipixelLogClientEvent(options) {
         event_order: options.event_order || 'clientFirst'
     };
 
-    return jQuery.post(UniPixelAjax.ajaxurl, payload)
-        .done(function(response) {
-            if (response.success) {
-                //console.log('UniPixel | Logger | Log sent successfully:', response);
-            } else {
-                //console.warn('UniPixel | Logger | Log failed:', response);
-            }
-        })
-        .fail(function(_, status, err) {
-            //console.error('UniPixel | Logger | Log error:', status, err);
-        });
+    // Fire-and-forget: a failed log write must never break tracking.
+    return unipixelAjaxPost(UniPixelAjax.ajaxurl, payload)
+        .catch(function () {});
 }
 
 // Mirrors unipixel_url_pattern_match in unipixel-functions.php — must stay identical.

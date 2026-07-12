@@ -1,7 +1,7 @@
 
 // File: public_html\wp-content\plugins\unipixel\js\clientfirst-watch-and-send-meta.js
 
-document.addEventListener('DOMContentLoaded', function () {
+unipixelOnReady(function () {
 
     //console.warn('Logger check at load:', typeof UniPixelConsoleLogger);
 
@@ -105,10 +105,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 nonce: UniPixelEventDataMeta.nonce
             };
 
-            jQuery.post(UniPixelEventDataMeta.ajaxurl, ajaxPayload)
+            unipixelAjaxPost(UniPixelEventDataMeta.ajaxurl, ajaxPayload)
 
-                .done(function (resp) {
-                    var jsn = (typeof resp === "string") ? JSON.parse(resp) : resp;
+                .then(function (jsn) {
 
                     if (!jsn.dataSent) {
                         log_Send('UniPixel | Meta | Server-side event not sent:', jsn);
@@ -123,8 +122,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         log_Send('UniPixel | Meta | Server-side platform response disabled, not waiting for response');
                     }
                 })
-                .fail(function (_, status, err) {
-                    log_Send('UniPixel | Meta | Server-side event error:', status, err);
+                .catch(function (err) {
+                    log_Send('UniPixel | Meta | Server-side event error:', err);
                 });
             }
         } else {

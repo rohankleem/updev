@@ -4,7 +4,7 @@ Tags: meta conversion api, pinterest conversions api, server-side tracking, tikt
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 7.0
-Stable tag: 2.6.10
+Stable tag: 2.6.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -155,6 +155,10 @@ For more details on privacy policies and terms of use, please visit the followin
 
 
 == Changelog ==
+
+= 2.6.11 =
+* Fix: Remove jQuery dependency, fixes some events not firing if jQuery not available.
+* Fix: Improvements to connection testing function (UX).
 
 = 2.6.10 =
 * New: Delete all stored event logs from General Settings, to empty the log if it has grown large.

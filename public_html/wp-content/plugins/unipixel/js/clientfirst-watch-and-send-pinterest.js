@@ -1,7 +1,7 @@
 
 // File: public_html\wp-content\plugins\unipixel\js\clientfirst-watch-and-send-pinterest.js
 
-document.addEventListener('DOMContentLoaded', function () {
+unipixelOnReady(function () {
 
     // Retrieve logging settings from the localized object, if available.
     var enableLogging_SendEvents = false;
@@ -107,10 +107,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 nonce: UniPixelEventDataPinterest.nonce
             };
 
-            jQuery.post(UniPixelEventDataPinterest.ajaxurl, ajaxPayload)
+            unipixelAjaxPost(UniPixelEventDataPinterest.ajaxurl, ajaxPayload)
 
-                .done(function (resp) {
-                    var jsn = (typeof resp === "string") ? JSON.parse(resp) : resp;
+                .then(function (jsn) {
 
                     if (!jsn.dataSent) {
                         log_Send('UniPixel | Pinterest | Server-side event not sent:', jsn);
@@ -125,8 +124,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         log_Send('UniPixel | Pinterest | Server-side platform response disabled, not waiting for response');
                     }
                 })
-                .fail(function (_, status, err) {
-                    log_Send('UniPixel | Pinterest | Server-side event error:', status, err);
+                .catch(function (err) {
+                    log_Send('UniPixel | Pinterest | Server-side event error:', err);
                 });
             }
         } else {

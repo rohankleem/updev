@@ -20,7 +20,7 @@ function unipixel_enqueue_common_data_script() {
     wp_enqueue_script(
         'unipixel-common',
         $script_url,
-        ['jquery', 'unipixel-console-logger'], // jquery needed by all platform tracker scripts; logger must load first
+        ['unipixel-console-logger'], // logger must load first. No jquery dep: WP silently drops a script whose dep is unregistered, and themes DO deregister the jquery handle (see platform-discoveries WP-001). Front-end JS is jQuery-free.
         UNIPIXEL_VERSION,
         true
     );

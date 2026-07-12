@@ -1,7 +1,7 @@
 // File: public_html\wp-content\plugins\unipixel\js\clientfirst-watch-and-send-google.js
 
-(function ($) {
-    $(document).ready(function () {
+(function () {
+    unipixelOnReady(function () {
 
 
         // Retrieve logging settings from the localized object, if available.
@@ -183,11 +183,9 @@
                     };
 
 
-                    $.post(UniPixelEventDataGoogle.ajaxurl, ajaxPayload)
+                    unipixelAjaxPost(UniPixelEventDataGoogle.ajaxurl, ajaxPayload)
 
-                        .done(function (resp) {
-
-                            var jsn = (typeof resp === "string") ? JSON.parse(resp) : resp;
+                        .then(function (jsn) {
 
                             if (!jsn.dataSent) {
                                 log_Send('UniPixel | Google | Server-side event not sent:', jsn);
@@ -203,8 +201,8 @@
                             }
 
                         })
-                        .fail(function (jqXHR, textStatus, errorThrown) {
-                            log_Send('UniPixel | Google | Server-side event error:', { textStatus, errorThrown, responseText: jqXHR.responseText });
+                        .catch(function (err) {
+                            log_Send('UniPixel | Google | Server-side event error:', err);
                         });
                 });
                 }
@@ -267,4 +265,4 @@
             });
         });
     });
-})(jQuery);
+})();
