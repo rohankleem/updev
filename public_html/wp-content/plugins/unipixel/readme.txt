@@ -4,7 +4,7 @@ Tags: meta conversion api, pinterest conversions api, server-side tracking, tikt
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.6.12
+Stable tag: 2.6.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -155,6 +155,12 @@ For more details on privacy policies and terms of use, please visit the followin
 
 
 == Changelog ==
+
+= 2.6.13 =
+* Fix: Reliability improvements to WooCommerce purchase tracking, including order confirmation pages.
+* Fix: Improved event matching for Pinterest and Google Analytics.
+* Fix: Consent handling for OneTrust users, and checkout tracking for Microsoft Advertising.
+* Stability improvements. Now requires PHP 8.0 or newer.
 
 = 2.6.12 =
 * General platform improvements and security updates.
