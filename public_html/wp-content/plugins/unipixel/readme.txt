@@ -2,7 +2,7 @@
 Contributors: buildiodev
 Tags: meta conversion api, pinterest conversions api, server-side tracking, tiktok events api, woocommerce pixel
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 8.0
 Stable tag: 2.6.13
 License: GPLv2 or later

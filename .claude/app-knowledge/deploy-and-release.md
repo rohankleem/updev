@@ -133,6 +133,7 @@ These exist because of real shipped-bug incidents. See `domain-knowledge/platfor
 2. **`php -l` on source** — lint every PHP file in the plugin folder. Must all be "No syntax errors."
 3. **Version check** — `UNIPIXEL_VERSION` in `unipixel.php` matches `Stable tag` in `readme.txt` matches the plugin header `Version:`.
 4. **Declared-minimum check** — the code must run on the `Requires PHP` / `Requires at least` declared in `readme.txt` (and the `unipixel.php` header, which must carry the same values). Lint every plugin `.php` file with a PHP binary of the declared minimum version (`php -l`), not the dev box's PHP 8.3. If no binary of that version is installed, add one to Laragon before releasing. Why: RQ-004, a PHP 8-only `match` shipped under `Requires PHP: 7.0` from 2.1.0 to 2.6.12 and crashed every PHP 7.x activation.
+5. **Tested up to check** — `Tested up to` in `readme.txt` must be the current WordPress major.minor: `curl -s https://api.wordpress.org/core/version-check/1.7/ | grep -oE '"current":"[^"]+"' | head -1`. If WordPress has moved on, run the test suite on the new version first, then bump. Why: 2.6.13 shipped with `Tested up to: 6.9` while WordPress was on 7.1.3, so every 7.x site saw "This plugin has not been tested with your current version of WordPress" in the plugin details, and "Untested with your version of WordPress" in plugin search. Between releases, this is a readme-only fix. Edit `readme.txt` in both SVN `trunk/` and `tags/<stable>/` and commit; no version bump needed.
 
 ### Run obfuscation
 
