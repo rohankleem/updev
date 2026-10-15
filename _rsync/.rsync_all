@@ -10,6 +10,7 @@
 - public_html/wp-content/autoptimize*
 - public_html/wp-content/uploads/
 - public_html/.well-known/
+- public_html/wp-content/imunify-security/
 - public_html/.htaccess
 - public_html/php.ini
 - public_html/***.log
@@ -17,6 +18,10 @@
 #+ public_html/wp-content/plugins/unipixelmetrics/***
 #+ public_html/wp-content/plugins/unipixelemailapi/***
 #- public_html/wp-content/plugins/**
+
+# Plugins: deploy only UniPixel. Other plugins on the server are excluded, so they are never overwritten or deleted.
++ public_html/wp-content/plugins/unipixel/***
+- public_html/wp-content/plugins/**
 
 + public_html/***
 + vendor/***

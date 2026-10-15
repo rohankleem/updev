@@ -21,17 +21,19 @@ Target: `buildiod@vda4300.is.cc:domains/dev.unipixelhq.com`. Server-side `.env` 
 
 ### How to run
 
-Run from Ubuntu/WSL for native rsync/ssh (Windows Git Bash has path-mangling and rsync quirks).
+Run from Git Bash: the scripts put cwRsync (installed via scoop) on the PATH themselves. The repo moved from XAMPP to Laragon.
 
 ```bash
-cd /mnt/c/xampp/htdocs/updev/_deploy
+cd /c/laragon/www/updev/_deploy
 bash deploy_all_TEST.sh        # dry-run — review what would change
 bash deploy_all_LIVE.sh        # real sync
 ```
 
+`--delete-after` removes anything under the included paths that exists on the server but not locally, so read the dry-run's `deleting` lines first. The marketing site (`C:\laragon\www\uphq\_deploy`) works the same way, targeting `domains/unipixelhq.com`; for a one-file change there, `scp` just that file.
+
 ### What ships to dev vs doesn't
 
-Currently pushes: `public_html/***` (everything), `vendor/***`, `composer.json/lock`. Excluded: `.git/`, `.env`, `_deploy/`, `_rsync/`, `_obf/`, `node_modules`, `wp-content/uploads/`, `wp-content/cache/`, log files, `.htaccess`, `php.ini`, `.well-known/`.
+Currently pushes: `public_html/***` (everything except plugins), `vendor/***`, `composer.json/lock`. **Plugins: only `wp-content/plugins/unipixel/`** (rule added 2026-10-15); every other plugin is excluded, so the dev server's own copies are never overwritten or deleted. The host's Imunify scanner keeps a `wp-content/imunify-security/` folder on both dev and live; it isn't in the local repos, so it is excluded in both `.rsync_all` lists (2026-10-15) to stop `--delete-after` removing it. Dry runs after the change: zero deletions on both sites. Excluded: `.git/`, `.env`, `_deploy/`, `_rsync/`, `_obf/`, `node_modules`, `wp-content/uploads/`, `wp-content/cache/`, log files, `.htaccess`, `php.ini`, `.well-known/`.
 
 The plugin's internal `.claude/` and `CLAUDE.md` **do** get deployed to dev.unipixelhq.com. That's fine — dev is a team-side surface, not end-user distribution. The exclusion that matters (obfuscation export) is handled separately.
 
@@ -130,6 +132,7 @@ These exist because of real shipped-bug incidents. See `domain-knowledge/platfor
    ```
 2. **`php -l` on source** — lint every PHP file in the plugin folder. Must all be "No syntax errors."
 3. **Version check** — `UNIPIXEL_VERSION` in `unipixel.php` matches `Stable tag` in `readme.txt` matches the plugin header `Version:`.
+4. **Declared-minimum check** — the code must run on the `Requires PHP` / `Requires at least` declared in `readme.txt` (and the `unipixel.php` header, which must carry the same values). Lint every plugin `.php` file with a PHP binary of the declared minimum version (`php -l`), not the dev box's PHP 8.3. If no binary of that version is installed, add one to Laragon before releasing. Why: RQ-004, a PHP 8-only `match` shipped under `Requires PHP: 7.0` from 2.1.0 to 2.6.12 and crashed every PHP 7.x activation.
 
 ### Run obfuscation
 
