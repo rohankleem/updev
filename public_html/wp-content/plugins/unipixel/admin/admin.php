@@ -126,7 +126,11 @@ function unipixel_admin_footer_feedback_modal() {
 add_action('admin_footer', 'unipixel_admin_footer_feedback_modal');
 
 
-function unipixel_enqueue_admin_feedback_scripts() {
+function unipixel_enqueue_admin_feedback_scripts($hook) {
+	// Only load (and localize the nonce) on UniPixel admin pages, which require manage_options.
+	if ($hook !== 'toplevel_page_unipixel' && strpos($hook, 'unipixel_page_') === false) {
+		return;
+	}
 	wp_enqueue_script('unipixel-admin-feedback', plugin_dir_url(__FILE__) . 'js/admin-feedback.js', array('jquery'), UNIPIXEL_VERSION, true);
 	wp_localize_script('unipixel-admin-feedback', 'UniPixelFeedbackAjax', array(
 		'ajax_url' => admin_url('admin-ajax.php'),
@@ -136,7 +140,11 @@ function unipixel_enqueue_admin_feedback_scripts() {
 add_action('admin_enqueue_scripts', 'unipixel_enqueue_admin_feedback_scripts');
 
 
-function unipixel_enqueue_admin_general_settings_scripts() {
+function unipixel_enqueue_admin_general_settings_scripts($hook) {
+    // Only load (and localize the nonce) on UniPixel admin pages, which require manage_options.
+    if ($hook !== 'toplevel_page_unipixel' && strpos($hook, 'unipixel_page_') === false) {
+        return;
+    }
     wp_enqueue_script('unipixel-admin-general-settings', plugin_dir_url(__FILE__) . 'js/ajax-general-settings.js', array('jquery'), UNIPIXEL_VERSION, true);
     wp_localize_script(
         'unipixel-admin-general-settings', 'UniPixelGeneralSettingsAjax',  array(

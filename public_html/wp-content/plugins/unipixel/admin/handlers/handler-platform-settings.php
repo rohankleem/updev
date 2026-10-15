@@ -8,6 +8,11 @@ function unipixel_handle_platform_update() {
     // Verify nonce
     check_ajax_referer('unipixel_ajax_nonce', 'nonce');
 
+    // Only administrators may change platform settings.
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Unauthorized'], 403);
+    }
+
     // Check required parameters with validation
     if (
         !isset($_POST['platform_id'], $_POST['pixel_id'], $_POST['access_token'], $_POST['platform_enabled'])

@@ -7,6 +7,11 @@ add_action('wp_ajax_unipixel_update_consent_settings', 'unipixel_handle_consent_
 function unipixel_handle_consent_update() {
 	check_ajax_referer('unipixel_ajax_nonce', 'nonce');
 
+	// Only administrators may change consent settings.
+	if (!current_user_can('manage_options')) {
+		wp_send_json_error(['message' => 'Unauthorized'], 403);
+	}
+
 	$consent_honour   = isset($_POST['consent_honour'])    ? intval($_POST['consent_honour'])    : 0;
 	$consent_ui       = isset($_POST['consent_ui'])        ? sanitize_text_field($_POST['consent_ui']) : 'unipixel';
 	$consent_ui_style = isset($_POST['consent_ui_style'])  ? intval($_POST['consent_ui_style'])  : 1;

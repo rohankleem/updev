@@ -9,6 +9,11 @@ function unipixel_handle_general_update()
 {
     check_ajax_referer('unipixel_ajax_nonce', 'nonce');
 
+    // Only administrators may change general settings.
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Unauthorized'], 403);
+    }
+
     // --- Handle ADVANCED MATCHING ---
     $new_am_enabled = isset($_POST['advanced_matching_enabled']) ? true : false;
     $current_am_enabled = get_option('unipixel_advanced_matching_enabled', true);

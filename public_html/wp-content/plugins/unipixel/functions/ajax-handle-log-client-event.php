@@ -11,6 +11,11 @@ function unipixel_log_client_event_handler() {
 
     check_ajax_referer('unipixel_log_client_event_nonce', 'nonce');
 
+    // Reject oversized payloads before doing any work (public endpoint hardening).
+    if (isset($_POST['json_data_sent']) && strlen($_POST['json_data_sent']) > 20000) {
+        wp_send_json_error(['message' => 'Payload too large.'], 413);
+    }
+
     $platform_id   = isset($_POST['platform_id'])   ? sanitize_text_field(wp_unslash($_POST['platform_id']))   : '';
     $element_ref   = isset($_POST['element_ref'])   ? sanitize_text_field(wp_unslash($_POST['element_ref']))   : '';
     $event_trigger = isset($_POST['event_trigger']) ? sanitize_text_field(wp_unslash($_POST['event_trigger'])) : '';

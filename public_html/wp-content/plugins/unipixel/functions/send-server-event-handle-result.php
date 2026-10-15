@@ -2,6 +2,40 @@
 
 //File: public_html\wp-content\plugins\unipixel\functions\send-server-event-handle-result.php
 
+/**
+ * Strip platform credentials from a wp_remote_post() args array before it is
+ * written to the event log or returned in the AJAX response. The real HTTP
+ * request has already been sent by the time we reach here, so redaction never
+ * changes what the platform receives — it only keeps access tokens out of the
+ * log table and the browser-facing response.
+ */
+function unipixel_redact_credentials_from_args($args)
+{
+    if (!is_array($args)) {
+        return $args;
+    }
+
+    // Header-carried tokens: TikTok (Access-Token), Pinterest + Microsoft (Authorization: Bearer ...).
+    if (!empty($args['headers']) && is_array($args['headers'])) {
+        foreach (['Authorization', 'Access-Token'] as $sensitive) {
+            if (isset($args['headers'][$sensitive])) {
+                $args['headers'][$sensitive] = '***redacted***';
+            }
+        }
+    }
+
+    // Body-carried token: Meta puts access_token inside the JSON body.
+    if (!empty($args['body']) && is_string($args['body'])) {
+        $decoded = json_decode($args['body'], true);
+        if (is_array($decoded) && array_key_exists('access_token', $decoded)) {
+            $decoded['access_token'] = '***redacted***';
+            $args['body'] = wp_json_encode($decoded);
+        }
+    }
+
+    return $args;
+}
+
 function unipixel_handle_send_event_result(
     $platform_id,
     $element_ref,
@@ -16,7 +50,7 @@ function unipixel_handle_send_event_result(
 
     // Extract consistent data from unified result
     $wpRemotePostResult   = $sendServerResultInfo['response'] ?? [];
-    $wpRemotePostSendArr  = $sendServerResultInfo['args'] ?? [];
+    $wpRemotePostSendArr  = unipixel_redact_credentials_from_args($sendServerResultInfo['args'] ?? []);
     $eventInfoPayloadArr  = $sendServerResultInfo['payload'] ?? [];
 
     // Ensure response is always a serializable array (wp_remote_post can return WP_Error)

@@ -12,6 +12,11 @@ function unipixel_handle_get_events()
     // Verify nonce
     check_ajax_referer('unipixel_ajax_nonce', 'nonce');
 
+    // Only administrators may read event settings.
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Unauthorized'], 403);
+    }
+
     $platform_id = intval($_POST['platform_id']);
     $events_table = $wpdb->prefix . 'unipixel_events_settings';
 
@@ -32,6 +37,11 @@ function unipixel_handle_update_event()
     global $wpdb;
 
     check_ajax_referer('unipixel_ajax_nonce', 'nonce');
+
+    // Only administrators may change event settings.
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Unauthorized'], 403);
+    }
 
     $event_id = intval($_POST['id']);
     $element_ref = sanitize_text_field(wp_unslash($_POST['element_ref']));
@@ -84,6 +94,11 @@ function unipixel_handle_add_event()
     global $wpdb;
 
     check_ajax_referer('unipixel_ajax_nonce', 'nonce');
+
+    // Only administrators may add events.
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Unauthorized'], 403);
+    }
 
     $platform_id = intval($_POST['platform_id']);
     $element_ref = sanitize_text_field(wp_unslash($_POST['element_ref']));
@@ -160,6 +175,11 @@ function unipixel_handle_delete_event()
     global $wpdb;
 
     check_ajax_referer('unipixel_ajax_nonce', 'nonce');
+
+    // Only administrators may delete events.
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Unauthorized'], 403);
+    }
 
     $event_id = intval($_POST['id']);
     $events_table = $wpdb->prefix . 'unipixel_events_settings';

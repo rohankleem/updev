@@ -6,6 +6,11 @@ function unipixel_handle_update_woo_events_batch()
 {
     check_ajax_referer('unipixel_ajax_nonce', 'nonce');
 
+    // Only administrators may change WooCommerce event settings.
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Unauthorized'], 403);
+    }
+
     global $wpdb;
     $table_name = $wpdb->prefix . 'unipixel_woocomm_event_settings';
 
