@@ -143,7 +143,7 @@ function unipixel_addtocart_fragments($fragments) {
 				if (window.__UniPixelConsoleActive && typeof UniPixelConsoleLogger !== 'undefined') {
 					UniPixelConsoleLogger.log('SEND', 'Pinterest | Client-side event sent | AddToCart object:', d);
 				}
-				pintrk('track', 'addtocart', payload, { event_id: d.event_id });
+				pintrk('track', 'addtocart', Object.assign({}, payload, { event_id: d.event_id }));
 			}
 		})();";
 	}
@@ -586,7 +586,7 @@ function unipixel_inline_script_pinterest_addtocart($triggerHook = "", $genericD
             UniPixelConsoleLogger.log('SEND', 'Pinterest | Client-side event sent | AddToCart object:', UniPixelAddToCartPinterest);
         }
 
-        pintrk('track', 'addtocart', payload, { event_id: UniPixelAddToCartPinterest.event_id });
+        pintrk('track', 'addtocart', Object.assign({}, payload, { event_id: UniPixelAddToCartPinterest.event_id }));
     } else {
         if (window.__UniPixelConsoleActive && typeof UniPixelConsoleLogger !== 'undefined') {
             UniPixelConsoleLogger.error('Pinterest | AddToCart payload not sent: UniPixelAddToCartPinterest or pintrk is undefined');

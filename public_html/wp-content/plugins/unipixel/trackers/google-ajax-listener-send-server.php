@@ -18,7 +18,7 @@ function unipixel_receive_ajax_data_for_server_event_google()
 
     // Early exit if server-side tracking is not enabled for this platform
     $event_name_raw = sanitize_text_field($_POST['eventName']);
-    if (empty($platformSettings->serverside_global_enabled)) {
+    if (empty($platformSettings->platform_enabled) || empty($platformSettings->serverside_global_enabled)) {
         echo wp_json_encode([$event_name_raw => 'Server-side not enabled for platform, skipped']);
         wp_die();
     }
@@ -58,7 +58,7 @@ function unipixel_receive_ajax_data_for_server_event_google()
     $rawParams = isset($_POST['eventParams']) && is_array($_POST['eventParams']) ? $_POST['eventParams'] : [];
 
     // If the client passed us page_location, engagement_time_msec, sanitize & add them:
-    if (! empty($rawParams['page_location'])) {
+    if (! empty($rawParams['page_location']) && is_string($rawParams['page_location'])) {
         $sanitized_custom_data['page_location'] = esc_url_raw(wp_unslash($rawParams['page_location']));
     }
     if (isset($rawParams['engagement_time_msec'])) {

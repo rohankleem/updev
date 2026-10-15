@@ -20,6 +20,14 @@ function unipixel_woocommerce_handler_purchase($order_id)
 
 	if (!$order_id) return;
 
+	$order = wc_get_order($order_id);
+	if (!$order) return;
+
+	// Send once per order, and never for failed or cancelled payments
+	if ($order->has_status(array('failed', 'cancelled')) || $order->get_meta('_unipixel_purchase_sent')) {
+		return;
+	}
+
 	// Prepare the generic placeholders
 	$genericDataToSend = unipixel_get_common_woo_data_purchase($order_id);
 	$eventTime = time();
@@ -308,5 +316,11 @@ function unipixel_woocommerce_handler_purchase($order_id)
 				unipixel_handle_send_event_result($platformIdMicrosoft, $elementRef, $eventTrigger, $eventNameMicrosoft, $mockResult, 'client', 'third', 'clientSecond');
 			}
 		}
+	}
+
+	// Mark the order as sent (only when consent allowed sending, so a later consented view can still send once)
+	if (!$consentBlocked) {
+		$order->update_meta_data('_unipixel_purchase_sent', time());
+		$order->save_meta_data();
 	}
 }

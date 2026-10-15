@@ -108,6 +108,12 @@ function unipixel_send_server_event_google(
         ]],
     ];
 
+    // Attach the visitor's GA4 session so the event keeps the visit's traffic source
+    $ga_session_id = unipixel_get_ga4_session_id($measurement_id);
+    if ($ga_session_id !== '') {
+        $eventInfoPayloadArr['events'][0]['params']['session_id'] = $ga_session_id;
+    }
+
     // Add optional debug flag
     $opts = get_option('unipixel_logging_options', []);
     if (!empty($opts['enableGoogleDebugViewServerSide'])) {

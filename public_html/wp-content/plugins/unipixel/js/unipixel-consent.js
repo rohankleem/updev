@@ -41,8 +41,8 @@
 		pairs.forEach(pair => {
 			const [group, value] = pair.split(':');
 			if (group && value) {
-				// Example: simplistic mapping—needs to match your server-side mapping
-				if (group === 'C0001') parsed.marketing = (value === '1');
+				// OneTrust default groups: C0001 Strictly Necessary, C0002 Performance, C0003 Functional, C0004 Targeting
+				if (group === 'C0004') parsed.marketing = (value === '1');
 				if (group === 'C0002') parsed.performance = (value === '1');
 				if (group === 'C0003') parsed.functional = (value === '1');
 			}

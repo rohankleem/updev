@@ -7,6 +7,7 @@
  * Plugin URI: https://unipixelhq.com
  * Description: Server-side event tracking for Meta, Pinterest, TikTok, Google and Microsoft. One install to connect your site with event tracking APIs. Includes custom events and consent.
  * Version: 2.6.12
+ * Requires PHP: 8.0
  * Author: Buildio
  * Author URI: https://buildio.dev/
  * License: GPLv2 or later

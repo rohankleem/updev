@@ -175,7 +175,7 @@ function unipixel_inline_script_pinterest_viewcontent($genericData = null)
             UniPixelConsoleLogger.log('SEND', 'Pinterest | Client-side event sent | ViewContent object:', UniPixelViewContentPinterest);
         }
 
-        pintrk('track', 'viewcontent', payload, { event_id: UniPixelViewContentPinterest.event_id });
+        pintrk('track', 'viewcontent', Object.assign({}, payload, { event_id: UniPixelViewContentPinterest.event_id }));
     } else {
         if (window.__UniPixelConsoleActive && typeof UniPixelConsoleLogger !== 'undefined') {
             UniPixelConsoleLogger.error('Pinterest | ViewContent payload not sent: UniPixelViewContentPinterest or pintrk is undefined');

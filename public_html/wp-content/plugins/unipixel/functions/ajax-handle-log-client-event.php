@@ -11,6 +11,13 @@ function unipixel_log_client_event_handler() {
 
     check_ajax_referer('unipixel_log_client_event_nonce', 'nonce');
 
+    // Reject non-text fields (e.g. json_data_sent[]=x), which would otherwise cause a fatal error.
+    foreach (['platform_id', 'element_ref', 'event_trigger', 'event_name', 'response_log_message', 'json_data_sent', 'party', 'event_order'] as $field) {
+        if (isset($_POST[$field]) && !is_string($_POST[$field])) {
+            wp_send_json_error(['message' => 'Invalid payload.'], 400);
+        }
+    }
+
     // Reject oversized payloads before doing any work (public endpoint hardening).
     if (isset($_POST['json_data_sent']) && strlen($_POST['json_data_sent']) > 20000) {
         wp_send_json_error(['message' => 'Payload too large.'], 413);

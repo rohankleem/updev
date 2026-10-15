@@ -913,6 +913,37 @@ function unipixel_normalize_ga_client_id($value)
 }
 
 
+/**
+ * GA4 session_id from the visitor's _ga_<ID> cookie, so server-side events attach to the visit
+ * (and keep its traffic source). Returns '' when the cookie is missing or in an unknown format.
+ */
+function unipixel_get_ga4_session_id($measurement_id)
+{
+    $measurement_id = trim((string)$measurement_id);
+    if (strpos($measurement_id, 'G-') !== 0) return '';
+
+    $cookie_name = '_ga_' . substr($measurement_id, 2);
+    $value = isset($_COOKIE[$cookie_name]) ? wp_unslash($_COOKIE[$cookie_name]) : '';
+    if (!is_string($value) || $value === '') return '';
+
+    $parts = explode('.', $value);
+    if (count($parts) < 3) return '';
+
+    // GS2.1.s1792022688$o1$g0$t1792022688$j60$l0$h0
+    if ($parts[0] === 'GS2') {
+        foreach (explode('$', $parts[2]) as $segment) {
+            if (preg_match('/^s(\d+)$/', $segment, $m)) return $m[1];
+        }
+        return '';
+    }
+
+    // GS1.1.1700000000.5.1.1700000500.0.0.0
+    if ($parts[0] === 'GS1' && preg_match('/^\d+$/', $parts[2])) return $parts[2];
+
+    return '';
+}
+
+
 function unipixel_get_msclkid_value()
 {
     if (! empty($_COOKIE['unipixel_msclkid'])) {

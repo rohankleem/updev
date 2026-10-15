@@ -201,7 +201,7 @@ function unipixel_inline_script_pinterest_purchase()
             UniPixelConsoleLogger.log('SEND', 'Pinterest | Client-side event sent | Purchase (checkout) object:', UniPixelPurchasePinterest);
         }
 
-        pintrk('track', 'checkout', payload, { event_id: UniPixelPurchasePinterest.event_id });
+        pintrk('track', 'checkout', Object.assign({}, payload, { event_id: UniPixelPurchasePinterest.event_id }));
     } else {
         if (window.__UniPixelConsoleActive && typeof UniPixelConsoleLogger !== 'undefined') {
             UniPixelConsoleLogger.error('Pinterest | Purchase payload not sent: UniPixelPurchasePinterest or pintrk is undefined');

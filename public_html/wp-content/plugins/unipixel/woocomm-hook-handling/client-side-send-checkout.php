@@ -201,7 +201,7 @@ function unipixel_inline_script_pinterest_initiate_checkout()
             UniPixelConsoleLogger.log('SEND', 'Pinterest | Client-side event sent | InitiateCheckout object:', UniPixelInitiateCheckoutPinterest);
         }
 
-        pintrk('track', 'initiatecheckout', payload, { event_id: UniPixelInitiateCheckoutPinterest.event_id });
+        pintrk('track', 'initiatecheckout', Object.assign({}, payload, { event_id: UniPixelInitiateCheckoutPinterest.event_id }));
     } else {
         if (window.__UniPixelConsoleActive && typeof UniPixelConsoleLogger !== 'undefined') {
             UniPixelConsoleLogger.error('Pinterest | InitiateCheckout payload not sent: UniPixelInitiateCheckoutPinterest or pintrk is undefined');
@@ -234,7 +234,7 @@ function unipixel_inline_script_microsoft_checkout()
             event_id:        UniPixelCheckoutMicrosoft.event_id,
             currency:        UniPixelCheckoutMicrosoft.currency,
             ecomm_totalvalue: UniPixelCheckoutMicrosoft.value,
-            ecomm_pagetype:  'checkout',
+            ecomm_pagetype:  'cart',
             items:           UniPixelCheckoutMicrosoft.items
         };
 

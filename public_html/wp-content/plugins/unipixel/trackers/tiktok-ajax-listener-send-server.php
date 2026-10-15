@@ -16,7 +16,7 @@ function unipixel_receive_ajax_data_for_server_event_tiktok() {
 
     // Early exit if server-side tracking is not enabled for this platform
     $event_name_raw = sanitize_text_field($_POST['eventName'] ?? '');
-    if (empty($platformSettings->serverside_global_enabled)) {
+    if (empty($platformSettings->platform_enabled) || empty($platformSettings->serverside_global_enabled)) {
         echo wp_json_encode([$event_name_raw => 'Server-side not enabled for platform, skipped']);
         wp_die();
     }
@@ -26,7 +26,7 @@ function unipixel_receive_ajax_data_for_server_event_tiktok() {
     $element_ref   = sanitize_text_field($_POST['elementRef'] ?? '');
     $event_trigger = sanitize_text_field($_POST['eventTrigger'] ?? '');
     $event_id      = sanitize_text_field($_POST['event_id'] ?? '');
-    $pageUrl       = isset($_POST['pageUrl']) ? esc_url_raw(wp_unslash($_POST['pageUrl'])) : '';
+    $pageUrl       = (isset($_POST['pageUrl']) && is_string($_POST['pageUrl'])) ? esc_url_raw(wp_unslash($_POST['pageUrl'])) : '';
 
     $isPageView = ($event_name === 'PageView');
 

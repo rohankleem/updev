@@ -22,8 +22,8 @@ function unipixel_get_common_woo_data_purchase($order_id)
         return null; // invalid order
     }
 
-    // Generate event_id for dedup
-    $plcehldr_event_id = 'purchase_' . microtime(true);
+    // One event_id per order, so platforms dedupe browser + server and any repeat send
+    $plcehldr_event_id = 'purchase_' . $order_id;
 
     // Advanced Matching — hashed PII from order billing data + logged-in user fallback
     $amData = unipixel_get_advanced_matching_data($order);
@@ -51,7 +51,7 @@ function unipixel_get_common_woo_data_purchase($order_id)
             'plcehldr_itemId'   => $product->get_id(),
             'plcehldr_itemName' => sanitize_text_field($product->get_name()),
             'plcehldr_quantity' => (int)$item->get_quantity(),
-            'plcehldr_price'    => (float)$item->get_total(),
+            'plcehldr_price'    => (float)$order->get_item_total($item, false, true), // per-unit, after discounts
             'plcehldr_discount'     => $discount,
             'plcehldr_categories'   => $arrCategories,    // array of strings
             'plcehldr_variant'      => $variant,

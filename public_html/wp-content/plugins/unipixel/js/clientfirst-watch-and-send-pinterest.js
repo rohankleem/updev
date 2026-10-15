@@ -67,9 +67,9 @@ unipixelOnReady(function () {
 
         if (event.send_client === 1) {
             if (typeof pintrk === 'function') {
-                pintrk('track', pinEventName, event_params, { event_id: event_id });
+                pintrk('track', pinEventName, Object.assign({}, event_params, { event_id: event_id }));
             } else if (window.pintrk) {
-                pintrk('track', pinEventName, event_params, { event_id: event_id });
+                pintrk('track', pinEventName, Object.assign({}, event_params, { event_id: event_id }));
             }
 
             log_Send('UniPixel | Pinterest | Client-side event sent:', { event_name: pinEventName, event_params: event_params, event_id: event_id });
