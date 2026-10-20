@@ -575,7 +575,7 @@ function unipixel_ensure_logcount_and_platform_settings()
             'platform_enabled' => 0,
             'additional_id' => '',
             'pixel_setting' => 'include',
-            'pageview_send_serverside' => 1,
+            'pageview_send_serverside' => 0,
             'pageview_send_clientside' => 1,
             'serverside_global_enabled' => 0
         ],

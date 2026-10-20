@@ -240,7 +240,18 @@ cat "$EXPORT/functions/unipixel-functions.php" | php -l 2>&1
 
 **Why:** Google's GA4 attribution does not deduplicate non-purchase events the way Meta CAPI does — sending the same event from both sides counts it twice. Purchase is special-cased because GA4 uses `transaction_id` as a natural dedup key.
 
-**How the plugin implements it:** The admin UI for Google events enforces this — picking client-side disables the server-side toggle for that event type, and vice versa, except on the Purchase event row.
+**Re-checked against Google's docs (2026-10-20):**
+- **Measurement Protocol (UniPixel's server path): still true.** GA4 dedupes only `purchase`, on `transaction_id`, web streams only ([Analytics Help 12313109](https://support.google.com/analytics/answer/12313109)). No Google GA4 or MP page offers an `event_id` or other dedup key; blogs claiming GA4 dedupes on `event_id` cite nothing from Google. The `event_id` param UniPixel adds to MP events is just a custom parameter. MP changelog to 2026-02-17: no dedup change. Google calls MP finished (no deprecation planned) and points new server-to-server work at the Data Manager API.
+- **Data Manager API is the exception.** GA4 dedupes any event sent through it with a `transactionId` against the tag's copy (first copy wins), but only for allowlisted properties (v1.6, 2026-05-07). Google Ads: tag and API copies dedupe on `transactionId` per conversion action, open to all accounts since 2026-02-10. Auth is a Google Cloud project with OAuth or a service account, not an API secret. Guides under `developers.google.com/data-manager/api/devguides/events/`.
+- **Google tag gateway doesn't change this:** the browser still sends one stream, relayed through the site's own domain to `<tag-id>.fps.goog`. Site Kit ships it as a PHP relay (`gtg/measurement.php`), so no CDN is needed.
+
+**History (Rohan, 2026-10-20):** learned the hard way. UniPixel was first built to send Google events from both browser and server, like Meta, and GA4 counted them twice. Either/or, with Purchase as the exception, was the eventual concession.
+
+**How the plugin implements it:** on the Google Events page, each row's client and server checkboxes are an XOR pair (`data-nondedup`, `admin/js/admin-common.js`): ticking one unticks the other, on every row except Purchase. The per-event seed (`config/schema.php`), Google's Apply Recommended preset and the Conversions builder (`admin/js/ajax-conversion-groups.js`) all default non-Purchase events to client only.
+
+**Gap: the guard is UI-only.** No save handler checks the rule (nor does the Google server listener), and the XOR only fires when a box is ticked, so any path that writes the flags directly can store both on. Cases:
+- **Fixed 2026-10-20 (fix-plan #21):** a clean install set Google PageView to browser + server, and the setup wizard posted `pageview_send_serverside: 1`. Harmless until Google server-side is switched on; from then on every page view went both ways. Both now default to browser only (`config/schema.php`, `admin/js/google-setup-wizard.js`). Existing installs keep whatever they have.
+- **Still open:** every setup-page save writes `pageview_send_clientside = 1` (`admin/handlers/handler-platform-settings.php` defaults it to 1 when the form doesn't send it, and the form never does), so a Google site set to server-only PageView goes back to both on save (fix-plan #36).
 
 **Other platforms:** Meta, TikTok, Pinterest, Microsoft do **not** have this restriction. They support browser + CAPI on every event, with `event_id` (Meta/TikTok/Pinterest) as the dedup key.
 

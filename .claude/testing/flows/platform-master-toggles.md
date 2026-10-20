@@ -87,7 +87,7 @@ Sanity-check that with everything enabled, the test environment produces the exp
 **State delta from baseline:**
 - All platforms: `platform_enabled = 1, serverside_global_enabled = 1`
 - For each WC event row, all platforms: `send_client = 1, send_server = 1, send_server_log_response = 1`
-- **Exception**: Google's non-Purchase events must respect G-001 (see `google-g001-mutex.md`). For this scenario, set Google non-Purchase events to `send_client = 1, send_server = 0` to keep the test legal.
+- **Exception**: Google's non-Purchase events must respect G-001 (see `domain-knowledge/platform-discoveries.md` § G-001). For this scenario, set Google non-Purchase events to `send_client = 1, send_server = 0` to keep the test legal.
 
 **Action:** Complete a WooCommerce purchase.
 

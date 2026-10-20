@@ -21,6 +21,8 @@ Single source of truth for release history, what's staged for the next release, 
 
 > **Cleared into v2.6.12 (2026-09-16) and v2.6.13 (2026-10-15)** — see Released History.
 
+- **Google PageView defaults to browser only (fix-plan #21, 2026-10-20).** A clean install and the Google setup wizard set it to browser + server, so once Google server-side was switched on every page view went to GA4 twice (G-001). Files: `config/schema.php`, `admin/js/google-setup-wizard.js`. Existing installs unchanged.
+
 - **Token-acquisition UX initiative — all 8 phases shipped (#34 + subsumes #8 + #30 + #1).** Full plan and per-phase detail: `projects/token-acquisition-ux.md`. Headline pieces:
   - **Test Connection button on every platform setup page** (Meta / Google / TikTok / Pinterest / Microsoft). Each validates against the platform's real API and surfaces platform-specific diagnostic feedback (Meta parses `debug_token` scopes/expiry/error codes; Google fires `debug_mode:1` event to DebugView; TikTok uses `test_event_code` to land in Test Events tab; Pinterest two-call validation of token + ad-account access; Microsoft parses structured CAPI error body).
   - **Three-state status indicator strip** on each setup page (Not Started / Pasted Unverified / Connected) with verified-X-ago timestamp on the Connected variant.
