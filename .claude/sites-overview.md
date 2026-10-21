@@ -36,4 +36,4 @@ All four live on the same Interserver box (`vda4300.is.cc`, user `buildiod`), ma
 - `dev.unipixelhq.com` — live (local + remote)
 - `buildio.au` — live
 - `buildio.dev` — live
-- `github.com/unipixelhq` — live (account flag restricting `/releases` listing index until cleared)
+- `github.com/unipixelhq` — public again (checked 2026-10-21; the account flag has cleared). Repo re-created 2026-07-22, README only, no releases or topics yet

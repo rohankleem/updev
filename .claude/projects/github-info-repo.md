@@ -1,9 +1,10 @@
 # GitHub presence — `unipixelhq/unipixelhq`
 
-**Status:** Active but **hidden from anonymous visitors** as of 2026-05-09 — entire `unipixelhq` namespace returns 404 when logged out. Account flag escalated since initial setup. Appeal is the blocking next step (see § Flag situation).
+**Status:** Active and **public again**. An anonymous check on 2026-10-21 loaded the profile, the repo and its releases feed. The repo was re-created on 2026-07-22 and holds only the README: no releases, tags or topics. It had been hidden since 2026-05-09 by an account flag (see § Flag situation).
 
 **Started:** 2026-05-01
 **Live:** 2026-05-02
+**Repo re-created:** 2026-07-22
 **URL:** `https://github.com/unipixelhq/unipixelhq`
 
 ---
@@ -45,7 +46,15 @@ The "no source code" decision was deliberate. The licensing/protection strategy 
 
 ## Current state
 
-### Live
+### Public again (checked 2026-10-21, anonymous requests)
+- **Profile** `github.com/unipixelhq` loads: bio, website `https://unipixelhq.com`, 1 public repo. Same account as in May (created 2026-05-01).
+- **Repo** `unipixelhq/unipixelhq` loads, and so do `/releases`, `releases.atom` and the REST API. It is a **new repo**, created 2026-07-22 with three web-UI commits that day: upload `readme.txt`, edit it, rename it to `readme.md`. Signed in as the owner, the account lists only this one repo (no private ones), so the May repo is gone from the account. How it went isn't recorded.
+- **README** (`readme.md`, 7.8 KB): what it is, why server-side, why WordPress changes the picture, supported platforms, what's in the box, comparison, install, docs, support, changelog, license. The changelog lists recent releases up to v2.6.6 and sends readers to Releases for the full history. The 5 stray `<!-- release: vX.Y.Z -->` lines are still in it.
+- **About sidebar:** description set (newer copy that mentions the Centralised Event Manager and the 18-language consent layer). No website link, no topics.
+- **No releases or tags.** `/releases` is empty, and old release URLs such as `/releases/tag/v2.6.6` return 404.
+- **Differs from the May decisions:** no license detected (May: GPLv2); Wiki and Projects are switched on (May: Issues only).
+
+### As first built (May 2026; that repo no longer exists)
 - Profile: avatar (UniPixel logo), bio, URL `https://unipixelhq.com`, location `Australia`, Facebook social link
 - Repo public, GPLv2
 - README: positioning, why server-side, why WordPress changes the picture, supported platforms table, what's in the box, comparison table, install pointer, docs pointer, support, comparisons, changelog with full version history (v1.1.1 through v2.6.6), license, closing CTA. Voice rules from `marketing-knowledge/writing-style.md` applied throughout.
@@ -53,20 +62,7 @@ The "no source code" decision was deliberate. The licensing/protection strategy 
 - Social preview image (1280×640) uploaded
 - 5 releases on 5 unique commits: v2.5.3, v2.6.0, v2.6.4, v2.6.5, v2.6.6 (Latest). Each release page renders independently and is indexable.
 
-### Hidden from public (escalated 2026-05-09)
-The flag has escalated. To anonymous visitors (and therefore Google) the entire account namespace now 404s:
-
-- `github.com/unipixelhq` → 404
-- `github.com/unipixelhq/unipixelhq` → 404
-- `.../releases` → 404
-- `.../releases/tag/v2.6.6` (and all individual release URLs) → 404
-- `releases.atom` → 404
-- REST API endpoints → 404
-- Code search → disabled
-
-Discovery and SEO value is currently zero — nothing in the namespace is reachable without being signed in as the owner. The README, topics, social preview, and 5 release pages are all set up correctly; they're simply not served to the public.
-
-### Pending (do once flag clears)
+### Pending (no longer blocked by the flag)
 - Clean up 5 stray HTML comment lines from the README (`<!-- release: vX.Y.Z -->` added during the per-release commits to give each release a unique target). Single small commit.
 - Three pinned issues: Roadmap, Known limitations, Where to get help. Each one a long-lived indexable page giving the Issues tab structure.
 - Issue templates at `.github/ISSUE_TEMPLATE/*.yml` for the five platforms (Meta, Google, TikTok, Pinterest, Microsoft) plus generic bug and feature request.
@@ -86,6 +82,8 @@ The `unipixelhq` account was flagged by GitHub's anti-abuse system on 2026-05-02
 2. ~~Appeal at https://support.github.com/contact?subject=account-flagged~~ — submitted 2026-05-10. Awaiting GitHub support response.
 
 Typical clearance for legitimate accounts: a few days. The README, topics, social preview, and release pages are all intact and will start serving publicly again once the flag is lifted; no rebuild needed at that point.
+
+**Now (checked 2026-10-21):** the profile, repo, `/releases`, `releases.atom` and REST API all answer anonymous requests. Signed in as the owner, no flag or restriction notice shows. The account is the original one, but the repo was re-created on 2026-07-22, so the May releases, topics and About-sidebar website link are gone (see § Current state). When the flag lifted, and whether re-creating the repo was part of that, isn't recorded.
 
 **Lesson, applies to any future GitHub account creation:** do not drive high-velocity automated activity on a fresh GitHub account in the first 24 hours. Either pace it manually with human delays, or restrict automation to read-only operations until the account is established. Applies to any future Buildio or related accounts.
 

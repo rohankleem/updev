@@ -446,7 +446,7 @@ Real data point: ~1,000 clicks for ~$30. That's $0.03/click.
 
 **What it isn't:** the source of truth for plugin code. Public unobfuscated source would undermine the obfuscation-based licensing strategy in `domain-knowledge/licensing-and-protection.md`. The repo states "ships via wp.org" up front so visitors don't expect code.
 
-**Status:** Live as of 2026-05-02. Full content surface complete. Account-level flag from launch-day automation velocity is restricting the `/releases` listing index page until cleared (direct release URLs work; sidebar widget on repo home shows all five releases). See `projects/github-info-repo.md` § Flag situation for detail.
+**Status:** Public again (checked 2026-10-21). First live 2026-05-02, then hidden from 2026-05-09 by an account flag triggered by launch-day automation velocity; the flag has since cleared. The repo was re-created on 2026-07-22 and holds only the README: no releases, topics or About-sidebar website link yet. See `projects/github-info-repo.md` § Current state and § Flag situation.
 
 **Maintenance cost:** ~5 minutes per wp.org release (mirror the version + changelog into a GitHub Release).
 
