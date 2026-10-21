@@ -71,13 +71,17 @@ function unipixel_handle_google_test_connection()
 
     // Build the test event payload. debug_mode: 1 makes the event appear in
     // GA4 DebugView (the user's self-verification path), not in regular reports.
-    $client_id     = 'unipixel.test_connection.' . wp_generate_password(10, false, false) . '.' . time();
+    // client_id must be <number>.<number>: Google's strict validation rejects any other format.
+    $client_id     = wp_rand(100000000, 2147483647) . '.' . time();
     $event_payload = array(
         'client_id' => $client_id,
         'events'    => array(array(
             'name'   => 'unipixel_test_connection',
+            // DebugView only showed the event once session_id and engagement_time_msec were included (2026-10-21).
             'params' => array(
-                'debug_mode' => 1,
+                'debug_mode'           => true,
+                'session_id'           => (string) time(),
+                'engagement_time_msec' => 100,
             ),
         )),
     );
@@ -173,6 +177,6 @@ function unipixel_handle_google_test_connection()
 
     wp_send_json_success(array(
         'state'   => 'connected',
-        'message' => __('Format checks passed. A test event has been sent to Google with debug_mode on. To confirm your API Secret value is actually correct, open Google Analytics → Admin → DebugView and look for the event "unipixel_test_connection" within 60 seconds. If it appears, you are fully set up. If it does not appear, the API Secret is likely wrong (Google does not surface this error to us directly).', 'unipixel'),
+        'message' => __('Format checks passed. A test event has been sent to Google with debug_mode on. To confirm your API Secret value is actually correct, open Google Analytics → Admin → DebugView. Each test shows up as a new device in the Debug Device list and can take a minute or two to appear, so pick the newest device and look for the event "unipixel_test_connection". If it appears, you are fully set up. If it still does not appear after a few minutes, the API Secret is likely wrong (Google does not surface this error to us directly).', 'unipixel'),
     ));
 }

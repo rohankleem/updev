@@ -67,7 +67,7 @@ function unipixel_home_page()
 
         <div class="row mb-4">
             <div class="col-6">
-                <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . 'img/unipixel-logo-landscape-3.svg'); ?>" alt="UniPixel Logo" style="width:330px" class="img-fluid">
+                <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . 'img/unipixel-logo.png'); ?>" alt="UniPixel Logo" style="width:330px" class="img-fluid">
             </div>
             <div class="col-6 d-flex justify-content-end align-items-start">
                 <?php unipixel_render_feedback_buttons(); ?>

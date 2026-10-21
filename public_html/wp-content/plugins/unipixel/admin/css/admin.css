@@ -1,6 +1,6 @@
 :root {
-    --bs-primary: #4A54F5;
-    /* Force the Bootstrap purple color as the primary color */
+    --bs-primary: #650EE2;
+    /* Brand purple, from the UniPixel logo */
 
     --bs-blue: #0d6efd;
     --bs-indigo: #6610f2;
@@ -20,19 +20,33 @@
     --bs-btn-bg: var(--bs-primary);
     --bs-btn-border-color: var(--bs-primary);
     --bs-btn-hover-color: #fff;
-    --bs-btn-hover-bg: #3e47d4;
+    --bs-btn-hover-bg: #560CC0;
     /* Adjust this as needed */
-    --bs-btn-hover-border-color: #3e47d4;
+    --bs-btn-hover-border-color: #560CC0;
     /* Adjust this as needed */
-    --bs-btn-focus-shadow-rgb: 74, 84, 245;
+    --bs-btn-focus-shadow-rgb: 101, 14, 226;
     /* Update this to match the RGB value */
     --bs-btn-active-color: #fff;
-    --bs-btn-active-bg: #3e47d4;
+    --bs-btn-active-bg: #560CC0;
     /* Adjust this as needed */
-    --bs-btn-active-border-color: #3e47d4;
+    --bs-btn-active-border-color: #560CC0;
     /* Adjust this as needed */
     --bs-btn-disabled-color: #fff;
     --bs-btn-disabled-bg: var(--bs-primary);
+    --bs-btn-disabled-border-color: var(--bs-primary);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--bs-primary);
+    --bs-btn-hover-border-color: var(--bs-primary);
+    --bs-btn-focus-shadow-rgb: 101, 14, 226;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #560CC0;
+    --bs-btn-active-border-color: #560CC0;
+    --bs-btn-disabled-color: var(--bs-primary);
     --bs-btn-disabled-border-color: var(--bs-primary);
 }
 
@@ -131,6 +145,16 @@
     max-width: 500px;
 }
 
+/* Eye toggle on credential fields: the field and its button share one line, capped like other fields */
+.UniPixelShell .unipixel-secret-group {
+    max-width: 500px;
+    flex-wrap: nowrap;
+}
+
+.UniPixelShell .unipixel-secret-group > .form-control {
+    width: 1%;
+}
+
 /* Style the submit button */
 .UniPixelShell .btn.btn-primary {
     font-size: 1rem;
@@ -203,7 +227,11 @@
 }
 
 
-.UniPixelShell .form-check.form-switch input[type=checkbox]:checked {}
+/* WordPress 7 fills checked checkboxes with the `background` shorthand, which wipes Bootstrap's switch circle */
+.UniPixelShell .form-check.form-switch input[type=checkbox]:checked {
+    background-image: var(--bs-form-switch-bg);
+    background-size: contain;
+}
 
 .UniPixelShell .form-check.form-switch .form-check-input {
     margin-top: 3px;

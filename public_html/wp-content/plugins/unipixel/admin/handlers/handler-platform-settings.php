@@ -35,12 +35,12 @@ function unipixel_handle_platform_update() {
     $pixel_id = sanitize_text_field(wp_unslash($_POST['pixel_id']));
     $access_token = sanitize_text_field(wp_unslash($_POST['access_token']));
     $platform_enabled = intval($_POST['platform_enabled']);
-    // This setup form does not manage the server-side PageView toggle (it lives on
-    // the events page). Default to null so a missing key neither throws an
-    // "Undefined array key" warning (which corrupted the AJAX JSON response) nor
-    // clobbers the events-page setting to 0 on every save.
+    // This setup form does not manage the PageView toggles (they live on the events
+    // page). Default to null so a missing key neither throws an "Undefined array key"
+    // warning (which corrupted the AJAX JSON response) nor clobbers the events-page
+    // settings on every save.
     $pageview_send_serverside = isset($_POST['pageview_send_serverside']) ? intval($_POST['pageview_send_serverside']) : null;
-    $pageview_send_clientside = isset($_POST['pageview_send_clientside']) ? intval($_POST['pageview_send_clientside']) : 1;
+    $pageview_send_clientside = isset($_POST['pageview_send_clientside']) ? intval($_POST['pageview_send_clientside']) : null;
     $serverside_global_enabled = isset($_POST['serverside_global_enabled']) ? intval($_POST['serverside_global_enabled']) : 0;
 
 
@@ -49,7 +49,7 @@ function unipixel_handle_platform_update() {
     // Fetch the current values from the database
     $query = $wpdb->prepare(
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        "SELECT platform_name, pixel_id, access_token, platform_enabled, additional_id, pixel_setting, pageview_send_serverside, serverside_global_enabled FROM %i WHERE id = %d",
+        "SELECT platform_name, pixel_id, access_token, platform_enabled, additional_id, pixel_setting, pageview_send_serverside, pageview_send_clientside, serverside_global_enabled FROM %i WHERE id = %d",
         $table_name,
         $platform_id
     );
@@ -64,6 +64,7 @@ function unipixel_handle_platform_update() {
         ($current_data['additional_id'] === $additional_id || $additional_id === null) &&
         ($current_data['pixel_setting'] === $pixel_setting || $pixel_setting === null) &&
         ($current_data['pageview_send_serverside'] === $pageview_send_serverside || $pageview_send_serverside === null) &&
+        ($current_data['pageview_send_clientside'] === $pageview_send_clientside || $pageview_send_clientside === null) &&
         (isset($current_data['serverside_global_enabled']) && (int) $current_data['serverside_global_enabled'] === $serverside_global_enabled)
     ) {
         wp_send_json_success(array('message' => 'No changes entered'));
@@ -75,15 +76,19 @@ function unipixel_handle_platform_update() {
         'pixel_id' => $pixel_id,
         'access_token' => $access_token,
         'platform_enabled' => $platform_enabled,
-        'pageview_send_clientside' => $pageview_send_clientside,
         'serverside_global_enabled' => $serverside_global_enabled,
     );
 
-    $format = array('%s','%s','%d','%d','%d');
+    $format = array('%s','%s','%d','%d');
 
-    // Only persist pageview_send_serverside when this form actually submitted it.
+    // Only persist the PageView toggles when this form actually submitted them.
     if ($pageview_send_serverside !== null) {
         $update_data['pageview_send_serverside'] = $pageview_send_serverside;
+        $format[] = '%d';
+    }
+
+    if ($pageview_send_clientside !== null) {
+        $update_data['pageview_send_clientside'] = $pageview_send_clientside;
         $format[] = '%d';
     }
 

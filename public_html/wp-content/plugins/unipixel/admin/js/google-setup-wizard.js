@@ -108,6 +108,7 @@
                     additional_id: additionalId,
                     platform_enabled: 1,
                     serverside_global_enabled: 1,
+                    pageview_send_clientside: 1,
                     pageview_send_serverside: 0,
                     pixel_setting: pixelSetting
                 },

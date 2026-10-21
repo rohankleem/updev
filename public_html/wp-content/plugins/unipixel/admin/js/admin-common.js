@@ -188,6 +188,29 @@
   })();
 
 
+  // ---- Show/hide toggle on API key, secret and token fields --------------
+  // Adds an eye button to every credential password field (setup pages and
+  // their wizards). The hidden autofill decoys have no .form-control, so they
+  // are skipped.
+  (function () {
+    $('input[type="password"].form-control').each(function () {
+      var input = this;
+      var $button = $('<button type="button" class="btn btn-outline-secondary" aria-label="Show value" aria-pressed="false"><i class="fa-solid fa-eye" aria-hidden="true"></i></button>');
+      $(input).wrap('<div class="input-group unipixel-secret-group"></div>').after($button);
+
+      $button.on('click', function () {
+        var show = input.type === 'password';
+        // Clicking the eye counts as interacting with the field, so drop the
+        // anti-autofill readonly the same way focusing it does.
+        input.removeAttribute('readonly');
+        input.type = show ? 'text' : 'password';
+        $button.attr({ 'aria-label': show ? 'Hide value' : 'Show value', 'aria-pressed': String(show) });
+        $button.find('i').toggleClass('fa-eye', !show).toggleClass('fa-eye-slash', show);
+      });
+    });
+  })();
+
+
 })(jQuery);
 
 

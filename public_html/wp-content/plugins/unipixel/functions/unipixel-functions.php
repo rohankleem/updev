@@ -912,6 +912,33 @@ function unipixel_normalize_ga_client_id($value)
     return ''; // unknown format
 }
 
+/**
+ * GA4 client ID for a server-side event: the visitor's _ga cookie when there is one.
+ * When there isn't (usually because a blocker stopped Google's tag), creates an ID in Google's
+ * format and sets it as a first-party _ga cookie so GA4 can count the event. Google's tag adopts
+ * an existing _ga cookie, so browser and server share the ID if the tag runs later.
+ * Returns '' when there's no usable ID and the cookie can't be set (output already started).
+ */
+function unipixel_get_or_create_ga_client_id()
+{
+    $existing  = isset($_COOKIE['_ga']) ? sanitize_text_field(wp_unslash($_COOKIE['_ga'])) : '';
+    $client_id = unipixel_normalize_ga_client_id($existing);
+    if ($client_id !== '' || $existing !== '' || headers_sent()) {
+        return $client_id;
+    }
+
+    $client_id    = wp_rand(100000000, 2147483647) . '.' . time();
+    $cookie_value = 'GA1.1.' . $client_id;
+    setcookie('_ga', $cookie_value, [
+        'expires'  => time() + 2 * YEAR_IN_SECONDS,
+        'path'     => '/',
+        'secure'   => is_ssl(),
+        'samesite' => 'Lax',
+    ]);
+    $_COOKIE['_ga'] = $cookie_value; // reuse it for further events in this request
+    return $client_id;
+}
+
 
 /**
  * GA4 session_id from the visitor's _ga_<ID> cookie, so server-side events attach to the visit
@@ -995,7 +1022,7 @@ function unipixel_get_ip_address()
     if (! empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
         $parts = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
         $first = trim($parts[0]);
-        if (filter_var($first, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        if (filter_var($first, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
             return $first;
         }
     }

@@ -31,4 +31,27 @@ function unipixel_capture_msclkid() {
 }
 
 
+//GA4 client ID on product, checkout and order-received pages, before the page starts sending
+add_action('template_redirect', 'unipixel_ensure_ga_client_id_before_page');
+
+function unipixel_ensure_ga_client_id_before_page() {
+    // Google's server-side View item, Begin checkout and Purchase are built partway through these pages,
+    // too late to set the _ga cookie on classic themes, so create it here for visitors who don't have one.
+    $on_page = (function_exists('is_product') && is_product())
+        || (function_exists('is_checkout') && is_checkout())
+        || (function_exists('is_order_received_page') && is_order_received_page());
+    if (!$on_page) {
+        return;
+    }
+    $google = unipixel_get_platform_settings(4);
+    if (empty($google->platform_enabled) || empty($google->serverside_global_enabled)) {
+        return;
+    }
+    if (unipixel_check_for_consent()) {
+        return; // consent not given
+    }
+    unipixel_get_or_create_ga_client_id();
+}
+
+
 

@@ -34,12 +34,21 @@
         const {
             measurementId,
             maxAttempts = 3,
-            attemptDelayMs = 150
+            attemptDelayMs = 150,
+            timeoutMs = 3000
         } = options || {};
 
         return new Promise((resolve) => {
             const cached = getCachedClientId();
             if (cached) return resolve(cached);
+
+            // Google's tag never answers 'get' when it's blocked, so stop waiting and fall back
+            // to the _ga cookie, or '' (the server then supplies an ID).
+            setTimeout(() => {
+                const fromCookie = parseClientIdFromGaCookie(readCookie('_ga'));
+                if (fromCookie) cacheClientId(fromCookie);
+                resolve(fromCookie);
+            }, timeoutMs);
 
             let attempts = 0;
             const tryOnce = () => {

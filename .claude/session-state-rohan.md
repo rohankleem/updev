@@ -23,13 +23,12 @@
 - **Fix plan additions:**
   - #34: GA4 server events drop the visitor's IP and user agent (fix: send `ip_override` and `user_agent`).
   - #36: a setup-page save turns browser page view back on.
-  - A policy item for existing installs still on the old page view default.
+  - Decided 2026-10-21: no migration for existing installs. Owners see both page view boxes ticked and control the toggles.
 - **The session went badly:** a two-line fix took most of an hour because of unapproved code edits and shifting descriptions of the issue. Lessons are in Claude's memory (`answer-the-question-asked`).
 
 ## Where We Need To Go
 
-- Fix-plan #34 and #36, when Rohan says go.
-- Decide whether to migrate existing installs off the old Google page view default.
+- Done 2026-10-21, uncommitted (tested against the real code, no DB): fix-plan #30 (visitor IP behind proxies), #34 (IP and user agent on GA4 server events), #36 (setup save no longer resets browser page view). Also #29, fixed differently: Google server-side now reaches visitors whose browser blocked Google's tag. The server creates the client ID as a `_ga` cookie that Google's tag adopts (on product, checkout and order-received pages, before the page is sent), and the browser helper no longer hangs (`domain-knowledge/platform-discoveries.md` § G-004).
 - Google strategy needs a plan: a tag gateway PHP relay, and the Data Manager API for Google Ads conversions. A planning session was proposed on 2026-10-20.
 - Still uncommitted from 2026-10-15:
   - `projects/fix-plan-2.6.13.md` and `projects/adoption-dropoff-investigation.md` (both untracked)

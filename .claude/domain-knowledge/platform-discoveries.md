@@ -232,6 +232,28 @@ cat "$EXPORT/functions/unipixel-functions.php" | php -l 2>&1
 
 ---
 
+### RQ-003: Host malware scanners quarantine obfuscated files, plugin then fatals (FIELD INCIDENT, 2026-10-14, OPEN)
+
+**Occurrence:** wp.org thread "Unable to activate the plugin" (aftab1003, sweetonic.pk, fresh install of 2.6.12). cPGuard quarantined `trackers/meta-enqueue.php` (7136 bytes, identical in every tag 2.5.3 to 2.6.12) as `Malware_Content`. `unipixel.php` loads every tracker with a bare `require_once`, so the missing file fatals and WordPress refuses activation ("Plugin could not be activated because it triggered a fatal error").
+
+**Likely trigger:** the `--encode-strings` obfuscation pass. Every `trackers/*-enqueue.php` ships a ~245-char hex-encoded JavaScript string fed to `wp_add_inline_script` (the "Platform tracking disabled" console line). Hex-encoded JS injected into front-end pages is the textbook signature of injected malware. The clean source has nothing a scanner would object to beyond the standard Meta noscript pixel. Not confirmed against cPGuard's rules (closed product); only meta was reported, but the other four enqueue files carry the same pattern.
+
+**Wider exposure:** if a scanner quarantines a file on a site where UniPixel is already active (signature update, nightly scan, auto-update), the same `require_once` fatals every page load, not just activation.
+
+**Policy angle:** wp.org Detailed Plugin Guideline 4 ("Code must be (mostly) human readable") says obscured code is not permitted in the directory and calls it "a common vector for hidden, malicious code". It also requires public access to source and build tools when shipping non-readable code. Hex-encoded strings are squarely in scope; a public "malware?" thread is the kind of thing that triggers a plugin review.
+
+**Priority (Rohan, 2026-10-15):** not a priority. Scanner quarantine is treated as the host/user's issue, not a plugin defect; any change to obfuscation is a separate decision for another time. Don't rank it alongside functional fixes.
+
+**Fix options (if ever decided):** drop `--encode-strings` from `FLAGS` in `_obf/obf.sh` (removes the trigger; the post-export "every PHP carries `\xNN`" check in `deploy-and-release.md` must change with it); optionally guard tracker includes so a missing file degrades with an admin notice instead of fataling.
+
+---
+
+### RQ-004: PHP 8 syntax shipped under `Requires PHP: 7.0`
+
+`admin/admin-wpmenu.php` uses a `match` expression (PHP 8.0+). It is loaded unconditionally via `admin/admin.php`, and has shipped since at least 2.1.0. The readme declares `Requires PHP: 7.0` and the plugin header declares nothing, so WordPress lets PHP 7.x sites activate and they get the same generic activation fatal as RQ-003. Per `api.wordpress.org/stats/php/1.0/` (2026-10), PHP 7.0-7.4 is ~20% of WordPress sites, and those failures never reach telemetry (the activation hook never runs). Fix: declare `Requires PHP: 8.0` in both `readme.txt` and the `unipixel.php` header so WordPress blocks with a clear message instead. Related: `$wpdb->prepare()` with `%i` needs WP 6.2+, but `Requires at least` is 5.0.
+
+---
+
 ## Google
 
 ### G-001: Mutual-exclusion rule for client-side vs server-side per event
@@ -251,7 +273,7 @@ cat "$EXPORT/functions/unipixel-functions.php" | php -l 2>&1
 
 **Gap: the guard is UI-only.** No save handler checks the rule (nor does the Google server listener), and the XOR only fires when a box is ticked, so any path that writes the flags directly can store both on. Cases:
 - **Fixed 2026-10-20 (fix-plan #21):** a clean install set Google PageView to browser + server, and the setup wizard posted `pageview_send_serverside: 1`. Harmless until Google server-side is switched on; from then on every page view went both ways. Both now default to browser only (`config/schema.php`, `admin/js/google-setup-wizard.js`). Existing installs keep whatever they have.
-- **Still open:** every setup-page save writes `pageview_send_clientside = 1` (`admin/handlers/handler-platform-settings.php` defaults it to 1 when the form doesn't send it, and the form never does), so a Google site set to server-only PageView goes back to both on save (fix-plan #36).
+- **Fixed 2026-10-21 (uncommitted, fix-plan #36):** every setup-page save wrote `pageview_send_clientside = 1` (`admin/handlers/handler-platform-settings.php` defaulted it to 1 when the form didn't send it, and the form never does), so a Google site set to server-only PageView went back to both on save. Now it's only written when posted.
 
 **Other platforms:** Meta, TikTok, Pinterest, Microsoft do **not** have this restriction. They support browser + CAPI on every event, with `event_id` (Meta/TikTok/Pinterest) as the dedup key.
 
@@ -265,7 +287,9 @@ _(No platform reports processed yet)_
 
 ## Microsoft
 
-_(No reports processed yet)_
+### MS-001: UET `ecomm_pagetype` is an enum; an invalid value throws in `bat.js` (VERIFIED 2026-10-15)
+
+Allowed values: `home`, `searchresults`, `category`, `product`, `cart`, `purchase`, `other`. UniPixel's begin_checkout sends `'checkout'`, and `bat.js` throws `Uncaught ecomm_pagetype value must be one of the allowed values`, so the event never leaves the browser. UET's variable revenue key is `revenue_value` (maps to `gv`), not `revenue`. UET also auto-sends `pageLoad` on load, so an extra custom `PageView` event plus a CAPI `pageLoad` double-counts page views. Fix tracked in `projects/fix-plan-2.6.13.md` (#11, #31).
 
 ---
 
@@ -284,9 +308,41 @@ _(No reports processed yet)_
 
 **Cross-reference:** `event-terminology.md` § Platform-specific quirks.
 
+### PIN-002: `event_id` passed in the callback slot, so browser/CAPI dedup never happens (VERIFIED 2026-10-15, OPEN)
+
+Every client-side Pinterest call is shaped `pintrk('track', name, payload, { event_id: ... })`: `clientfirst-watch-and-send-pinterest.js` and all four `woocomm-hook-handling/client-side-send-*.php` (Purchase included). Pinterest's 4th argument is a callback, so the console shows `Pinterest Tag Error: Expected '%s' to be a %s, but found '%s' callback function [object Object]` and the `event_id` is dropped. Verified on updev: the pagevisit beacon carried `ed=%7B%7D` (empty event data). The server-side event does carry `event_id`, so Pinterest can't pair them, and conversions sent both ways are likely double-counted. Present since at least the repo's initial commit (2026-04-19).
+
+**Fix:** put `event_id` inside the payload object (`pintrk('track', 'checkout', { event_id, value, currency, ... })`). While there, check payload keys against Pinterest's spec (`order_quantity`, `line_items`) rather than Meta-style `num_items` / `contents` / `content_ids`.
+
 ---
 
 ## Google
+
+### G-003: GA4 config runs before consent, no Consent Mode signals (CLAUDE'S CLAIM, 2026-10-15; Rohan disputes the principles, 2026-10-21)
+
+`js/pixel-google-gtag.js` calls `gtag('config', id, { send_page_view: false })` on every page load whenever Google is enabled, regardless of consent state, and nothing in the plugin ever calls `gtag('consent', ...)`. Observed on updev: `_ga` and `_ga_0DZLET9ZXH` cookies set before Accept (confounded by the theme's own GA tag, but the code path is clear). Consent gating only delays UniPixel's `page_view`, not the tag's cookies. This conflicts with the readme/marketing claim that tracking pauses until consent, and without Consent Mode v2 defaults Google limits ads measurement for EEA traffic.
+
+**Fix direction:** when consent honouring is on, push `gtag('consent', 'default', {... 'denied'})` before config and `gtag('consent', 'update', ...)` from the consent popup's grant/revoke.
+
+### G-004: Google server-side couldn't reach visitors whose browser blocked Google's tag (FIXED 2026-10-21, uncommitted)
+
+**Cause:** GA4 needs a `client_id` on every server event, and UniPixel only got one from Google's tag (the `_ga` cookie, or `gtag('get')` in the browser). With the tag blocked:
+- Page view and site events never reached the server: `resolveGoogleClientId()` (`js/clientfirst-watch-and-send-google-helper.js`) waited forever for a `gtag('get')` answer, because `window.gtag` is always UniPixel's stand-in and only Google's library answers. Observed in headless Chrome: still waiting after 8s.
+- WooCommerce events went out with an empty `client_id`, which GA4 discards.
+
+**Fix:** the browser helper stops waiting after 3s (`timeoutMs`) and falls back to the `_ga` cookie or `''` (observed: resolves after 3002ms). With no ID, the Google sender calls `unipixel_get_or_create_ga_client_id()` (`functions/unipixel-functions.php`), which creates an ID in Google's format and sets a host-only first-party `_ga` cookie: `GA1.1.<random>.<timestamp>`, two years, path `/`, Secure on HTTPS, SameSite=Lax.
+
+**Google's tag adopts an existing `_ga`** (verified in headless Chrome on updev, 2026-10-21): a preset on `.local.site` was used as-is; a host-only preset was used and copied to `.local.site` with the same ID. On a fresh visit Google's tag sets `GA1.1.<random>.<timestamp>` on the parent domain (`.local.site`).
+
+**Events built partway through a page:** once page output has started (`headers_sent()`, the norm on classic themes), the cookie can't be set. So `unipixel_ensure_ga_client_id_before_page()` (`functions/hooks.php`, on `template_redirect`) creates the ID at the start of product, checkout and order-received pages, covering View item, Begin checkout and Purchase. Small cost: a product page load for a visitor without a `_ga` cookie carries the cookie, and page caches usually won't store that load.
+
+**Limits:** An unreadable `_ga` is left alone. IDs are only created after the sender's consent check. These visitors appear in GA4 without browser-only data such as traffic source and session.
+
+### G-005: Measurement Protocol `client_id` must be `<number>.<number>` (VERIFIED 2026-10-21)
+
+Google's validation server in strict mode (`validation_behavior: ENFORCE_RECOMMENDATIONS`) rejects anything else: "client_id ... has invalid format. It should be in <number>.<number> format." The default (relaxed) check lets it through, so a payload can pass validation and still never show up. UniPixel's Test Connection sent `unipixel.test_connection.<letters>.<time>`, and its event never reached DebugView.
+
+**DebugView also needs `session_id` and `engagement_time_msec`** (observed 2026-10-21, dev property): with a valid client ID, an event with only `debug_mode: 1` never appeared, while one with `debug_mode: true`, `session_id` and `engagement_time_msec` showed within a minute. Test Connection now sends `<random>.<time>` plus those three params (`admin/handlers/handler-google-test-connection.php`, uncommitted), and its event arrived. Each test is a new client ID, so it shows as a new entry in DebugView's "Debug Device" dropdown and can take about a minute.
 
 ### G-002: GA4 event-name validation — INFORMATIONAL
 
@@ -318,3 +374,37 @@ _(No reports processed yet)_
 **Resolution:** Fixed in 2.6.11 (staged 2026-07-12) — front-end JS fully de-jQueryed (`unipixelOnReady` / `unipixelAjaxPost` helpers), `jquery` removed from `unipixel-common`'s dependency array. Verified on updev with WP jQuery deregistered to reproduce the steelchief condition: full chain enqueues and fires cleanly. steelchief.com.au heals when it updates to 2.6.11 — no site-side change needed.
 
 **Product hardening idea:** a diagnostics/Site Health check — "UniPixel front-end tracker did not load on this page (theme deregisters `jquery`)" — this failure is otherwise invisible on every surface (no console error, empty event log, config UI looks perfect).
+
+### WP-002: Full-page caching could serve stale nonces (THEORY, not observed on any real site)
+
+> **Status, corrected 2026-10-15:** only one piece is verified: WordPress rejects a `unipixel_track_nonce` older than 12-24h with `403 -1`. There is **no evidence** that any real UniPixel site serves cached pages old enough for this to happen. It was wrongly labelled "verified" and ranked as a top issue. Treat it as an unconfirmed theory until it's observed on a real cached site.
+
+**Source:** Public forum thread "Security and caching considerations" (2026-09-08, unresolved), reproduced on updev.
+
+**The failure mode:** every front-end AJAX endpoint (`ajax_data_for_server_event_{meta,pinterest,tiktok,google}`, `unipixel_ajax_server_event_microsoft`, `unipixel_log_client_event`) runs `check_ajax_referer()` against a nonce localized into the page HTML. WP nonces are valid for 12-24h. A page cache (LiteSpeed Cache default public TTL is 7 days, Cloudflare APO, host-level caches) keeps serving the old nonce, so once the cached HTML is over ~24h old, every server-side event from it returns `403 -1`. The browser pixel still fires; only CAPI dies, silently (the JS parses `-1` and logs "not sent" to the console logger only).
+
+**Verified:** logged-out nonces built 0-12h and 12-24h old returned 200; 24-36h and 36-48h old returned `403 -1` (Pinterest listener and client-event logger). WooCommerce's `nonce_user_logged_out` filter only applies to `woocommerce*` actions, so the failure is purely age-based.
+
+**Why it matters:** CAPI is the headline feature. A store on a cached host sees client events in Events Manager and no server events, with nothing in the admin to explain why. Top hypothesis in `projects/adoption-dropoff-investigation.md`.
+
+**Fix direction (see also `projects/fix-plan-2.6.13.md` #25):** don't gate the public tracking endpoints on a page-embedded nonce (a nonce on a public, unauthenticated endpoint adds no CSRF protection anyway). Alternatives: fetch a fresh nonce via an uncached request before sending, or move to a REST route with origin/referrer checks plus the 2.6.12 payload cap and rate limiting.
+
+### WP-003: Block themes run WooCommerce template hooks before `wp_enqueue_scripts` (VERIFIED 2026-10-15)
+
+Block themes render the whole template (`get_the_block_template_html()`) before `wp_head`, so `woocommerce_before_single_product` and `woocommerce_thankyou` fire before `wp_enqueue_scripts` has run. Any `wp_add_inline_script()` / `wp_localize_script()` against a handle registered in `wp_enqueue_scripts` (e.g. `unipixel-common`) returns false silently: no notice, no output. Verified on Twenty Twenty-Five (`unipixel_common_registered: false` at both hooks). Classic themes fire these hooks after `wp_head`, so the same code works there (verified on `buildio2`: hook ran with `unipixel-common` registered, browser ViewContent fired for Meta/Pinterest/GA with `eid` matching the server event). Only block-theme stores are affected. Pattern for anything added from a template hook: if `!did_action('wp_enqueue_scripts')`, queue it and attach on `wp_enqueue_scripts` at a late priority.
+
+### WP-004: "Non-blocking" `wp_remote_post` still blocks for the full round trip, up to 1s (VERIFIED 2026-10-15)
+
+WP's Requests cURL transport floors any timeout to 1 second (`Requests/src/Transport/Curl.php`: "cURL requires a minimum timeout of 1 second") and `curl_exec` is synchronous even with `blocking => false`. Measured from the dev laptop: `blocking=false, timeout=0.1` waited 0.34s (Meta) and 0.71s (Microsoft), the same as `blocking=true`. So every "fire-and-forget" call made during page render adds its full network round trip to TTFB. Truly deferring a call needs `fastcgi_finish_request()` / `litespeed_finish_request()` on `shutdown`, or Action Scheduler.
+
+### WP-005: WordPress 7 checkbox styles wipe Bootstrap's switch circle (VERIFIED 2026-10-21)
+
+WordPress 7's `wp-admin/css/forms.css` sets `input[type="checkbox"]:checked { background: var(--wp-admin-theme-color) }`. The `background` shorthand resets `background-image`, which is how Bootstrap 5.3 draws the switch circle, so ticked UniPixel switches showed a plain blue pill. Fixed in `admin/css/admin.css` by putting back `background-image: var(--bs-form-switch-bg)` and `background-size: contain` on ticked `.form-switch` inputs (uncommitted). Checked in headless Chrome and on the real Google setup page.
+
+## Consent vendors
+
+### CONSENT-001: Third-party CMP cookie formats (VERIFIED 2026-10-15)
+
+- **OneTrust** (`OptanonConsent`): `groups=C0001:1,C0002:1,C0003:1,C0004:0,C0005:0`. Standard IDs: C0001 Strictly Necessary (always 1), C0002 Performance, C0003 Functional, C0004 Targeting (= marketing), C0005 Social Media. Stores can rename groups, so IDs should be configurable. UniPixel maps C0001 to marketing (bug, fix-plan #3).
+- **Cookiebot** (`CookieConsent`): a JavaScript object literal, not JSON: `{stamp:'...',necessary:true,preferences:true,statistics:true,marketing:true,method:'explicit',ver:1,...}`. `JSON.parse` / `json_decode` fail on it; parse with a regex (fix-plan #5).
+- **Moove GDPR** (`moove_gdpr_popup`): URL-encoded JSON (`{"strict":"1","thirdparty":"1","advanced":"0"}`); decode it as JSON, don't split on `,`/`:`.

@@ -98,7 +98,7 @@ function unipixel_send_server_event_google(
 
     // Build event info
     $eventInfoPayloadArr = [
-        'client_id' => $user_data['client_id'] ?? '',
+        'client_id' => !empty($user_data['client_id']) ? $user_data['client_id'] : unipixel_get_or_create_ga_client_id(),
         'events'    => [[
             'name'   => $event_name,
             'params' => array_merge($custom_data, [
@@ -107,6 +107,16 @@ function unipixel_send_server_event_google(
             ]),
         ]],
     ];
+
+    // Visitor's IP and user agent, so GA4 can place the event and its device
+    $ip_address = !empty($user_data['client_ip_address']) ? $user_data['client_ip_address'] : unipixel_get_ip_address();
+    $user_agent = !empty($user_data['client_user_agent']) ? $user_data['client_user_agent'] : sanitize_text_field($_SERVER['HTTP_USER_AGENT'] ?? '');
+    if (!empty($ip_address)) {
+        $eventInfoPayloadArr['ip_override'] = $ip_address;
+    }
+    if ($user_agent !== '') {
+        $eventInfoPayloadArr['user_agent'] = $user_agent;
+    }
 
     // Attach the visitor's GA4 session so the event keeps the visit's traffic source
     $ga_session_id = unipixel_get_ga4_session_id($measurement_id);
