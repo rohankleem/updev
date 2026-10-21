@@ -4,7 +4,7 @@ Tags: meta conversion api, pinterest conversions api, server-side tracking, tikt
 Requires at least: 5.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.6.13
+Stable tag: 2.6.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -155,6 +155,14 @@ For more details on privacy policies and terms of use, please visit the followin
 
 
 == Changelog ==
+
+= 2.6.14 =
+* Improvement: Google server-side tracking now works for visitors whose browsers block Google's tag.
+* Improvement: Google server-side events now include visitor location and device details.
+* Improvement: More accurate visitor matching on sites behind Cloudflare or other CDNs.
+* Improvement: Google page views now default to browser-only tracking, avoiding double counting.
+* Fix: Google "Test Connection" events now appear in GA4 DebugView, with clearer instructions.
+* Improvement: Admin UI improvements, including a show/hide button for API keys and refreshed branding.
 
 = 2.6.13 =
 * Fix: Reliability improvements to WooCommerce purchase tracking, including order confirmation pages.

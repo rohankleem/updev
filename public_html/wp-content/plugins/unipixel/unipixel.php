@@ -6,7 +6,7 @@
  * Plugin Name: UniPixel
  * Plugin URI: https://unipixelhq.com
  * Description: Server-side event tracking for Meta, Pinterest, TikTok, Google and Microsoft. One install to connect your site with event tracking APIs. Includes custom events and consent.
- * Version: 2.6.13
+ * Version: 2.6.14
  * Requires PHP: 8.0
  * Author: Buildio
  * Author URI: https://buildio.dev/
@@ -16,7 +16,7 @@
 
 defined('ABSPATH') or die('Direct script access disallowed.');
 
-define('UNIPIXEL_VERSION', '2.6.13');
+define('UNIPIXEL_VERSION', '2.6.14');
 
 
 require_once plugin_dir_path(__FILE__) . 'config/schema.php'; 
