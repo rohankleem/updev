@@ -4,6 +4,8 @@ How we verify the UniPixel plugin behaves correctly. Lives separately from app-k
 
 The browser agent (Claude in Chrome) executes most flows directly. Things that need platform login (Meta Events Manager, GA, etc.) are flagged as human spot-checks.
 
+**Browser caveat (2026-10-15):** the Claude desktop app's built-in browser pane blocks every subresource on `updev.local.site` (`ERR_BLOCKED_BY_CLIENT`), so front-end flows can't run there. Use Claude in Chrome, or headless Chrome over the DevTools protocol (`cdp-smoke.mjs`, see `projects/adoption-dropoff-investigation.md` § Test tooling). With headless Chrome, override the user agent: Meta's pixel ignores `HeadlessChrome` and sends no `facebook.com/tr` beacon.
+
 ## Verification surfaces
 
 What the agent can read to verify behaviour, in order of preference:
@@ -29,16 +31,16 @@ Most flows depend on a specific admin configuration (which platforms are enabled
 
 | Approach | When to use |
 |---|---|
-| **PHP via WP bootstrap** (`/c/xampp/php/php.exe -r '...wp-load.php; update_option(...)'`) | **Default on this dev box.** WP CLI is not installed and the bundled MariaDB mysql client throws `caching_sha2_password.dll` on connect. PHP+wp-load is the only working path; verified 2026-05-03. |
+| **PHP via WP bootstrap** (`/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php -r '...wp-load.php; update_option(...)'`) | **Default on this dev box.** WP CLI is not installed. PHP+wp-load is the working path (verified on XAMPP 2026-05-03, on Laragon 2026-10-15). The dev box moved from XAMPP (`C:\xampp\htdocs\updev`) to Laragon (`C:\laragon\www\updev`); Apache + MySQL 8.4 must be started in Laragon first. |
 | **Click through admin UI** (browser agent) | Only when testing the admin UI itself (e.g. `admin-pixel-config` flow). Otherwise too slow + fragile. |
 | **WP CLI / `mysql` client** | Add to allowlist + paths if/when installed; the docs reference these for completeness, but treat them as future state, not current. |
 
 **PHP one-shot template (read state):**
 ```bash
-/c/xampp/php/php.exe -r "
+/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php -r "
 \$_SERVER['HTTP_HOST']='updev.local.site';
 \$_SERVER['REQUEST_URI']='/';
-require 'C:/xampp/htdocs/updev/public_html/wp-load.php';
+require 'C:/laragon/www/updev/public_html/wp-load.php';
 global \$wpdb;
 \$p = \$wpdb->prefix;  // wx4gk_, NOT wp_
 print_r(\$wpdb->get_results(\"SELECT * FROM {\$p}unipixel_platform_settings\", ARRAY_A));
@@ -47,10 +49,10 @@ print_r(\$wpdb->get_results(\"SELECT * FROM {\$p}unipixel_platform_settings\", A
 
 **PHP one-shot template (mutate option, snapshot original first):**
 ```bash
-/c/xampp/php/php.exe -r "
+/c/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php -r "
 \$_SERVER['HTTP_HOST']='updev.local.site';
 \$_SERVER['REQUEST_URI']='/';
-require 'C:/xampp/htdocs/updev/public_html/wp-load.php';
+require 'C:/laragon/www/updev/public_html/wp-load.php';
 \$orig = get_option('unipixel_logging_options');
 file_put_contents('C:/tmp/snap.json', json_encode(\$orig));
 \$new = \$orig; \$new['enableLogging_SendEvents'] = true;

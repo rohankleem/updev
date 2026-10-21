@@ -91,6 +91,8 @@ Rolling and fresh. Only keep what's still loaded / still relevant. Git log is th
 - Action out-of-scope changes without approval
 - Add unnecessary comments, docblocks, or type annotations to unchanged code
 - Over-engineer solutions — keep it simple
+- **Use PHP or WordPress features above the plugin's declared minimums** (`Requires PHP` / `Requires at least` in `readme.txt` and the `unipixel.php` header). Raising a minimum is a product decision for Rohan, made explicitly (headers + changelog), never a side effect of a code change. Precedent: a single PHP 8 `match` expression shipped in 2.1.0 while the readme declared PHP 7.0, so every PHP 7.x site crashed on activation for a year (RQ-004).
+- **Call a product decision a bug.** When code and its declared requirements disagree, say which one is wrong and why, or present it as a choice.
 - Create new files when editing existing ones would work
 - **Chain compound bash commands across different permission rules.** Claude Code parses shell operators (`&&`, `||`, `;`, `|`) and permission-checks each segment separately. Default to one logical command per Bash call; only chain when all segments share an allowed pattern or the chain is truly atomic.
 
@@ -144,6 +146,8 @@ CLAUDE.md                                    ← You are here. Operating manual.
 │   ├── consent-popup-i18n.md                ← Feature spec (not started) — multi-language + editable consent popup.
 │   ├── centralised-event-builder.md         ← 3-phase feature: URL trigger → event name dropdowns → conversion builder + grouping.
 │   ├── github-info-repo.md                  ← Public GitHub presence at `github.com/unipixelhq` — info-only repo, decisions, current state, flag situation, per-release maintenance.
+│   ├── adoption-dropoff-investigation.md    ← Why downloads/activations/retention look down: data sources and their limits, test findings, ranked hypotheses, reusable test tooling.
+│   ├── fix-plan-2.6.13.md                   ← Validated problems ranked by harm vs fix risk (Tier 1 low-risk first), with evidence, fixes and a re-test checklist.
 │   └── token-acquisition-ux.md              ← Cross-platform token-acquisition initiative. Wizard, Test Connection button, per-platform status indicators. Origin: Moisés support 2026-05-12. Bundles #8, #30. Subsumes #1.
 └── testing/                                 ← Verification flows. Browser-agent-executable test specs.
     ├── testing.md                           ← Methodology, verification surfaces, index of all flows.
